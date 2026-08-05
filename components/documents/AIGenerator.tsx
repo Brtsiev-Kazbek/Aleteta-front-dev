@@ -137,13 +137,13 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                 exit={{ opacity: 0, y: -8, height: 0 }}
                 className="mb-6 flex flex-col items-center text-center"
               >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 shadow-sm">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-violet-500 shadow-sm">
                   <Sparkles className="h-5 w-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
+                <h2 className="text-2xl font-semibold tracking-tight text-stone-900">
                   Что будем писать сегодня?
                 </h2>
-                <p className="mt-2 max-w-md text-sm text-zinc-500">
+                <p className="mt-2 max-w-md text-sm text-stone-500">
                   Опишите документ своими словами — Алетейя составит его
                   целиком, со структурой, реквизитами и юридическими
                   формулировками.
@@ -157,8 +157,8 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
             className={cn(
               "rounded-xl border bg-white p-4 shadow-sm transition-colors",
               prompt.trim()
-                ? "border-indigo-200 ring-2 ring-indigo-100"
-                : "border-zinc-200"
+                ? "border-violet-200 ring-2 ring-violet-100"
+                : "border-stone-200"
             )}
           >
             <AutoGrowTextarea
@@ -174,8 +174,8 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
               disabled={stage === "thinking" || stage === "typing"}
             />
 
-            <div className="mt-3 flex items-center justify-between gap-3 border-t border-zinc-100 pt-3">
-              <span className="text-xs text-zinc-400">
+            <div className="mt-3 flex items-center justify-between gap-3 border-t border-stone-100 pt-3">
+              <span className="text-xs text-stone-400">
                 Enter — сгенерировать, Shift+Enter — новая строка
               </span>
               <Button
@@ -200,7 +200,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                   key={item}
                   type="button"
                   onClick={() => setPrompt(item)}
-                  className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-600 transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                  className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-600 transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
                 >
                   {item}
                 </button>
@@ -215,10 +215,10 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
+                className="mt-6 rounded-xl border border-stone-200 bg-white p-6 shadow-sm"
               >
-                <div className="flex items-center gap-2 text-sm text-zinc-500">
-                  <Sparkles className="h-4 w-4 animate-pulse text-indigo-600" />
+                <div className="flex items-center gap-2 text-sm text-stone-500">
+                  <Sparkles className="h-4 w-4 animate-pulse text-violet-600" />
                   Алетейя составляет документ…
                 </div>
 
@@ -234,7 +234,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                   ].map((width, index) => (
                     <motion.div
                       key={width + index}
-                      className="h-3 rounded-full bg-zinc-100"
+                      className="h-3 rounded-full bg-stone-100"
                       style={{ width }}
                       animate={{ opacity: [0.45, 1, 0.45] }}
                       transition={{
@@ -254,15 +254,15 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm"
+              className="mt-6 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm"
             >
-              <div className="flex items-center gap-2 border-b border-zinc-200 bg-zinc-50/60 px-5 py-3">
-                <Sparkles className="h-4 w-4 text-indigo-600" />
-                <span className="text-sm font-medium text-zinc-900">
+              <div className="flex items-center gap-2 border-b border-stone-200 bg-stone-50/60 px-5 py-3">
+                <Sparkles className="h-4 w-4 text-violet-600" />
+                <span className="text-sm font-medium text-stone-900">
                   Сгенерированный документ
                 </span>
                 {stage === "typing" && (
-                  <span className="ml-auto text-xs text-zinc-400">
+                  <span className="ml-auto text-xs text-stone-400">
                     печатает…
                   </span>
                 )}
@@ -279,13 +279,13 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="flex flex-wrap items-center gap-2 border-t border-zinc-200 bg-zinc-50/60 px-5 py-3.5"
+                  className="flex flex-wrap items-center gap-2 border-t border-stone-200 bg-stone-50/60 px-5 py-3.5"
                 >
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleCopy}
-                    className="gap-1.5 border-zinc-200 bg-white"
+                    className="gap-1.5 border-stone-200 bg-white"
                   >
                     {copied ? (
                       <Check className="h-3.5 w-3.5 text-emerald-600" />
@@ -299,7 +299,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                     variant="outline"
                     size="sm"
                     onClick={handleSaveDocx}
-                    className="gap-1.5 border-zinc-200 bg-white"
+                    className="gap-1.5 border-stone-200 bg-white"
                   >
                     <FileDown className="h-3.5 w-3.5" />
                     Сохранить в DOCX
@@ -314,7 +314,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                     variant="ghost"
                     size="sm"
                     onClick={reset}
-                    className="ml-auto gap-1.5 text-zinc-500 hover:text-zinc-900"
+                    className="ml-auto gap-1.5 text-stone-500 hover:text-stone-900"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
                     Заново
@@ -347,14 +347,14 @@ function MarkdownDocument({
       {lines.map((line, index) => {
         const isLast = index === lines.length - 1;
         const caret = showCaret && isLast && (
-          <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-indigo-600 align-middle" />
+          <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse bg-violet-600 align-middle" />
         );
 
         if (line.startsWith("## ")) {
           return (
             <h3
               key={index}
-              className="mt-3 text-sm font-semibold uppercase tracking-wide text-zinc-900"
+              className="mt-3 text-sm font-semibold uppercase tracking-wide text-stone-900"
             >
               {line.slice(3)}
               {caret}
@@ -366,7 +366,7 @@ function MarkdownDocument({
           return (
             <h2
               key={index}
-              className="text-center text-base font-semibold tracking-tight text-zinc-900"
+              className="text-center text-base font-semibold tracking-tight text-stone-900"
             >
               {line.slice(2)}
               {caret}
@@ -379,7 +379,7 @@ function MarkdownDocument({
         }
 
         return (
-          <p key={index} className="text-sm leading-relaxed text-zinc-700">
+          <p key={index} className="text-sm leading-relaxed text-stone-700">
             {line}
             {caret}
           </p>

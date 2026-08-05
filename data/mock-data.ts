@@ -173,6 +173,77 @@ export const INITIAL_CHAT_MESSAGES: ChatMessage[] = [
   },
 ];
 
+export type ActivityKind = "upload" | "ai" | "edit" | "create" | "generate";
+
+export interface ActivityItem {
+  id: string;
+  caseId: string;
+  kind: ActivityKind;
+  text: string;
+  actor: string;
+  at: string;
+}
+
+/** Лента действий по делу — кто и что менял. */
+export const CASE_ACTIVITY: ActivityItem[] = [
+  {
+    id: "act-1",
+    caseId: "case-1",
+    kind: "ai",
+    text: "Ассистент распознал реквизиты в выписке ЕГРН",
+    actor: "Алетейя",
+    at: "2026-08-01T15:46:00.000Z",
+  },
+  {
+    id: "act-2",
+    caseId: "case-1",
+    kind: "upload",
+    text: "Загружен файл «Межевой план.pdf»",
+    actor: "Казбек Б.",
+    at: "2026-08-01T15:45:00.000Z",
+  },
+  {
+    id: "act-3",
+    caseId: "case-1",
+    kind: "edit",
+    text: "Изменено назначение земель у участка №12",
+    actor: "Казбек Б.",
+    at: "2026-07-30T13:22:00.000Z",
+  },
+  {
+    id: "act-4",
+    caseId: "case-1",
+    kind: "create",
+    text: "Дело создано",
+    actor: "Казбек Б.",
+    at: "2026-07-28T09:00:00.000Z",
+  },
+  {
+    id: "act-5",
+    caseId: "case-2",
+    kind: "upload",
+    text: "Загружено техническое задание",
+    actor: "Казбек Б.",
+    at: "2026-07-15T12:00:00.000Z",
+  },
+  {
+    id: "act-6",
+    caseId: "case-2",
+    kind: "create",
+    text: "Дело создано",
+    actor: "Казбек Б.",
+    at: "2026-07-15T11:30:00.000Z",
+  },
+  {
+    id: "act-7",
+    caseId: "case-3",
+    kind: "create",
+    text: "Дело создано",
+    actor: "Казбек Б.",
+    at: "2026-06-02T08:15:00.000Z",
+  },
+];
+
 export const SUGGESTED_PROMPTS: string[] = [
   "Найти ИНН в файлах",
   "Проверить риски",
@@ -251,6 +322,26 @@ export const REVIEW_RISKS: DocumentRisk[] = [
     recommendation:
       "Добавить: «За нарушение сроков оплаты Покупатель уплачивает неустойку в размере 0,1% от неоплаченной суммы за каждый день просрочки».",
     paragraphId: "p-5",
+    practice: [
+      {
+        id: "cp-1",
+        court: "Верховный Суд РФ",
+        number: "305-ЭС21-11556",
+        year: "2021",
+        holding:
+          "Общая отсылка к закону не заменяет согласованный размер неустойки: взыскание возможно только по ст. 395 ГК РФ по ключевой ставке.",
+        side: "against",
+      },
+      {
+        id: "cp-2",
+        court: "АС Северо-Кавказского округа",
+        number: "А61-4412/2022",
+        year: "2022",
+        holding:
+          "Договорная неустойка, согласованная сторонами, взыскивается без доказывания размера убытков.",
+        side: "favor",
+      },
+    ],
   },
   {
     id: "risk-2",
@@ -261,6 +352,26 @@ export const REVIEW_RISKS: DocumentRisk[] = [
     recommendation:
       "Указать кадастровый номер 15:09:0000000:0000 непосредственно в предмете договора.",
     paragraphId: "p-1",
+    practice: [
+      {
+        id: "cp-3",
+        court: "Верховный Суд РФ",
+        number: "307-ЭС20-2237",
+        year: "2020",
+        holding:
+          "Отсутствие кадастрового номера при наличии иных идентифицирующих признаков не влечёт незаключённости договора.",
+        side: "favor",
+      },
+      {
+        id: "cp-4",
+        court: "АС Московского округа",
+        number: "А40-118923/2021",
+        year: "2021",
+        holding:
+          "Регистрация приостановлена: описание объекта не позволяло однозначно установить предмет сделки.",
+        side: "against",
+      },
+    ],
   },
   {
     id: "risk-3",

@@ -3,16 +3,16 @@ import { RecentCases } from "@/components/dashboard/RecentCases";
 
 export default function CasesPage() {
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50">
+    <div className="flex h-screen overflow-hidden bg-stone-50">
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-8 py-10">
           <header className="flex flex-col gap-1.5">
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+            <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
               Все дела
             </h1>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-stone-500">
               Рабочие пространства с файлами, сущностями и массовой генерацией.
             </p>
           </header>

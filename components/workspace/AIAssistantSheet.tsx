@@ -61,7 +61,7 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
       <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
         <SheetHeader>
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-500">
               <Sparkles className="h-4 w-4 text-white" />
             </div>
             <SheetTitle>Алетейя AI</SheetTitle>
@@ -69,7 +69,7 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
 
           <SheetDescription asChild>
             <div className="pl-[42px]">
-              <span className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs text-zinc-600">
+              <span className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-stone-200 bg-stone-50 px-2 py-1 text-xs text-stone-600">
                 <FileText className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate">Контекст: {contextFile}</span>
               </span>
@@ -93,7 +93,7 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
                   )}
                 >
                   {message.role === "assistant" && (
-                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500">
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-500">
                       <Sparkles className="h-3.5 w-3.5 text-white" />
                     </div>
                   )}
@@ -108,8 +108,8 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
                       className={cn(
                         "rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
                         message.role === "assistant"
-                          ? "rounded-tl-sm bg-zinc-100 text-zinc-900"
-                          : "rounded-tr-sm bg-indigo-600 text-white"
+                          ? "rounded-tl-sm bg-stone-100 text-stone-900"
+                          : "rounded-tr-sm bg-violet-600 text-white"
                       )}
                     >
                       {message.text}
@@ -134,14 +134,14 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-start gap-2.5"
               >
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-500">
                   <Sparkles className="h-3.5 w-3.5 text-white" />
                 </div>
-                <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm bg-zinc-100 px-4 py-3.5">
+                <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm bg-stone-100 px-4 py-3.5">
                   {[0, 1, 2].map((dot) => (
                     <motion.span
                       key={dot}
-                      className="h-1.5 w-1.5 rounded-full bg-zinc-400"
+                      className="h-1.5 w-1.5 rounded-full bg-stone-400"
                       animate={{ opacity: [0.3, 1, 0.3] }}
                       transition={{
                         duration: 1.1,
@@ -159,7 +159,7 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
         </ScrollArea>
 
         {/* Умный инпут */}
-        <div className="flex flex-col gap-2.5 border-t border-zinc-200 px-5 py-4">
+        <div className="flex flex-col gap-2.5 border-t border-stone-200 px-5 py-4">
           <div className="flex flex-wrap gap-1.5">
             {SUGGESTED_PROMPTS.map((prompt) => (
               <button
@@ -167,7 +167,7 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
                 type="button"
                 onClick={() => handleSend(prompt)}
                 disabled={isThinking}
-                className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-600 transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 disabled:opacity-50"
+                className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-600 transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 disabled:opacity-50"
               >
                 {prompt}
               </button>
@@ -185,13 +185,13 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
                 }
               }}
               placeholder="Спросите Алетейю о деле…"
-              className="h-11 w-full rounded-xl border border-zinc-200 bg-white pl-4 pr-12 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+              className="h-11 w-full rounded-xl border border-stone-200 bg-white pl-4 pr-12 text-sm text-stone-900 outline-none transition-colors placeholder:text-stone-400 focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
             />
             <button
               type="button"
               onClick={() => handleSend(draft)}
               disabled={!draft.trim() || isThinking}
-              className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-indigo-600 text-white transition-colors hover:bg-indigo-700 disabled:bg-zinc-200 disabled:text-zinc-400"
+              className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-violet-600 text-white transition-colors hover:bg-violet-700 disabled:bg-stone-200 disabled:text-stone-400"
               aria-label="Отправить сообщение"
             >
               <ArrowUp className="h-4 w-4" />
@@ -233,11 +233,11 @@ function FindingCard({
             >
               {meta.label}
             </span>
-            <span className="text-xs text-zinc-500">{finding.clause}</span>
+            <span className="text-xs text-stone-500">{finding.clause}</span>
           </div>
 
-          <p className="text-sm font-medium text-zinc-900">{finding.title}</p>
-          <p className="text-sm leading-relaxed text-zinc-600">
+          <p className="text-sm font-medium text-stone-900">{finding.title}</p>
+          <p className="text-sm leading-relaxed text-stone-600">
             {finding.description}
           </p>
         </div>

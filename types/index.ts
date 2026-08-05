@@ -339,6 +339,17 @@ export interface ContractParagraph {
   text: string;
 }
 
+/** Судебный акт, найденный по спорному пункту договора. */
+export interface CourtPractice {
+  id: string;
+  court: string;
+  number: string;
+  year: string;
+  holding: string;
+  /** Трактует ли суд условие против вас или в вашу пользу. */
+  side: "against" | "favor";
+}
+
 export interface DocumentRisk {
   id: string;
   level: RiskLevel;
@@ -347,6 +358,16 @@ export interface DocumentRisk {
   recommendation: string;
   /** id абзаца в левой панели, который подсвечивается при клике. */
   paragraphId: string;
+  /** Практика по этому пункту — подбирается автоматически. */
+  practice?: CourtPractice[];
+}
+
+/** Результат проверки одного документа в пакетном разборе. */
+export interface BatchReviewResult {
+  documentId: string;
+  title: string;
+  critical: number;
+  warning: number;
 }
 
 /* ------------------------------------------------------------------ */

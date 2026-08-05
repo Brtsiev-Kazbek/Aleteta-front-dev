@@ -11,6 +11,7 @@ import { plural } from "@/lib/utils";
 import { findSchema, withValidation } from "@/lib/validation";
 import {
   CUSTOM_REQUEST_GROUP,
+  type BatchReviewResult,
   type Case,
   type ChatMessage,
   type Document,
@@ -80,6 +81,13 @@ interface AppState {
   bulkProgress: number;
   bulkResults: BulkGenerationResult[];
 
+  /* --- Пакетная проверка документов на риски --- */
+  selectedDocumentIds: string[];
+  isBatchReviewOpen: boolean;
+  batchReviewStatus: GenerationStatus;
+  batchReviewProgress: number;
+  batchReviewResults: BatchReviewResult[];
+
   /* --- Оболочка --- */
   isSidebarExpanded: boolean;
   isCreateCaseOpen: boolean;
@@ -89,6 +97,7 @@ interface AppState {
   updateEntityField: (entityId: string, field: string, value: string) => void;
   addEntity: (caseId: string, typeId: string) => void;
   deleteEntity: (entityId: string) => void;
+  duplicateEntity: (entityId: string) => void;
   setEditingCell: (cell: EditingCell | null) => void;
 
   /** Создаёт пользовательский тип и сразу добавляет сущность этого типа. */
@@ -110,6 +119,11 @@ interface AppState {
   setGenerationSheetOpen: (open: boolean) => void;
   /** Документ по произвольному текстовому запросу, вне шаблонов. */
   generateCustomDocument: (caseId: string, prompt: string) => void;
+
+  toggleDocumentSelection: (documentId: string) => void;
+  clearDocumentSelection: () => void;
+  startBatchReview: (caseId: string) => void;
+  setBatchReviewOpen: (open: boolean) => void;
 
   toggleCaseSelection: (caseId: string) => void;
   toggleAllCases: (caseIds: string[]) => void;
@@ -158,6 +172,16 @@ function stopGenerationTimer() {
   if (generationTimerId !== null) {
     window.clearInterval(generationTimerId);
     generationTimerId = null;
+  }
+}
+
+/** Таймер пакетной проверки документов на риски. */
+let batchReviewTimerId: number | null = null;
+
+function stopBatchReviewTimer() {
+  if (batchReviewTimerId !== null) {
+    window.clearInterval(batchReviewTimerId);
+    batchReviewTimerId = null;
   }
 }
 
@@ -226,6 +250,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   bulkStatus: "idle",
   bulkProgress: 0,
   bulkResults: [],
+
+  selectedDocumentIds: [],
+  isBatchReviewOpen: false,
+  batchReviewStatus: "idle",
+  batchReviewProgress: 0,
+  batchReviewResults: [],
 
   isSidebarExpanded: false,
   isCreateCaseOpen: false,
@@ -337,6 +367,30 @@ export const useAppStore = create<AppState>((set, get) => ({
       editingCell:
         get().editingCell?.entityId === entityId ? null : get().editingCell,
     });
+  },
+
+  duplicateEntity: (entityId) => {
+    const source = get().entities.find((entity) => entity.id === entityId);
+    if (!source) return;
+
+    const schema = findSchema(get().customSchemas, source.type);
+    // Имя берём из первого поля схемы: у своих типов ключа `name` нет.
+    const nameKey = schema.fields[0]?.key;
+    const data = { ...source.data };
+    if (nameKey && data[nameKey]) {
+      data[nameKey] = `${data[nameKey]} (копия)`;
+    }
+
+    const copy = withValidation(
+      { ...source, id: nextId("entity"), data },
+      schema
+    );
+
+    const index = get().entities.findIndex((entity) => entity.id === entityId);
+    const entities = [...get().entities];
+    entities.splice(index + 1, 0, copy);
+
+    set({ entities });
   },
 
   setEditingCell: (cell) => set({ editingCell: cell }),
@@ -608,6 +662,72 @@ export const useAppStore = create<AppState>((set, get) => ({
         ],
       });
     }, 1400);
+  },
+
+  toggleDocumentSelection: (documentId) => {
+    const selected = get().selectedDocumentIds;
+    set({
+      selectedDocumentIds: selected.includes(documentId)
+        ? selected.filter((id) => id !== documentId)
+        : [...selected, documentId],
+    });
+  },
+
+  clearDocumentSelection: () => set({ selectedDocumentIds: [] }),
+
+  setBatchReviewOpen: (open) => {
+    if (!open) stopBatchReviewTimer();
+    set({
+      isBatchReviewOpen: open,
+      ...(open ? {} : { batchReviewStatus: "idle", batchReviewProgress: 0 }),
+    });
+  },
+
+  startBatchReview: (caseId) => {
+    if (get().batchReviewStatus === "running") return;
+
+    const selected = get().selectedDocumentIds;
+    const targets = get().documents.filter(
+      (item) => item.caseId === caseId && selected.includes(item.id)
+    );
+    if (targets.length === 0) return;
+
+    stopBatchReviewTimer();
+    set({
+      isBatchReviewOpen: true,
+      batchReviewStatus: "running",
+      batchReviewProgress: 0,
+      batchReviewResults: [],
+    });
+
+    batchReviewTimerId = window.setInterval(() => {
+      const progress = get().batchReviewProgress + 13;
+
+      if (progress < 100) {
+        set({ batchReviewProgress: progress });
+        return;
+      }
+
+      stopBatchReviewTimer();
+
+      // Демо-разбор: количество замечаний выводится детерминированно из имени,
+      // чтобы результат не «прыгал» при каждом повторном запуске.
+      const results: BatchReviewResult[] = targets.map((document, index) => {
+        const seed = document.title.length + index;
+        return {
+          documentId: document.id,
+          title: document.title,
+          critical: seed % 3 === 0 ? 1 : 0,
+          warning: (seed % 3) + 1,
+        };
+      });
+
+      set({
+        batchReviewProgress: 100,
+        batchReviewStatus: "done",
+        batchReviewResults: results,
+      });
+    }, 140);
   },
 
   toggleCaseSelection: (caseId) => {

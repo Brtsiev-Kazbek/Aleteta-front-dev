@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, CalendarDays, Layers } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CaseSelectionBar } from "@/components/dashboard/CaseSelectionBar";
@@ -28,7 +27,7 @@ export function RecentCases() {
     <>
       {/* Выбор всех дел для массовой генерации */}
       <div className="mb-3 flex items-center gap-2">
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-500 transition-colors hover:text-zinc-900">
+        <label className="flex cursor-pointer items-center gap-2 text-xs text-stone-500 transition-colors hover:text-stone-900">
           <Checkbox
             checked={allSelected}
             onCheckedChange={() => toggleAllCases(allIds)}
@@ -38,7 +37,7 @@ export function RecentCases() {
         </label>
 
         {selectedCaseIds.length > 0 && (
-          <span className="rounded-md border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+          <span className="rounded-md border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700">
             Выбрано: {selectedCaseIds.length}
           </span>
         )}
@@ -63,10 +62,10 @@ export function RecentCases() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: index * 0.06 }}
             className={cn(
-              "flex flex-col rounded-xl border bg-white p-5 shadow-sm transition-all",
+              "flex flex-col rounded-2xl border bg-white p-6 transition-all duration-300",
               isSelected
-                ? "border-indigo-300 ring-2 ring-indigo-100"
-                : "border-zinc-200 hover:shadow-md"
+                ? "border-violet-300 ring-2 ring-violet-100"
+                : "border-stone-200 hover:-translate-y-1 hover:shadow-lg"
             )}
           >
             <div className="flex items-start justify-between gap-3">
@@ -77,9 +76,11 @@ export function RecentCases() {
                   aria-label={`Выбрать дело «${caseItem.title}»`}
                 />
 
-                <Badge
-                  variant="outline"
-                  className={cn("gap-1.5", statusMeta.badgeClassName)}
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium tracking-wide",
+                    statusMeta.badgeClassName
+                  )}
                 >
                   <span
                     className={cn(
@@ -88,7 +89,7 @@ export function RecentCases() {
                     )}
                   />
                   {statusMeta.label}
-                </Badge>
+                </span>
               </div>
 
               {invalidCount > 0 && (
@@ -99,26 +100,26 @@ export function RecentCases() {
               )}
             </div>
 
-            <h3 className="mt-3.5 line-clamp-2 text-sm font-semibold leading-snug text-zinc-900">
+            <h3 className="mt-4 line-clamp-2 text-[15px] font-medium leading-snug tracking-[-0.01em] text-stone-900">
               {caseItem.title}
             </h3>
 
-            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-zinc-500">
+            <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-stone-500">
               {caseItem.description}
             </p>
 
-            <div className="mt-3.5 flex flex-wrap gap-1.5">
+            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
               {caseItem.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[10px] text-zinc-500"
+                  className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400"
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            <div className="mt-4 flex items-center gap-4 border-t border-zinc-100 pt-3.5 text-xs text-zinc-400">
+            <div className="mt-4 flex items-center gap-4 border-t border-stone-100 pt-3.5 text-xs text-stone-400">
               <span className="inline-flex items-center gap-1.5">
                 <CalendarDays className="h-3.5 w-3.5" />
                 {formatDate(caseItem.createdAt)}
@@ -134,7 +135,7 @@ export function RecentCases() {
               asChild
               variant="outline"
               size="sm"
-              className="mt-4 w-full gap-1.5 border-zinc-200"
+              className="mt-4 w-full gap-1.5 border-stone-200"
             >
               <Link href={`/cases/${caseItem.id}`}>
                 Открыть

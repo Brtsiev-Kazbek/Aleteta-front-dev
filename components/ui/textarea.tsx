@@ -11,7 +11,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     <textarea
       ref={ref}
       className={cn(
-        "flex min-h-[80px] w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm outline-none transition-colors placeholder:text-zinc-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-50",
+        "flex min-h-[80px] w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm outline-none transition-colors placeholder:text-stone-400 focus:border-violet-400 focus:ring-2 focus:ring-violet-100 disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
       {...props}
@@ -62,7 +62,7 @@ const AutoGrowTextarea = React.forwardRef<
         resize();
       }}
       className={cn(
-        "w-full resize-none bg-transparent text-base leading-relaxed text-zinc-900 outline-none placeholder:text-zinc-400",
+        "w-full resize-none bg-transparent text-base leading-relaxed text-stone-900 outline-none placeholder:text-stone-400",
         className
       )}
       {...props}

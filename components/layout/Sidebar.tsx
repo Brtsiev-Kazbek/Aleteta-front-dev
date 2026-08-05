@@ -79,7 +79,7 @@ export function Sidebar() {
       initial={false}
       animate={{ width: isExpanded ? 232 : 68 }}
       transition={{ duration: 0.24, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className="flex h-screen shrink-0 flex-col overflow-hidden border-r border-zinc-200 bg-white"
+      className="flex h-screen shrink-0 flex-col overflow-hidden border-r border-stone-200 bg-white"
     >
       {/* Логотип */}
       <div
@@ -93,7 +93,7 @@ export function Sidebar() {
           className="group flex min-w-0 items-center gap-2.5"
           aria-label="На главную"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-sm font-semibold text-white transition-transform duration-300 group-hover:scale-105">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-950 text-sm font-semibold text-white transition-transform duration-300 group-hover:scale-105">
             А
           </span>
 
@@ -106,10 +106,10 @@ export function Sidebar() {
                 transition={{ duration: 0.16 }}
                 className="flex min-w-0 flex-col leading-none"
               >
-                <span className="truncate text-sm font-semibold tracking-tight text-zinc-900">
+                <span className="truncate text-sm font-semibold tracking-tight text-stone-900">
                   Алетейя
                 </span>
-                <span className="mt-0.5 truncate text-[10px] text-zinc-400">
+                <span className="mt-0.5 truncate text-[10px] text-stone-400">
                   AI Document OS
                 </span>
               </motion.span>
@@ -144,7 +144,7 @@ export function Sidebar() {
         )}
       >
         {isExpanded && (
-          <p className="px-3 pb-1 pt-2 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+          <p className="px-3 pb-1 pt-2 text-[10px] font-medium uppercase tracking-wider text-stone-400">
             Рабочая область
           </p>
         )}
@@ -161,8 +161,8 @@ export function Sidebar() {
                   "relative flex h-10 items-center rounded-lg transition-colors",
                   isExpanded ? "w-full gap-3 px-3" : "w-10 justify-center",
                   active
-                    ? "bg-indigo-50 text-indigo-600"
-                    : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-900"
+                    ? "bg-violet-50 text-violet-600"
+                    : "text-stone-400 hover:bg-stone-100 hover:text-stone-900"
                 )}
               >
                 <item.icon className="h-[18px] w-[18px] shrink-0" />
@@ -183,14 +183,14 @@ export function Sidebar() {
       {/* Профиль */}
       <div
         className={cn(
-          "flex shrink-0 items-center gap-2.5 border-t border-zinc-200 py-3",
+          "flex shrink-0 items-center gap-2.5 border-t border-stone-200 py-3",
           isExpanded ? "px-4" : "justify-center px-0"
         )}
       >
         <MaybeTooltip show={!isExpanded} label="Казбек Б. — Юрист-партнёр">
           <button
             type="button"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-semibold text-white"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-violet-500 text-xs font-semibold text-white"
           >
             КБ
             <span className="sr-only">Профиль пользователя</span>
@@ -199,10 +199,10 @@ export function Sidebar() {
 
         {isExpanded && (
           <div className="flex min-w-0 flex-col leading-tight">
-            <span className="truncate text-sm font-medium text-zinc-900">
+            <span className="truncate text-sm font-medium text-stone-900">
               Казбек Б.
             </span>
-            <span className="truncate text-xs text-zinc-400">
+            <span className="truncate text-xs text-stone-400">
               Юрист-партнёр
             </span>
           </div>
@@ -213,7 +213,7 @@ export function Sidebar() {
       <CreateCaseDialog />
 
       {/* Переключатель */}
-      <div className="shrink-0 border-t border-zinc-200 p-2">
+      <div className="shrink-0 border-t border-stone-200 p-2">
         <MaybeTooltip
           show={!isExpanded}
           label="Развернуть меню"
@@ -223,7 +223,7 @@ export function Sidebar() {
             size="icon"
             onClick={() => toggleSidebar()}
             aria-expanded={isExpanded}
-            className="h-8 w-full text-zinc-400 hover:text-zinc-700"
+            className="h-8 w-full text-stone-400 hover:text-stone-700"
           >
             {isExpanded ? (
               <PanelLeftClose className="h-4 w-4" />

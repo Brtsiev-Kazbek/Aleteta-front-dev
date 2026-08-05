@@ -77,32 +77,19 @@ export default function CaseWorkspacePage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50">
+    <div className="flex h-screen overflow-hidden bg-stone-50">
       <Sidebar />
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Шапка дела */}
-        <header className="shrink-0 border-b border-zinc-200 bg-white px-8 pt-5">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex min-w-0 flex-col gap-1.5">
-              <nav className="flex items-center gap-1 text-xs text-zinc-400">
-                <Link
-                  href="/dashboard"
-                  className="transition-colors hover:text-zinc-600"
-                >
-                  Дела
-                </Link>
-                <ChevronRight className="h-3 w-3" />
-                <span className="text-zinc-500">Рабочее пространство</span>
-              </nav>
-
+        <header className="shrink-0 border-b border-stone-200 bg-white px-8 pt-6">
+          <div className="flex items-start justify-between gap-6">
+            <div className="flex min-w-0 flex-col">
+              {/* Статус в виде метки — как рубрики на лендинге */}
               <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="text-lg font-semibold tracking-tight text-zinc-900">
-                  {caseItem.title}
-                </h1>
                 <span
                   className={cn(
-                    "inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium",
+                    "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium tracking-wide",
                     statusMeta.badgeClassName
                   )}
                 >
@@ -114,12 +101,36 @@ export default function CaseWorkspacePage() {
                   />
                   {statusMeta.label}
                 </span>
+
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400 transition-colors hover:text-stone-700"
+                >
+                  <ChevronRight className="h-3 w-3 rotate-180" />
+                  Все дела
+                </Link>
+              </div>
+
+              <h1 className="mt-3.5 max-w-3xl text-xl font-medium leading-[1.2] tracking-[-0.025em] text-stone-900 sm:text-[1.6rem]">
+                {caseItem.title}
+              </h1>
+
+              {/* Метаданные дела моноширинной строкой */}
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+                {caseItem.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </div>
 
             <Button
               onClick={handleToggleAssistant}
-              className="shrink-0 gap-2 bg-slate-900 text-white shadow-sm hover:bg-slate-800"
+              className="shrink-0 gap-2 bg-stone-950 text-white shadow-sm hover:bg-stone-900"
             >
               <Sparkles className="h-4 w-4" />
               AI Ассистент
@@ -144,7 +155,7 @@ export default function CaseWorkspacePage() {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="relative gap-2 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 pt-0 text-sm font-medium text-zinc-500 shadow-none transition-colors hover:text-zinc-900 data-[state=active]:border-indigo-600 data-[state=active]:bg-transparent data-[state=active]:text-zinc-900 data-[state=active]:shadow-none"
+                    className="relative gap-2 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 pt-0 text-sm font-medium text-stone-500 shadow-none transition-colors hover:text-stone-900 data-[state=active]:border-violet-600 data-[state=active]:bg-transparent data-[state=active]:text-stone-900 data-[state=active]:shadow-none"
                   >
                     {tab.label}
                     {count !== null && (
@@ -152,8 +163,8 @@ export default function CaseWorkspacePage() {
                         className={cn(
                           "rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors",
                           isActive
-                            ? "bg-indigo-50 text-indigo-700"
-                            : "bg-zinc-100 text-zinc-500"
+                            ? "bg-violet-50 text-violet-700"
+                            : "bg-stone-100 text-stone-500"
                         )}
                       >
                         {count}

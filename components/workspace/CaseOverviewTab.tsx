@@ -3,24 +3,37 @@
 import { useMemo } from "react";
 import {
   AlertTriangle,
-  CalendarDays,
   CheckCircle2,
+  FilePlus2,
   FileText,
-  Layers,
+  Pencil,
   Sparkles,
+  Upload,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { MetaLabel } from "@/components/layout/PanelHeading";
+import { CASE_ACTIVITY, type ActivityKind } from "@/data/mock-data";
 import { cn, formatDate, plural } from "@/lib/utils";
 import { findSchema, validateEntity } from "@/lib/validation";
 import { useAppStore } from "@/store/useAppStore";
-import { CASE_STATUS_META, type Case } from "@/types";
+import type { Case } from "@/types";
+
+const ACTIVITY_ICONS: Record<ActivityKind, LucideIcon> = {
+  upload: Upload,
+  ai: Sparkles,
+  edit: Pencil,
+  create: FilePlus2,
+  generate: FileText,
+};
 
 export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
   const allEntities = useAppStore((state) => state.entities);
   const allDocuments = useAppStore((state) => state.documents);
+  const customSchemas = useAppStore((state) => state.customSchemas);
+  const setActiveTab = useAppStore((state) => state.setActiveTab);
+  const toggleAssistant = useAppStore((state) => state.toggleAssistant);
 
   const entities = useMemo(
     () => allEntities.filter((entity) => entity.caseId === caseItem.id),
@@ -30,21 +43,16 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
     () => allDocuments.filter((document) => document.caseId === caseItem.id),
     [allDocuments, caseItem.id]
   );
+  const activity = useMemo(
+    () => CASE_ACTIVITY.filter((item) => item.caseId === caseItem.id),
+    [caseItem.id]
+  );
 
-  const customSchemas = useAppStore((state) => state.customSchemas);
-  const setActiveTab = useAppStore((state) => state.setActiveTab);
-  const toggleAssistant = useAppStore((state) => state.toggleAssistant);
-
-  /** Валидация с учётом собственной схемы каждой сущности. */
   const checked = useMemo(
     () =>
       entities.map((entity) => {
         const schema = findSchema(customSchemas, entity.type);
-        return {
-          entity,
-          schema,
-          validation: validateEntity(entity, schema),
-        };
+        return { entity, schema, validation: validateEntity(entity, schema) };
       }),
     [entities, customSchemas]
   );
@@ -64,103 +72,94 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
   }, [checked]);
 
   const problems = checked.filter((item) => !item.validation.isValid);
-
-  const statusMeta = CASE_STATUS_META[caseItem.status];
+  const isReady = stats.percent === 100 && stats.total > 0;
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-      <section className="flex flex-col gap-5 lg:col-span-2">
-        {/* Готовность */}
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-sm font-semibold text-zinc-900">
-                Готовность к генерации
-              </h2>
-              <p className="mt-0.5 text-xs text-zinc-500">
-                {stats.valid} из {stats.total}{" "}
-                {plural(stats.total, "сущности", "сущностей", "сущностей")}{" "}
-                прошли валидацию
+    <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+      {/* Готовность и проблемы */}
+      <section className="lg:col-span-7">
+        <MetaLabel>Готовность к генерации</MetaLabel>
+
+        <div className="mt-4 flex items-end gap-4">
+          <span
+            className={cn(
+              "font-mono text-6xl leading-none tabular-nums tracking-tight",
+              isReady ? "text-emerald-600" : "text-stone-900"
+            )}
+          >
+            {Math.round(stats.percent)}
+            <span className="text-2xl text-stone-300">%</span>
+          </span>
+
+          <span className="pb-1.5 text-sm text-stone-500">
+            {stats.valid} из {stats.total}{" "}
+            {plural(stats.total, "объекта", "объектов", "объектов")} готовы
+          </span>
+        </div>
+
+        {/* Полоса готовности вместо карточки с прогрессом */}
+        <div className="mt-5 h-px w-full bg-stone-200">
+          <div
+            className={cn(
+              "h-px transition-[width] duration-500",
+              isReady ? "bg-emerald-500" : "bg-violet-600"
+            )}
+            style={{ width: `${stats.percent}%` }}
+          />
+        </div>
+
+        {/* Три показателя — тонкие разделители, без плашек */}
+        <div className="mt-8 grid grid-cols-3 gap-px bg-stone-200">
+          {[
+            { value: stats.total, label: "объектов" },
+            { value: stats.valid, label: "готовы" },
+            { value: stats.errorFields, label: "полей с ошибками" },
+          ].map((tile) => (
+            <div key={tile.label} className="bg-stone-50 px-4 py-5">
+              <span className="font-mono text-2xl tabular-nums text-stone-900">
+                {tile.value}
+              </span>
+              <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                {tile.label}
               </p>
             </div>
-            <span
-              className={cn(
-                "text-2xl font-semibold tabular-nums",
-                stats.percent === 100 ? "text-emerald-600" : "text-zinc-900"
-              )}
-            >
-              {Math.round(stats.percent)}%
-            </span>
-          </div>
-
-          <Progress
-            value={stats.percent}
-            className="mt-4 h-2"
-            indicatorClassName={
-              stats.percent === 100 ? "bg-emerald-500" : "bg-indigo-600"
-            }
-          />
-
-          <div className="mt-4 grid grid-cols-3 gap-3">
-            <StatTile
-              icon={Layers}
-              label="Сущностей"
-              value={String(stats.total)}
-              tone="neutral"
-            />
-            <StatTile
-              icon={CheckCircle2}
-              label="Валидных"
-              value={String(stats.valid)}
-              tone="success"
-            />
-            <StatTile
-              icon={AlertTriangle}
-              label="Полей с ошибками"
-              value={String(stats.errorFields)}
-              tone={stats.errorFields > 0 ? "danger" : "neutral"}
-            />
-          </div>
+          ))}
         </div>
 
         {/* Требуют внимания */}
-        <div className="rounded-xl border border-zinc-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
-            <h2 className="text-sm font-semibold text-zinc-900">
-              Требуют внимания
-            </h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 text-xs text-indigo-600 hover:text-indigo-700"
-              onClick={() => setActiveTab("entities")}
-            >
-              Открыть матрицу
-            </Button>
+        <div className="mt-12">
+          <div className="flex items-center justify-between">
+            <MetaLabel>Требуют внимания</MetaLabel>
+
+            {problems.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setActiveTab("entities")}
+                className="text-xs text-violet-600 transition-colors hover:text-violet-700"
+              >
+                Открыть матрицу
+              </button>
+            )}
           </div>
 
           {problems.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 px-5 py-10 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-              </div>
-              <p className="text-sm font-medium text-zinc-900">
-                Все сущности заполнены
-              </p>
-              <p className="text-xs text-zinc-500">
-                Пакет документов можно генерировать.
-              </p>
+            <div className="mt-4 flex items-center gap-3 border-t border-stone-200 pt-5">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <span className="text-sm text-stone-600">
+                Все объекты заполнены — пакет можно генерировать
+              </span>
             </div>
           ) : (
-            <ul className="divide-y divide-zinc-200/70">
+            <ul className="mt-4 flex flex-col divide-y divide-stone-200 border-t border-stone-200">
               {problems.map(({ entity, schema, validation }) => (
                 <li
                   key={entity.id}
-                  className="flex items-center gap-3 px-5 py-3.5"
+                  className="flex items-center gap-4 py-4"
                 >
+                  <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm font-medium text-zinc-900">
-                      {/* У своих типов ключа `name` нет — берём первое поле схемы */}
+                    <span className="truncate text-sm text-stone-900">
                       {entity.data[schema.fields[0]?.key ?? "name"]?.trim() ||
                         `Без наименования · ${schema.label}`}
                     </span>
@@ -168,14 +167,10 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
                       {validation.errors[0]}
                     </span>
                   </div>
-                  <span className="shrink-0 rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700">
+
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
                     {validation.errors.length}{" "}
-                    {plural(
-                      validation.errors.length,
-                      "ошибка",
-                      "ошибки",
-                      "ошибок"
-                    )}
+                    {plural(validation.errors.length, "ошибка", "ошибки", "ошибок")}
                   </span>
                 </li>
               ))}
@@ -184,114 +179,87 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
         </div>
       </section>
 
-      {/* Карточка дела */}
-      <section className="flex flex-col gap-5">
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-zinc-900">О деле</h2>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-500">
-            {caseItem.description}
-          </p>
+      {/* Сведения и активность */}
+      <section className="lg:col-span-5">
+        <MetaLabel>О деле</MetaLabel>
 
-          <dl className="mt-4 flex flex-col gap-3 border-t border-zinc-100 pt-4">
-            <MetaRow label="Статус" value={statusMeta.label} />
-            <MetaRow label="Создано" value={formatDate(caseItem.createdAt)} />
-            <MetaRow label="Документов" value={String(documents.length)} />
-            <MetaRow label="Контекст AI" value={caseItem.contextFile} />
-          </dl>
+        <p className="mt-4 text-sm leading-relaxed text-stone-600">
+          {caseItem.description}
+        </p>
 
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {caseItem.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded border border-zinc-200 bg-zinc-50 px-1.5 py-0.5 text-[10px] text-zinc-500"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+        <dl className="mt-6 flex flex-col divide-y divide-stone-200 border-y border-stone-200">
+          {[
+            { label: "Создано", value: formatDate(caseItem.createdAt) },
+            { label: "Документов", value: String(documents.length) },
+            { label: "Контекст ассистента", value: caseItem.contextFile },
+          ].map((row) => (
+            <div
+              key={row.label}
+              className="flex items-baseline justify-between gap-4 py-3"
+            >
+              <dt className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                {row.label}
+              </dt>
+              <dd className="truncate text-sm text-stone-900">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
 
-          <Button
-            variant="outline"
-            className="mt-4 w-full gap-2 border-zinc-200"
-            onClick={() => toggleAssistant(true)}
-          >
-            <Sparkles className="h-4 w-4 text-indigo-600" />
-            Спросить Алетейю
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          className="mt-6 w-full gap-2 border-stone-200"
+          onClick={() => toggleAssistant(true)}
+        >
+          <Sparkles className="h-4 w-4 text-violet-600" />
+          Спросить Алетейю о деле
+        </Button>
 
-        {/* Последние документы */}
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-zinc-900">
-            Последние документы
-          </h2>
+        {/* Активность */}
+        <div className="mt-12">
+          <MetaLabel>Активность</MetaLabel>
 
-          <ul className="mt-3 flex flex-col gap-2">
-            {documents.slice(0, 4).map((document) => (
-              <li key={document.id} className="flex items-center gap-2.5">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-                  <FileText className="h-3.5 w-3.5 text-zinc-500" />
-                </div>
-                <span className="min-w-0 flex-1 truncate text-sm text-zinc-700">
-                  {document.title}
-                </span>
-                <span className="shrink-0 text-xs text-zinc-400">
-                  <CalendarDays className="mr-1 inline h-3 w-3" />
-                  {formatDate(document.createdAt)}
-                </span>
-              </li>
-            ))}
+          {activity.length === 0 ? (
+            <p className="mt-4 border-t border-stone-200 pt-5 text-sm text-stone-400">
+              Действий по делу пока не было
+            </p>
+          ) : (
+            <ol className="mt-4 flex flex-col gap-5 border-t border-stone-200 pt-5">
+              {activity.map((item, index) => {
+                const Icon = ACTIVITY_ICONS[item.kind] ?? FileText;
+                const isLast = index === activity.length - 1;
 
-            {documents.length === 0 && (
-              <li className="text-sm text-zinc-400">Документов пока нет</li>
-            )}
-          </ul>
+                return (
+                  <li key={item.id} className="relative flex gap-3.5">
+                    {!isLast && (
+                      <span className="absolute left-[13px] top-8 h-[calc(100%+4px)] w-px bg-stone-200" />
+                    )}
+
+                    <div
+                      className={cn(
+                        "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                        item.kind === "ai"
+                          ? "bg-violet-50 text-violet-600"
+                          : "bg-stone-100 text-stone-500"
+                      )}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                    </div>
+
+                    <div className="flex min-w-0 flex-col">
+                      <span className="text-sm leading-snug text-stone-900">
+                        {item.text}
+                      </span>
+                      <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                        {item.actor} · {formatDate(item.at)}
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
         </div>
       </section>
-    </div>
-  );
-}
-
-function StatTile({
-  icon: Icon,
-  label,
-  value,
-  tone,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  tone: "neutral" | "success" | "danger";
-}) {
-  const tones = {
-    neutral: "bg-zinc-50 text-zinc-500",
-    success: "bg-emerald-50 text-emerald-600",
-    danger: "bg-red-50 text-red-600",
-  } as const;
-
-  return (
-    <div className="rounded-lg border border-zinc-200/70 p-3">
-      <div
-        className={cn(
-          "flex h-7 w-7 items-center justify-center rounded-lg",
-          tones[tone]
-        )}
-      >
-        <Icon className="h-3.5 w-3.5" />
-      </div>
-      <p className="mt-2 text-lg font-semibold leading-none text-zinc-900">
-        {value}
-      </p>
-      <p className="mt-1 text-xs text-zinc-500">{label}</p>
-    </div>
-  );
-}
-
-function MetaRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <dt className="shrink-0 text-xs text-zinc-400">{label}</dt>
-      <dd className="truncate text-sm text-zinc-900">{value}</dd>
     </div>
   );
 }

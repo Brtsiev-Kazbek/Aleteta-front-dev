@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* zinc-50 #F9FAFB */
-    --foreground: 240 10% 9%; /* zinc-900 */
+    --background: 60 9% 98%; /* stone-50 */
+    --foreground: 24 10% 10%; /* stone-900 */
 
     --card: 0 0% 100%; /* white */
     --card-foreground: 240 10% 9%;
@@ -13,24 +13,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 9%;
 
-    --primary: 239 84% 58%; /* indigo-600 */
+    --primary: 262 83% 58%; /* violet-600 */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 240 5% 96%;
     --secondary-foreground: 222 47% 11%; /* slate-900-ish */
 
     --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%; /* zinc-500 */
+    --muted-foreground: 25 5% 45%; /* stone-500 */
 
-    --accent: 239 84% 96%;
-    --accent-foreground: 239 84% 40%;
+    --accent: 262 83% 96%;
+    --accent-foreground: 262 83% 40%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 90%; /* zinc-200/80 */
-    --input: 240 6% 90%;
-    --ring: 239 84% 58%;
+    --border: 20 6% 90%; /* stone-200 */
+    --input: 20 6% 90%;
+    --ring: 262 83% 58%;
 
     --radius: 0.625rem;
   }
@@ -86,11 +86,19 @@
 }
 
 @layer utilities {
-  /* Тонкая сетка на фоне hero-секции. */
+  /* Тонкая сетка на светлом фоне. */
   .bg-grid {
     background-image:
-      linear-gradient(to right, rgb(228 228 231 / 0.6) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(228 228 231 / 0.6) 1px, transparent 1px);
+      linear-gradient(to right, rgb(214 211 209 / 0.55) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(214 211 209 / 0.55) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Та же сетка на тёмном фоне. */
+  .bg-grid-dark {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
     background-size: 56px 56px;
   }
 
@@ -112,5 +120,67 @@
   .mask-fade-b {
     mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  }
+
+  /* Затухание по краям бегущей ленты. */
+  .mask-fade-x {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 12%,
+      black 88%,
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 12%,
+      black 88%,
+      transparent
+    );
+  }
+
+  .animate-marquee {
+    animation: marquee 46s linear infinite;
+  }
+
+  .animate-marquee-reverse {
+    animation: marquee 52s linear infinite reverse;
+  }
+
+  /* Останавливаем ленту, когда курсор над ней — можно прочитать. */
+  .marquee-host:hover .animate-marquee,
+  .marquee-host:hover .animate-marquee-reverse {
+    animation-play-state: paused;
+  }
+
+  /*
+   * Едва заметное зерно поверх крупных плоскостей: убирает ощущение
+   * «плоской заливки» и добавляет глубины без декоративных элементов.
+   */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee,
+    .animate-marquee-reverse {
+      animation: none;
+    }
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* Лента дублируется дважды, поэтому сдвиг на половину — бесшовный. */
+    transform: translateX(-50%);
   }
 }

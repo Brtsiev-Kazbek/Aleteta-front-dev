@@ -73,20 +73,20 @@ export function CaseSelectionBar() {
             transition={{ duration: 0.22, ease: "easeOut" }}
             className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2"
           >
-            <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white/95 px-4 py-3 shadow-2xl shadow-zinc-400/20 backdrop-blur">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
-                <FolderKanban className="h-4 w-4 text-indigo-600" />
+            <div className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white/95 px-4 py-3 shadow-2xl shadow-stone-400/20 backdrop-blur">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
+                <FolderKanban className="h-4 w-4 text-violet-600" />
               </div>
 
               <span className="whitespace-nowrap text-sm">
-                <span className="font-semibold text-zinc-900">{count}</span>
-                <span className="text-zinc-500">
+                <span className="font-semibold text-stone-900">{count}</span>
+                <span className="text-stone-500">
                   {" "}
                   {plural(count, "дело", "дела", "дел")} выбрано
                 </span>
               </span>
 
-              <span className="h-6 w-px bg-zinc-200" />
+              <span className="h-6 w-px bg-stone-200" />
 
               <Button size="sm" className="gap-1.5" onClick={() => setSheetOpen(true)}>
                 <Sparkles className="h-4 w-4" />
@@ -97,7 +97,7 @@ export function CaseSelectionBar() {
                 variant="ghost"
                 size="icon"
                 onClick={clearCaseSelection}
-                className="h-8 w-8 text-zinc-400 hover:text-zinc-900"
+                className="h-8 w-8 text-stone-400 hover:text-stone-900"
               >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Снять выделение</span>
@@ -115,11 +115,11 @@ export function CaseSelectionBar() {
         <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
           <SheetHeader>
             <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
                 {status === "running" ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
+                  <Loader2 className="h-4 w-4 animate-spin text-violet-600" />
                 ) : (
-                  <Sparkles className="h-4 w-4 text-indigo-600" />
+                  <Sparkles className="h-4 w-4 text-violet-600" />
                 )}
               </div>
               <SheetTitle>
@@ -149,7 +149,7 @@ export function CaseSelectionBar() {
           {status === "running" && (
             <div className="px-5 py-6">
               <Progress value={progress} />
-              <p className="mt-3 text-center text-xs text-zinc-400">
+              <p className="mt-3 text-center text-xs text-stone-400">
                 {Math.round(progress)}%
               </p>
             </div>
@@ -166,17 +166,17 @@ export function CaseSelectionBar() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.24, delay: index * 0.06 }}
-                        className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5"
+                        className="flex items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2.5"
                       >
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50">
-                          <FileText className="h-4 w-4 text-indigo-600" />
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-50">
+                          <FileText className="h-4 w-4 text-violet-600" />
                         </div>
 
                         <div className="flex min-w-0 flex-1 flex-col leading-tight">
-                          <span className="truncate text-sm text-zinc-900">
+                          <span className="truncate text-sm text-stone-900">
                             {result.name}
                           </span>
-                          <span className="truncate text-xs text-zinc-400">
+                          <span className="truncate text-xs text-stone-400">
                             {result.caseTitle}
                           </span>
                         </div>
@@ -188,7 +188,7 @@ export function CaseSelectionBar() {
                 </div>
               </ScrollArea>
 
-              <div className="flex items-center gap-2 border-t border-zinc-200 px-5 py-4">
+              <div className="flex items-center gap-2 border-t border-stone-200 px-5 py-4">
                 <Button
                   className="flex-1"
                   onClick={() => {
@@ -207,17 +207,17 @@ export function CaseSelectionBar() {
                   <div className="flex flex-col gap-4">
                     {/* Список выбранных дел */}
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                      <span className="text-xs font-medium uppercase tracking-wide text-stone-400">
                         Выбранные дела
                       </span>
 
                       {selectedCases.map((item) => (
                         <div
                           key={item.id}
-                          className="flex items-center gap-2.5 rounded-lg border border-zinc-200 px-3 py-2"
+                          className="flex items-center gap-2.5 rounded-lg border border-stone-200 px-3 py-2"
                         >
-                          <FolderKanban className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-                          <span className="truncate text-sm text-zinc-700">
+                          <FolderKanban className="h-3.5 w-3.5 shrink-0 text-stone-400" />
+                          <span className="truncate text-sm text-stone-700">
                             {item.title}
                           </span>
                         </div>
@@ -226,7 +226,7 @@ export function CaseSelectionBar() {
 
                     {/* Свободный запрос */}
                     <div className="flex flex-col gap-2">
-                      <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                      <span className="text-xs font-medium uppercase tracking-wide text-stone-400">
                         Что сгенерировать
                       </span>
 
@@ -234,8 +234,8 @@ export function CaseSelectionBar() {
                         className={cn(
                           "rounded-xl border bg-white p-3 transition-colors",
                           prompt.trim()
-                            ? "border-indigo-300 ring-2 ring-indigo-100"
-                            : "border-zinc-200"
+                            ? "border-violet-300 ring-2 ring-violet-100"
+                            : "border-stone-200"
                         )}
                       >
                         <AutoGrowTextarea
@@ -259,7 +259,7 @@ export function CaseSelectionBar() {
                             key={item}
                             type="button"
                             onClick={() => setPrompt(item)}
-                            className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-600 transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
+                            className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-600 transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
                           >
                             {item}
                           </button>
@@ -269,7 +269,7 @@ export function CaseSelectionBar() {
                   </div>
                 </ScrollArea>
 
-                <div className="flex items-center gap-2 border-t border-zinc-200 px-5 py-4">
+                <div className="flex items-center gap-2 border-t border-stone-200 px-5 py-4">
                   <Button
                     className="flex-1 gap-1.5"
                     onClick={handleGenerate}

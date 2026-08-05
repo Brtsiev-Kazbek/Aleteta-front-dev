@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { ArrowRight, FolderPlus, ShieldCheck, Wand2 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import {
   Dialog,
@@ -25,36 +27,40 @@ import { useAppStore } from "@/store/useAppStore";
 
 interface ActionCard {
   id: "generate" | "review" | "create";
-  emoji: string;
+  icon: LucideIcon;
+  label: string;
   title: string;
   description: string;
-  accentClassName: string;
+  iconClassName: string;
 }
 
 const ACTIONS: ActionCard[] = [
   {
     id: "generate",
-    emoji: "📄",
-    title: "Сгенерировать документ",
+    icon: Wand2,
+    label: "Генерация",
+    title: "Составить документ",
     description:
-      "Опишите задачу словами — Алетейя составит готовый документ со структурой и формулировками.",
-    accentClassName: "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100",
+      "Опишите задачу словами. Если шаблона нет — Алетейя составит документ с нуля.",
+    iconClassName: "bg-violet-50 text-violet-600 group-hover:bg-violet-100",
   },
   {
     id: "review",
-    emoji: "🔍",
-    title: "Проверить документ (AI Review)",
+    icon: ShieldCheck,
+    label: "Проверка",
+    title: "Разобрать договор",
     description:
-      "Загрузите договор — получите разбор по пунктам, список рисков и исправленную версию.",
-    accentClassName: "bg-amber-50 text-amber-600 group-hover:bg-amber-100",
+      "Загрузите файл — получите риски по пунктам, судебную практику и исправленную редакцию.",
+    iconClassName: "bg-amber-50 text-amber-600 group-hover:bg-amber-100",
   },
   {
     id: "create",
-    emoji: "📁",
-    title: "Создать новое дело",
+    icon: FolderPlus,
+    label: "Дело",
+    title: "Завести новое дело",
     description:
-      "Структурированное рабочее пространство с файлами, сущностями и массовой генерацией.",
-    accentClassName: "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100",
+      "Рабочее пространство с файлами, объектами и массовой генерацией пакета.",
+    iconClassName: "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100",
   },
 ];
 
@@ -89,23 +95,30 @@ export function QuickActions() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: index * 0.07 }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.99 }}
-            className="group flex flex-col items-start rounded-xl border border-zinc-200 bg-white p-5 text-left shadow-sm transition-shadow hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
+            whileHover={{ y: -4 }}
+            className="group flex flex-col items-start rounded-2xl border border-stone-200 bg-white p-6 text-left transition-shadow duration-300 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2"
           >
-            <div
-              className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-xl text-xl transition-colors",
-                action.accentClassName
-              )}
-            >
-              <span aria-hidden>{action.emoji}</span>
+            <div className="flex w-full items-start justify-between">
+              <div
+                className={cn(
+                  "flex h-11 w-11 items-center justify-center rounded-xl transition-colors",
+                  action.iconClassName
+                )}
+              >
+                <action.icon className="h-5 w-5" />
+              </div>
+
+              <ArrowRight className="h-4 w-4 shrink-0 text-stone-300 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-stone-900" />
             </div>
 
-            <h3 className="mt-4 text-sm font-semibold text-zinc-900">
+            <span className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+              {action.label}
+            </span>
+
+            <h3 className="mt-1.5 text-base font-medium tracking-[-0.01em] text-stone-900">
               {action.title}
             </h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-zinc-500">
+            <p className="mt-2 text-sm leading-relaxed text-stone-500">
               {action.description}
             </p>
           </motion.button>
@@ -125,7 +138,7 @@ export function QuickActions() {
             </SheetDescription>
           </SheetHeader>
 
-          <div className="min-h-0 flex-1 overflow-hidden bg-zinc-50">
+          <div className="min-h-0 flex-1 overflow-hidden bg-stone-50">
             <AIGenerator onClose={() => setGeneratorOpen(false)} />
           </div>
         </SheetContent>

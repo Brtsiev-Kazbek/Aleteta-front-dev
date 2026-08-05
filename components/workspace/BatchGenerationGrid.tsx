@@ -14,8 +14,10 @@ import {
   AlertTriangle,
   Building2,
   CheckCircle2,
+  Copy,
   Inbox,
   MapPinned,
+  MoreHorizontal,
   Plus,
   Shapes,
   Sparkles,
@@ -117,6 +119,9 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
     }
 
     return [...buckets.entries()].map(([typeId, items]) => ({
+      // typeId, а не schema.id: неизвестные типы откатываются к одной и той же
+      // запасной схеме, и ключи React стали бы одинаковыми.
+      typeId,
       schema: findSchema(customSchemas, typeId),
       entities: items,
     }));
@@ -145,14 +150,14 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
       {/* Панель над таблицей */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-stone-200 px-4 py-3">
         <div className="flex flex-col leading-tight">
-          <span className="text-sm font-medium text-zinc-900">
+          <span className="text-sm font-medium text-stone-900">
             Сущности дела
           </span>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-stone-500">
             Реквизиты подставляются в шаблоны при массовой генерации
           </span>
         </div>
@@ -162,7 +167,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
             <Button
               size="sm"
               variant="outline"
-              className="h-9 gap-1.5 border-zinc-200"
+              className="h-9 gap-1.5 border-stone-200"
             >
               <Plus className="h-3.5 w-3.5" />
               Добавить сущность
@@ -180,10 +185,10 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
                   onSelect={() => addEntity(caseId, schema.id)}
                   className="items-start gap-2.5 py-2.5"
                 >
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-stone-400" />
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate font-medium">{schema.label}</span>
-                    <span className="truncate text-xs text-zinc-400">
+                    <span className="truncate text-xs text-stone-400">
                       {schema.hint}
                     </span>
                   </span>
@@ -195,12 +200,12 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
 
             <DropdownMenuItem
               onSelect={() => setCustomSchemaOpen(true)}
-              className="items-start gap-2.5 py-2.5 text-indigo-700 focus:bg-indigo-50 focus:text-indigo-700"
+              className="items-start gap-2.5 py-2.5 text-violet-700 focus:bg-violet-50 focus:text-violet-700"
             >
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
               <span className="flex min-w-0 flex-col">
                 <span className="font-medium">Создать свой тип</span>
-                <span className="truncate text-xs text-indigo-400">
+                <span className="truncate text-xs text-violet-400">
                   Произвольный набор реквизитов
                 </span>
               </span>
@@ -217,13 +222,13 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
       <div className="scrollable-area relative min-h-0 flex-1 overflow-auto">
         {entities.length === 0 ? (
           <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-3 p-10 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-100">
-              <Inbox className="h-5 w-5 text-zinc-400" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-stone-100">
+              <Inbox className="h-5 w-5 text-stone-400" />
             </div>
-            <p className="text-sm font-medium text-zinc-900">
+            <p className="text-sm font-medium text-stone-900">
               В деле пока нет сущностей
             </p>
-            <p className="max-w-sm text-sm text-zinc-500">
+            <p className="max-w-sm text-sm text-stone-500">
               Добавьте участок, контрагента, правообладателя — или опишите свой
               тип с нужными реквизитами.
             </p>
@@ -232,7 +237,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
           <div className="flex flex-col">
             {groups.map((group) => (
               <EntityGroupTable
-                key={group.schema.id}
+                key={group.typeId}
                 schema={group.schema}
                 entities={group.entities}
                 validations={validations}
@@ -243,7 +248,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
       </div>
 
       {/* Липкая панель валидации и запуска генерации */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-white/95 px-4 py-3.5 backdrop-blur">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-3.5 backdrop-blur">
         <div className="flex items-center gap-3">
           <div
             className={cn(
@@ -262,12 +267,12 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
 
           <div className="flex flex-col leading-tight">
             <span className="text-sm">
-              <span className="text-zinc-500">Готово к генерации: </span>
-              <span className="font-semibold text-zinc-900">
+              <span className="text-stone-500">Готово к генерации: </span>
+              <span className="font-semibold text-stone-900">
                 {stats.valid} / {stats.total}
               </span>
             </span>
-            <span className="text-xs text-zinc-400">
+            <span className="text-xs text-stone-400">
               {stats.allValid
                 ? "Все обязательные реквизиты заполнены"
                 : `${stats.errorFields} ${plural(
@@ -343,6 +348,7 @@ function EntityGroupTable({
   validations: Record<string, EntityValidation>;
 }) {
   const deleteEntity = useAppStore((state) => state.deleteEntity);
+  const duplicateEntity = useAppStore((state) => state.duplicateEntity);
   const Icon = getTypeIcon(schema);
 
   const columns = useMemo<ColumnDef<Entity>[]>(() => {
@@ -397,26 +403,41 @@ function EntityGroupTable({
       meta: { width: 56 },
       cell: ({ row }) => (
         <div className="flex h-11 items-center justify-center">
-          <Tooltip>
-            <TooltipTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 text-zinc-300 transition-colors hover:bg-red-50 hover:text-red-600"
-                onClick={() => deleteEntity(row.original.id)}
+                className="h-7 w-7 text-stone-300 transition-colors hover:text-stone-900"
               >
-                <Trash2 className="h-3.5 w-3.5" />
-                <span className="sr-only">Удалить сущность</span>
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Действия над объектом</span>
               </Button>
-            </TooltipTrigger>
-            <TooltipContent>Удалить сущность</TooltipContent>
-          </Tooltip>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem
+                onSelect={() => duplicateEntity(row.original.id)}
+              >
+                <Copy className="h-4 w-4 text-stone-400" />
+                Дублировать
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={() => deleteEntity(row.original.id)}
+                className="text-red-600 focus:bg-red-50 focus:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+                Удалить
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       ),
     };
 
     return [...fieldColumns, statusColumn, actionsColumn];
-  }, [schema, validations, deleteEntity]);
+  }, [schema, validations, deleteEntity, duplicateEntity]);
 
   const table = useReactTable({
     data: entities,
@@ -426,18 +447,18 @@ function EntityGroupTable({
   });
 
   return (
-    <section className="border-b border-zinc-200 last:border-b-0">
+    <section className="border-b border-stone-200 last:border-b-0">
       {/* Заголовок группы */}
-      <div className="sticky left-0 flex items-center gap-2 bg-zinc-50/80 px-4 py-2.5">
-        <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-        <span className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+      <div className="sticky left-0 flex items-center gap-2 bg-stone-50/80 px-4 py-2.5">
+        <Icon className="h-3.5 w-3.5 shrink-0 text-stone-400" />
+        <span className="text-xs font-medium uppercase tracking-wide text-stone-500">
           {schema.label}
         </span>
-        <span className="rounded bg-zinc-200/70 px-1.5 py-0.5 text-[10px] font-medium text-zinc-600">
+        <span className="rounded bg-stone-200/70 px-1.5 py-0.5 text-[10px] font-medium text-stone-600">
           {entities.length}
         </span>
         {schema.isCustom && (
-          <span className="rounded border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 text-[10px] font-medium text-indigo-700">
+          <span className="rounded border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-[10px] font-medium text-violet-700">
             свой тип
           </span>
         )}
@@ -459,7 +480,7 @@ function EntityGroupTable({
                       left: meta?.stickyLeft,
                     }}
                     className={cn(
-                      "h-9 whitespace-nowrap border-y border-zinc-200 bg-white px-3 text-left text-xs font-medium text-zinc-400",
+                      "h-9 whitespace-nowrap border-y border-stone-200 bg-white px-3 text-left text-xs font-medium text-stone-400",
                       isSticky &&
                         "sticky z-10 shadow-[1px_0_0_0_rgb(228,228,231)]"
                     )}
@@ -487,7 +508,7 @@ function EntityGroupTable({
                 duration: 0.22,
                 delay: Math.min(index * 0.04, 0.24),
               }}
-              className="group hover:bg-zinc-50/70"
+              className="group hover:bg-stone-50/70"
             >
               {row.getVisibleCells().map((cell) => {
                 const meta = cell.column.columnDef.meta;
@@ -501,7 +522,7 @@ function EntityGroupTable({
                       left: meta?.stickyLeft,
                     }}
                     className={cn(
-                      "border-b border-zinc-200/70 p-0 align-middle",
+                      "border-b border-stone-200/70 p-0 align-middle",
                       isSticky &&
                         "sticky z-10 bg-white shadow-[1px_0_0_0_rgb(228,228,231)] group-hover:bg-[#fafafa]"
                     )}
@@ -576,7 +597,7 @@ function EntityCell({
               setEditingCell(null);
             }
           }}
-          className="h-full w-full rounded-md border-2 border-indigo-500 bg-white px-2.5 text-sm text-zinc-900 shadow-[0_0_0_3px_rgba(99,102,241,0.12)] outline-none placeholder:text-zinc-300"
+          className="h-full w-full rounded-md border-2 border-violet-500 bg-white px-2.5 text-sm text-stone-900 shadow-[0_0_0_3px_rgba(99,102,241,0.12)] outline-none placeholder:text-stone-300"
         />
       </div>
     );
@@ -616,10 +637,10 @@ function EntityCell({
         onClick={() =>
           setEditingCell({ entityId: entity.id, field: field.key })
         }
-        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-400"
+        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400"
       >
-        <Plus className="h-3.5 w-3.5 shrink-0 text-zinc-300 transition-colors group-hover/cell:text-indigo-500" />
-        <span className="truncate text-sm text-zinc-300 transition-colors group-hover/cell:text-zinc-500">
+        <Plus className="h-3.5 w-3.5 shrink-0 text-stone-300 transition-colors group-hover/cell:text-violet-500" />
+        <span className="truncate text-sm text-stone-300 transition-colors group-hover/cell:text-stone-500">
           Добавить
         </span>
       </button>
@@ -630,9 +651,9 @@ function EntityCell({
     <button
       type="button"
       onClick={() => setEditingCell({ entityId: entity.id, field: field.key })}
-      className="flex h-11 w-full items-center px-3 text-left transition-colors hover:bg-indigo-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-400"
+      className="flex h-11 w-full items-center px-3 text-left transition-colors hover:bg-violet-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400"
     >
-      <span className="truncate text-sm text-zinc-900">{value}</span>
+      <span className="truncate text-sm text-stone-900">{value}</span>
     </button>
   );
 }

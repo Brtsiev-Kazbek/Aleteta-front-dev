@@ -84,8 +84,8 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
       <DialogContent className="max-w-xl">
         <DialogHeader>
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
-              <Sparkles className="h-4 w-4 text-indigo-600" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
+              <Sparkles className="h-4 w-4 text-violet-600" />
             </div>
             <DialogTitle>Свой тип сущности</DialogTitle>
           </div>
@@ -99,7 +99,7 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="schema-label"
-              className="text-xs font-medium text-zinc-500"
+              className="text-xs font-medium text-stone-500"
             >
               Название типа
             </label>
@@ -114,10 +114,10 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-zinc-500">
+              <span className="text-xs font-medium text-stone-500">
                 Реквизиты
               </span>
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-stone-400">
                 Обязательные проверяются перед генерацией
               </span>
             </div>
@@ -125,7 +125,7 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
             <div className="flex max-h-64 flex-col gap-2 overflow-y-auto pr-1">
               {fields.map((field) => (
                 <div key={field.id} className="flex items-center gap-2">
-                  <GripVertical className="h-4 w-4 shrink-0 text-zinc-300" />
+                  <GripVertical className="h-4 w-4 shrink-0 text-stone-300" />
 
                   <Input
                     value={field.label}
@@ -136,7 +136,7 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
                     className="flex-1"
                   />
 
-                  <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-zinc-200 px-2.5 py-2 text-xs text-zinc-600 transition-colors hover:bg-zinc-50">
+                  <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-stone-200 px-2.5 py-2 text-xs text-stone-600 transition-colors hover:bg-stone-50">
                     <Checkbox
                       checked={field.required}
                       onCheckedChange={(checked) =>
@@ -151,7 +151,7 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
                     size="icon"
                     onClick={() => removeField(field.id)}
                     disabled={fields.length <= 1}
-                    className="h-9 w-9 shrink-0 text-zinc-400 hover:text-red-600 disabled:opacity-40"
+                    className="h-9 w-9 shrink-0 text-stone-400 hover:text-red-600 disabled:opacity-40"
                   >
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">Удалить реквизит</span>
@@ -164,7 +164,7 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
               variant="outline"
               size="sm"
               onClick={addField}
-              className="w-full gap-1.5 border-dashed border-zinc-300"
+              className="w-full gap-1.5 border-dashed border-stone-300"
             >
               <Plus className="h-3.5 w-3.5" />
               Добавить реквизит

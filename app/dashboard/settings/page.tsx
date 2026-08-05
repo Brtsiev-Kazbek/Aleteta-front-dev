@@ -64,16 +64,16 @@ const SECTIONS: SettingsSection[] = [
 
 export default function SettingsPage() {
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50">
+    <div className="flex h-screen overflow-hidden bg-stone-50">
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-8 py-10">
           <header className="flex flex-col gap-1.5">
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+            <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
               Настройки
             </h1>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-stone-500">
               Профиль, реквизиты организации и правила обработки документов.
             </p>
           </header>
@@ -82,30 +82,30 @@ export default function SettingsPage() {
             {SECTIONS.map((section) => (
               <section
                 key={section.title}
-                className="rounded-xl border border-zinc-200 bg-white shadow-sm"
+                className="rounded-lg border border-stone-200 bg-white"
               >
-                <div className="flex items-start gap-3 border-b border-zinc-200 px-5 py-4">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-                    <section.icon className="h-4 w-4 text-zinc-500" />
+                <div className="flex items-start gap-3 border-b border-stone-200 px-5 py-4">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100">
+                    <section.icon className="h-4 w-4 text-stone-500" />
                   </div>
                   <div className="flex flex-col leading-tight">
-                    <h2 className="text-sm font-semibold text-zinc-900">
+                    <h2 className="text-sm font-semibold text-stone-900">
                       {section.title}
                     </h2>
-                    <span className="mt-0.5 text-xs text-zinc-500">
+                    <span className="mt-0.5 text-xs text-stone-500">
                       {section.description}
                     </span>
                   </div>
                 </div>
 
-                <dl className="divide-y divide-zinc-200/70">
+                <dl className="divide-y divide-stone-200/70">
                   {section.rows.map((row) => (
                     <div
                       key={row.label}
                       className="flex items-baseline justify-between gap-4 px-5 py-3.5"
                     >
-                      <dt className="text-sm text-zinc-500">{row.label}</dt>
-                      <dd className="truncate text-sm font-medium text-zinc-900">
+                      <dt className="text-sm text-stone-500">{row.label}</dt>
+                      <dd className="truncate text-sm font-medium text-stone-900">
                         {row.value}
                       </dd>
                     </div>
