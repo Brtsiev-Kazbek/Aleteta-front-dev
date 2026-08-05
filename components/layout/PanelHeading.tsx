@@ -12,8 +12,10 @@ interface PanelHeadingProps {
 }
 
 /**
- * Рубрика экрана приложения — тот же язык, что и разделы лендинга:
- * метка-пилюля, крупный заголовок с плотным трекингом, подпись.
+ * Рубрика экрана приложения набирается тем же приёмом, что и первый экран
+ * лендинга: волосяная линия, моноширинная метка, крупный заголовок с плотным
+ * трекингом. Плашка с заливкой уместна в маркетинге, но на рабочем экране
+ * она перетягивает внимание с содержимого.
  */
 export function PanelHeading({
   eyebrow,
@@ -23,19 +25,23 @@ export function PanelHeading({
   className,
 }: PanelHeadingProps) {
   return (
-    <div className={cn("flex flex-wrap items-end justify-between gap-4", className)}>
+    <div
+      className={cn("flex flex-wrap items-end justify-between gap-4", className)}
+    >
       <div className="flex min-w-0 flex-col">
-        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-violet-200/70 bg-violet-50 px-3 py-1.5 text-[11px] font-medium tracking-wide text-violet-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
-          {eyebrow}
+        <span className="flex items-center gap-2.5">
+          <span aria-hidden className="h-px w-6 bg-violet-500" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-stone-400">
+            {eyebrow}
+          </span>
         </span>
 
-        <h1 className="mt-4 text-2xl font-medium leading-[1.15] tracking-[-0.025em] text-stone-900 sm:text-[1.75rem]">
+        <h1 className="mt-5 max-w-2xl text-[1.75rem] font-medium leading-[1.12] tracking-[-0.03em] text-stone-900">
           {title}
         </h1>
 
         {description && (
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-stone-600">
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-stone-500">
             {description}
           </p>
         )}

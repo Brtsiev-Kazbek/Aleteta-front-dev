@@ -1,41 +1,32 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  Check,
-  FileText,
-  Loader2,
-  ShieldCheck,
-  UploadCloud,
-} from "lucide-react";
+import { motion } from "framer-motion";
+import { Check, Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { FileDropzone, type PickedFile } from "@/components/documents/FileDropzone";
+import { MetaLabel } from "@/components/layout/PanelHeading";
 import { cn, formatFileSize } from "@/lib/utils";
 
-/** Шаги «умной загрузки», которые видит пользователь во время анализа. */
+/** Шаги разбора, которые видит пользователь во время анализа. */
 const ANALYSIS_STEPS = [
-  "Распознавание текста...",
-  "Анализ рисков...",
-  "Подготовка отчёта...",
+  "Распознавание текста",
+  "Разбор по пунктам",
+  "Подбор формулировок правок",
 ] as const;
 
-const STEP_DURATION_MS = 1200;
+const STEP_DURATION_MS = 1000;
 
 interface AIReviewDropzoneProps {
-  /** Вызывается, когда анализ завершён — родитель показывает Split-View. */
-  onAnalyzed: (file: { name: string; sizeBytes: number }) => void;
+  /** Вызывается, когда разбор завершён — родитель показывает Split-View. */
+  onAnalyzed: (file: PickedFile) => void;
 }
 
 export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const timersRef = useRef<number[]>([]);
 
-  const [isDragging, setIsDragging] = useState(false);
-  const [file, setFile] = useState<{ name: string; sizeBytes: number } | null>(
-    null
-  );
+  const [file, setFile] = useState<PickedFile | null>(null);
   const [stepIndex, setStepIndex] = useState(-1);
 
   const clearTimers = useCallback(() => {
@@ -46,208 +37,126 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
   useEffect(() => clearTimers, [clearTimers]);
 
   const startAnalysis = useCallback(
-    (picked: { name: string; sizeBytes: number }) => {
+    (picked: PickedFile) => {
       clearTimers();
       setFile(picked);
       setStepIndex(0);
 
       ANALYSIS_STEPS.forEach((_, index) => {
-        const id = window.setTimeout(
-          () => setStepIndex(index + 1),
-          STEP_DURATION_MS * (index + 1)
+        timersRef.current.push(
+          window.setTimeout(
+            () => setStepIndex(index + 1),
+            STEP_DURATION_MS * (index + 1)
+          )
         );
-        timersRef.current.push(id);
       });
 
-      const doneId = window.setTimeout(
-        () => onAnalyzed(picked),
-        STEP_DURATION_MS * ANALYSIS_STEPS.length + 500
+      timersRef.current.push(
+        window.setTimeout(
+          () => onAnalyzed(picked),
+          STEP_DURATION_MS * ANALYSIS_STEPS.length + 400
+        )
       );
-      timersRef.current.push(doneId);
     },
     [clearTimers, onAnalyzed]
   );
-
-  function handleFiles(list: FileList | null) {
-    const picked = list?.[0];
-    if (!picked) return;
-    startAnalysis({ name: picked.name, sizeBytes: picked.size });
-  }
 
   const isAnalyzing = file !== null;
   const progress = isAnalyzing
     ? Math.min(100, (stepIndex / ANALYSIS_STEPS.length) * 100)
     : 0;
 
+  /*
+   * Состояния сменяются простым условием: ожидание ухода одного блока ради
+   * появления другого рискует зависнуть, если кадры не отрисовываются.
+   */
   return (
-    <div className="flex flex-col gap-4">
-      <AnimatePresence mode="wait">
-        {!isAnalyzing ? (
-          <motion.div
-            key="dropzone"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div
-              onDragOver={(event) => {
-                event.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={(event) => {
-                event.preventDefault();
-                setIsDragging(false);
-                handleFiles(event.dataTransfer.files);
-              }}
-              onClick={() => inputRef.current?.click()}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  inputRef.current?.click();
-                }
-              }}
-              className={cn(
-                "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-8 py-16 text-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400",
-                isDragging
-                  ? "border-violet-600 bg-violet-50/70"
-                  : "border-stone-300 bg-white hover:border-stone-400 hover:bg-stone-50/60"
-              )}
-            >
-              <motion.div
-                animate={isDragging ? { scale: 1.08, y: -4 } : { scale: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className={cn(
-                  "flex h-14 w-14 items-center justify-center rounded-2xl transition-colors",
-                  isDragging ? "bg-violet-100" : "bg-stone-100"
-                )}
-              >
-                <UploadCloud
-                  className={cn(
-                    "h-6 w-6 transition-colors",
-                    isDragging ? "text-violet-600" : "text-stone-400"
-                  )}
-                />
-              </motion.div>
+    <>
+      {!isAnalyzing ? (
+        <motion.div
+          key="dropzone"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <FileDropzone
+            accept=".pdf,.doc,.docx"
+            hint="PDF и DOCX, до 25 МБ"
+            demoFile={{
+              name: "Договор_купли-продажи_участка.pdf",
+              sizeBytes: 1_258_291,
+            }}
+            demoLabel="Или разберите демонстрационный договор"
+            onPick={startAnalysis}
+          />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="analysis"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-lg border border-stone-200 bg-white p-5"
+        >
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="min-w-0 truncate text-[13px] text-stone-900">
+              {file.name}
+            </span>
+            <span className="shrink-0 font-mono text-[10px] text-stone-400">
+              {formatFileSize(file.sizeBytes)}
+            </span>
+          </div>
 
-              <div className="flex flex-col gap-1">
-                <p
-                  className={cn(
-                    "text-sm font-medium transition-colors",
-                    isDragging ? "text-violet-700" : "text-stone-900"
-                  )}
-                >
-                  Перетащите файл сюда или нажмите для выбора
-                </p>
-                <p className="text-xs text-stone-500">
-                  Поддерживаются PDF и DOCX, до 25 МБ
-                </p>
-              </div>
+          <Progress value={progress} className="mt-4" />
 
-              <div className="mt-1 flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-500">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                Разбор по пунктам с указанием формулировок
-              </div>
-            </div>
+          <ol className="mt-5 flex flex-col gap-3">
+            {ANALYSIS_STEPS.map((step, index) => {
+              const isDone = stepIndex > index;
+              const isCurrent = stepIndex === index;
 
-            <input
-              ref={inputRef}
-              type="file"
-              className="hidden"
-              accept=".pdf,.doc,.docx"
-              onChange={(event) => {
-                handleFiles(event.target.files);
-                event.target.value = "";
-              }}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="analysis"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-50">
-                <FileText className="h-5 w-5 text-violet-600" />
-              </div>
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-medium text-stone-900">
-                  {file.name}
-                </span>
-                <span className="text-xs text-stone-400">
-                  {formatFileSize(file.sizeBytes)}
-                </span>
-              </div>
-            </div>
+              return (
+                <li key={step} className="flex items-center gap-2.5">
+                  <span
+                    className={cn(
+                      "flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors",
+                      isDone
+                        ? "bg-emerald-100 text-emerald-600"
+                        : isCurrent
+                          ? "bg-stone-900 text-white"
+                          : "bg-stone-100 text-stone-300"
+                    )}
+                  >
+                    {isDone ? (
+                      <Check className="h-2.5 w-2.5" strokeWidth={3} />
+                    ) : isCurrent ? (
+                      <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                    ) : (
+                      <span className="h-1 w-1 rounded-full bg-current" />
+                    )}
+                  </span>
 
-            <Progress value={progress} className="mt-5" />
+                  <span
+                    className={cn(
+                      "text-[13px] transition-colors",
+                      isDone
+                        ? "text-stone-400"
+                        : isCurrent
+                          ? "text-stone-900"
+                          : "text-stone-300"
+                    )}
+                  >
+                    {step}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
 
-            <ol className="mt-5 flex flex-col gap-3">
-              {ANALYSIS_STEPS.map((step, index) => {
-                const isDone = stepIndex > index;
-                const isCurrent = stepIndex === index;
-
-                return (
-                  <li key={step} className="flex items-center gap-2.5">
-                    <span
-                      className={cn(
-                        "flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors",
-                        isDone
-                          ? "bg-emerald-100 text-emerald-600"
-                          : isCurrent
-                            ? "bg-violet-100 text-violet-600"
-                            : "bg-stone-100 text-stone-300"
-                      )}
-                    >
-                      {isDone ? (
-                        <Check className="h-3 w-3" strokeWidth={3} />
-                      ) : isCurrent ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                      )}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-sm transition-colors",
-                        isDone
-                          ? "text-stone-500"
-                          : isCurrent
-                            ? "font-medium text-stone-900"
-                            : "text-stone-400"
-                      )}
-                    >
-                      {step}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {!isAnalyzing && (
-        <div className="flex justify-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-stone-500 hover:text-stone-900"
-            onClick={() =>
-              startAnalysis({
-                name: "Договор_купли-продажи_участка.pdf",
-                sizeBytes: 1_258_291,
-              })
-            }
-          >
-            Или попробуйте на демо-договоре
-          </Button>
-        </div>
+          <div className="mt-5 border-t border-stone-200 pt-3">
+            <MetaLabel>
+              Замечания привязываются к абзацам исходного текста
+            </MetaLabel>
+          </div>
+        </motion.div>
       )}
-    </div>
+    </>
   );
 }

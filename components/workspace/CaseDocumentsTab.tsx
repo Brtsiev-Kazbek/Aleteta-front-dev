@@ -6,6 +6,7 @@ import {
   Download,
   FileText,
   MoreHorizontal,
+  ScanLine,
   ShieldCheck,
   Sparkles,
   Trash2,
@@ -15,7 +16,13 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { BatchReviewSheet } from "@/components/workspace/BatchReviewSheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +30,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ReviewSplitView } from "@/components/documents/ReviewSplitView";
+import { MetaLabel } from "@/components/layout/PanelHeading";
+import { BatchReviewSheet } from "@/components/workspace/BatchReviewSheet";
 import { cn, formatDate, plural } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 import { DOCUMENT_STATUS_META } from "@/types";
@@ -37,29 +47,50 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const toggleAssistant = useAppStore((state) => state.toggleAssistant);
   const addDocuments = useAppStore((state) => state.addDocuments);
   const deleteDocument = useAppStore((state) => state.deleteDocument);
+  const startExtraction = useAppStore((state) => state.startExtraction);
 
   const selectedIds = useAppStore((state) => state.selectedDocumentIds);
   const toggleSelection = useAppStore((state) => state.toggleDocumentSelection);
+  const selectDocuments = useAppStore((state) => state.selectDocuments);
   const clearSelection = useAppStore((state) => state.clearDocumentSelection);
   const startBatchReview = useAppStore((state) => state.startBatchReview);
+
+  const reviewDocumentId = useAppStore((state) => state.reviewDocumentId);
+  const openDocumentReview = useAppStore((state) => state.openDocumentReview);
+  const closeDocumentReview = useAppStore((state) => state.closeDocumentReview);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
+  const reviewedDocument = useMemo(
+    () => documents.find((item) => item.id === reviewDocumentId) ?? null,
+    [documents, reviewDocumentId]
+  );
+
+  const allSelected =
+    documents.length > 0 && selectedIds.length === documents.length;
+
+  /**
+   * Загруженный файл не просто ложится в список: сразу запускается разбор,
+   * который вынимает реквизиты в карточку объекта.
+   */
   function handleFiles(list: FileList | null) {
     if (!list || list.length === 0) return;
-    addDocuments(
-      caseId,
-      Array.from(list).map((file) => ({
-        name: file.name,
-        sizeBytes: file.size,
-      }))
-    );
+
+    const files = Array.from(list).map((file) => ({
+      name: file.name,
+      sizeBytes: file.size,
+    }));
+
+    addDocuments(caseId, files);
+
+    const first = files[0];
+    if (first) startExtraction(first);
   }
 
   return (
     <div
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5"
       onDragOver={(event) => {
         event.preventDefault();
         setIsDragging(true);
@@ -71,66 +102,79 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
         handleFiles(event.dataTransfer.files);
       }}
     >
+      {/* Панель над списком */}
       <div
         className={cn(
-          "flex flex-wrap items-center gap-x-5 gap-y-2 rounded-lg border bg-white px-5 py-3.5 transition-colors",
-          isDragging ? "border-violet-400 bg-violet-50/50" : "border-stone-200"
+          "flex flex-wrap items-center gap-x-5 gap-y-3 border-b pb-3.5 transition-colors",
+          isDragging ? "border-stone-900" : "border-stone-200"
         )}
       >
-        <span className="text-sm font-semibold text-stone-900">
+        <label className="flex cursor-pointer items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400 transition-colors hover:text-stone-900">
+          <Checkbox
+            checked={allSelected}
+            onCheckedChange={() =>
+              allSelected
+                ? clearSelection()
+                : selectDocuments(documents.map((item) => item.id))
+            }
+            aria-label="Выбрать все документы"
+          />
           {documents.length}{" "}
           {plural(documents.length, "документ", "документа", "документов")}
-        </span>
+        </label>
 
         {isDragging && (
-          <span className="text-xs font-medium text-violet-600">
-            Отпустите файлы — они добавятся в дело
-          </span>
+          <MetaLabel className="text-stone-900">
+            Отпустите — файл добавится и будет разобран
+          </MetaLabel>
         )}
 
-        {selectedIds.length > 0 ? (
-          <div className="ml-auto flex items-center gap-2">
-            <span className="rounded-md border border-violet-200 bg-violet-50 px-2 py-1 text-xs font-medium text-violet-700">
-              Выбрано: {selectedIds.length}
-            </span>
-            <Button
-              size="sm"
-              className="h-8 gap-1.5"
-              onClick={() => startBatchReview(caseId)}
-            >
-              <ShieldCheck className="h-3.5 w-3.5" />
-              Проверить на риски
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-stone-400 hover:text-stone-900"
-              onClick={clearSelection}
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Снять выделение</span>
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="ml-auto h-8 gap-1.5 text-xs text-violet-600 hover:text-violet-700"
-            onClick={() => toggleAssistant(true)}
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Спросить ассистента
-          </Button>
-        )}
-
-        <Button
-          size="sm"
-          className="h-8 gap-1.5"
-          onClick={() => inputRef.current?.click()}
-        >
-          <Upload className="h-3.5 w-3.5" />
-          Добавить документы
-        </Button>
+        <div className="ml-auto flex items-center gap-2">
+          {selectedIds.length > 0 ? (
+            <>
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-900">
+                Выбрано: {selectedIds.length}
+              </span>
+              <Button
+                size="sm"
+                className="gap-1.5"
+                onClick={() => startBatchReview(caseId)}
+              >
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Проверить пачкой
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={clearSelection}
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Снять выделение</span>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => toggleAssistant(true)}
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Спросить ассистента
+              </Button>
+              <Button
+                size="sm"
+                className="gap-1.5"
+                onClick={() => inputRef.current?.click()}
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Загрузить и разобрать
+              </Button>
+            </>
+          )}
+        </div>
 
         <input
           ref={inputRef}
@@ -146,102 +190,137 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
         />
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-stone-200 bg-white">
-        {documents.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 px-6 py-14 text-center">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-stone-100">
-              <FileText className="h-5 w-5 text-stone-400" />
-            </div>
-            <p className="text-sm font-medium text-stone-900">
-              Документов пока нет
-            </p>
-            <p className="text-xs text-stone-500">
-              Сгенерируйте пакет во вкладке «Сущности и Генерация».
-            </p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-stone-200/70">
-            {documents.map((document, index) => {
-              const status = DOCUMENT_STATUS_META[document.status];
+      {/* Список документов */}
+      {documents.length === 0 ? (
+        <div className="flex flex-col items-center gap-2 border border-dashed border-stone-300 px-6 py-16 text-center">
+          <FileText className="h-5 w-5 text-stone-300" />
+          <p className="mt-1 text-sm text-stone-900">Документов пока нет</p>
+          <p className="max-w-sm text-[13px] leading-relaxed text-stone-500">
+            Перетащите файл сюда — реквизиты из него попадут в карточку
+            объекта. Либо соберите пакет во вкладке «Объекты и генерация».
+          </p>
+        </div>
+      ) : (
+        <ul className="flex flex-col divide-y divide-stone-200 border-y border-stone-200">
+          {documents.map((document, index) => {
+            const status = DOCUMENT_STATUS_META[document.status];
+            const isSelected = selectedIds.includes(document.id);
 
-              return (
-                <motion.li
-                  key={document.id}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.05 }}
+            return (
+              <motion.li
+                key={document.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.2) }}
+                className={cn(
+                  "group flex items-center gap-3.5 px-1 py-3.5 transition-colors",
+                  isSelected ? "bg-stone-50" : "hover:bg-stone-50/60"
+                )}
+              >
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={() => toggleSelection(document.id)}
+                  aria-label={`Выбрать «${document.title}» для проверки`}
+                  className="shrink-0"
+                />
+
+                <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
+
+                {/* Клик по строке открывает разбор — это основное действие */}
+                <button
+                  type="button"
+                  onClick={() => openDocumentReview(document.id)}
+                  className="flex min-w-0 flex-1 flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+                >
+                  <span className="truncate text-[13px] text-stone-900 underline-offset-4 group-hover:underline">
+                    {document.title}
+                  </span>
+                  <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+                    {document.type} · {formatDate(document.createdAt)}
+                  </span>
+                </button>
+
+                <span
                   className={cn(
-                    "flex items-center gap-3.5 px-5 py-3.5 transition-colors",
-                    selectedIds.includes(document.id)
-                      ? "bg-violet-50/50"
-                      : "hover:bg-stone-50/70"
+                    "hidden shrink-0 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] sm:inline-flex",
+                    status.className
                   )}
                 >
-                  <Checkbox
-                    checked={selectedIds.includes(document.id)}
-                    onCheckedChange={() => toggleSelection(document.id)}
-                    aria-label={`Выбрать «${document.title}» для проверки`}
-                    className="shrink-0"
-                  />
+                  {status.label}
+                </span>
 
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100">
-                    <FileText className="h-4 w-4 text-stone-500" />
-                  </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">Действия с документом</span>
+                    </Button>
+                  </DropdownMenuTrigger>
 
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm font-medium text-stone-900">
-                      {document.title}
-                    </span>
-                    <span className="truncate text-xs text-stone-400">
-                      {document.type} · {formatDate(document.createdAt)}
-                    </span>
-                  </div>
+                  <DropdownMenuContent align="end" className="w-52">
+                    <DropdownMenuItem
+                      onSelect={() => openDocumentReview(document.id)}
+                    >
+                      <ShieldCheck className="h-4 w-4 text-stone-400" />
+                      Разобрать по пунктам
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() =>
+                        startExtraction({
+                          name: document.title,
+                          sizeBytes: 1_048_576,
+                        })
+                      }
+                    >
+                      <ScanLine className="h-4 w-4 text-stone-400" />
+                      Извлечь реквизиты
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Download className="h-4 w-4 text-stone-400" />
+                      Скачать
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={() => deleteDocument(document.id)}
+                      className="text-red-600 focus:bg-red-50 focus:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Удалить
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </motion.li>
+            );
+          })}
+        </ul>
+      )}
 
-                  <span
-                    className={cn(
-                      "hidden shrink-0 rounded-md border px-2 py-1 text-xs font-medium sm:inline-flex",
-                      status.className
-                    )}
-                  >
-                    {status.label}
-                  </span>
+      {/* Разбор одного договора по пунктам */}
+      <Dialog
+        open={Boolean(reviewedDocument)}
+        onOpenChange={(open) => {
+          if (!open) closeDocumentReview();
+        }}
+      >
+        <DialogContent
+          className="h-[88vh] max-w-6xl gap-0 overflow-hidden p-0"
+          hideClose
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>Разбор документа по пунктам</DialogTitle>
+            <DialogDescription>
+              Слева оригинал документа, справа найденные замечания.
+            </DialogDescription>
+          </DialogHeader>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0 text-stone-400 hover:text-stone-900"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Действия с документом</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44">
-                      <DropdownMenuItem>
-                        <Download className="h-4 w-4 text-stone-400" />
-                        Скачать
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Sparkles className="h-4 w-4 text-stone-400" />
-                        Проверить риски
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onSelect={() => deleteDocument(document.id)}
-                        className="text-red-600 focus:bg-red-50 focus:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Удалить
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </motion.li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
+          {reviewedDocument && (
+            <ReviewSplitView
+              file={{ name: reviewedDocument.title, sizeBytes: 1_258_291 }}
+              onClose={closeDocumentReview}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Результаты пакетной проверки */}
       <BatchReviewSheet />

@@ -1,7 +1,10 @@
 import { Sidebar } from "@/components/layout/Sidebar";
-import { MetaLabel, PanelHeading } from "@/components/layout/PanelHeading";
-import { QuickActions } from "@/components/dashboard/QuickActions";
+import { MetaLabel } from "@/components/layout/PanelHeading";
+import { CapabilityGrid } from "@/components/dashboard/CapabilityGrid";
+import { CustomTypesPanel } from "@/components/dashboard/CustomTypesPanel";
+import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { RecentCases } from "@/components/dashboard/RecentCases";
+import { Reveal } from "@/components/landing/Reveal";
 
 export default function DashboardPage() {
   return (
@@ -9,28 +12,24 @@ export default function DashboardPage() {
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-6xl px-8 py-12">
-          <PanelHeading
-            eyebrow="Рабочий стол"
-            title="Добро пожаловать в Алетейю"
-            description="Начните с быстрого действия или продолжите работу над делом."
-          />
+        <DashboardHero />
 
-          {/* Быстрые действия */}
-          <section className="mt-12">
-            <MetaLabel>Быстрые действия</MetaLabel>
-            <div className="mt-4">
-              <QuickActions />
-            </div>
-          </section>
+        <div className="mx-auto max-w-6xl px-8 pb-16 pt-12">
+          {/* Возможности */}
+          <CapabilityGrid />
 
-          {/* Недавние дела */}
-          <section className="mt-14">
+          {/* Общие типы объектов — их создаёт инструмент 04 */}
+          <Reveal className="mt-16">
+            <CustomTypesPanel />
+          </Reveal>
+
+          {/* Дела */}
+          <Reveal className="mt-16">
             <MetaLabel>Недавние дела</MetaLabel>
             <div className="mt-4">
               <RecentCases />
             </div>
-          </section>
+          </Reveal>
         </div>
       </main>
     </div>

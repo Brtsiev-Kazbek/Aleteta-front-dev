@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { GripVertical, Plus, Sparkles, Trash2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,6 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { MetaLabel } from "@/components/layout/PanelHeading";
+import { plural } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
 interface DraftField {
@@ -27,7 +30,15 @@ const INITIAL_FIELDS: DraftField[] = [
   { id: 2, label: "", required: false },
 ];
 
-export function CustomSchemaDialog({ caseId }: { caseId: string }) {
+interface CustomSchemaDialogProps {
+  /**
+   * Дело, в которое сразу добавится объект нового типа. Без него создаётся
+   * только сам тип — он общий и доступен во всех делах.
+   */
+  caseId?: string;
+}
+
+export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
   const isOpen = useAppStore((state) => state.isCustomSchemaOpen);
   const setOpen = useAppStore((state) => state.setCustomSchemaOpen);
   const createCustomSchema = useAppStore((state) => state.createCustomSchema);
@@ -61,17 +72,23 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
   }
 
   function handleCreate() {
-    createCustomSchema(caseId, {
-      label,
-      fields: fields.map(({ label: fieldLabel, required }) => ({
-        label: fieldLabel,
-        required,
-      })),
-    });
+    createCustomSchema(
+      {
+        label,
+        fields: fields.map(({ label: fieldLabel, required }) => ({
+          label: fieldLabel,
+          required,
+        })),
+      },
+      caseId
+    );
     reset();
   }
 
   const filledFields = fields.filter((field) => field.label.trim()).length;
+  const requiredCount = fields.filter(
+    (field) => field.label.trim() && field.required
+  ).length;
 
   return (
     <Dialog
@@ -83,25 +100,22 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
     >
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
-              <Sparkles className="h-4 w-4 text-violet-600" />
-            </div>
-            <DialogTitle>Свой тип сущности</DialogTitle>
-          </div>
+          <MetaLabel>Свои типы объектов</MetaLabel>
+          <DialogTitle className="mt-1">
+            {caseId ? "Новый тип объекта в деле" : "Новый тип объекта"}
+          </DialogTitle>
           <DialogDescription>
-            Опишите, какие реквизиты нужны — они станут колонками в таблице и
-            будут проверяться перед генерацией.
+            Реквизиты станут колонками таблицы и будут проверяться перед
+            генерацией. {caseId
+              ? "Тип останется доступен и в остальных делах."
+              : "Тип появится в списке типов во всех делах."}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="schema-label"
-              className="text-xs font-medium text-stone-500"
-            >
-              Название типа
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="schema-label">
+              <MetaLabel>Название типа</MetaLabel>
             </label>
             <Input
               id="schema-label"
@@ -112,59 +126,75 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-stone-500">
-                Реквизиты
-              </span>
-              <span className="text-xs text-stone-400">
-                Обязательные проверяются перед генерацией
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-baseline justify-between gap-3">
+              <MetaLabel>Реквизиты</MetaLabel>
+              <span className="font-mono text-[10px] tabular-nums text-stone-400">
+                {filledFields} {plural(filledFields, "поле", "поля", "полей")}
+                {requiredCount > 0 &&
+                  ` · ${requiredCount} ${plural(
+                    requiredCount,
+                    "обязательное",
+                    "обязательных",
+                    "обязательных"
+                  )}`}
               </span>
             </div>
 
-            <div className="flex max-h-64 flex-col gap-2 overflow-y-auto pr-1">
-              {fields.map((field) => (
-                <div key={field.id} className="flex items-center gap-2">
-                  <GripVertical className="h-4 w-4 shrink-0 text-stone-300" />
-
-                  <Input
-                    value={field.label}
-                    onChange={(event) =>
-                      updateField(field.id, { label: event.target.value })
-                    }
-                    placeholder="Название реквизита"
-                    className="flex-1"
-                  />
-
-                  <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-stone-200 px-2.5 py-2 text-xs text-stone-600 transition-colors hover:bg-stone-50">
-                    <Checkbox
-                      checked={field.required}
-                      onCheckedChange={(checked) =>
-                        updateField(field.id, { required: checked === true })
-                      }
-                    />
-                    Обязательное
-                  </label>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeField(field.id)}
-                    disabled={fields.length <= 1}
-                    className="h-9 w-9 shrink-0 text-stone-400 hover:text-red-600 disabled:opacity-40"
+            <div className="scrollable-area flex max-h-64 flex-col gap-2 overflow-y-auto pr-1">
+              <AnimatePresence initial={false}>
+                {fields.map((field, index) => (
+                  <motion.div
+                    key={field.id}
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.18 }}
+                    className="flex items-center gap-2"
                   >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Удалить реквизит</span>
-                  </Button>
-                </div>
-              ))}
+                    <span className="w-5 shrink-0 font-mono text-[10px] tabular-nums text-stone-300">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+
+                    <Input
+                      value={field.label}
+                      onChange={(event) =>
+                        updateField(field.id, { label: event.target.value })
+                      }
+                      placeholder="Название реквизита"
+                      className="flex-1"
+                    />
+
+                    <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-stone-200 px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.1em] text-stone-500 transition-colors hover:border-stone-300 hover:text-stone-900">
+                      <Checkbox
+                        checked={field.required}
+                        onCheckedChange={(checked) =>
+                          updateField(field.id, { required: checked === true })
+                        }
+                      />
+                      Обязательное
+                    </label>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeField(field.id)}
+                      disabled={fields.length <= 1}
+                      className="h-9 w-9 shrink-0 hover:text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Удалить реквизит</span>
+                    </Button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
 
             <Button
               variant="outline"
               size="sm"
               onClick={addField}
-              className="w-full gap-1.5 border-dashed border-stone-300"
+              className="w-full gap-1.5 border-dashed"
             >
               <Plus className="h-3.5 w-3.5" />
               Добавить реквизит
@@ -177,7 +207,7 @@ export function CustomSchemaDialog({ caseId }: { caseId: string }) {
             Отмена
           </Button>
           <Button onClick={handleCreate} disabled={filledFields === 0}>
-            Создать тип и сущность
+            {caseId ? "Создать тип и объект" : "Создать тип"}
           </Button>
         </DialogFooter>
       </DialogContent>

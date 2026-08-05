@@ -8,7 +8,7 @@ import {
   ArrowUp,
   FileText,
   Info,
-  Sparkles,
+  Quote,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -20,10 +20,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { MetaLabel } from "@/components/layout/PanelHeading";
 import { SUGGESTED_PROMPTS } from "@/data/mock-data";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
-import { RISK_LEVEL_META, type RiskFinding, type RiskLevel } from "@/types";
+import {
+  RISK_LEVEL_META,
+  type Citation,
+  type RiskFinding,
+  type RiskLevel,
+} from "@/types";
 
 const RISK_ICONS: Record<RiskLevel, LucideIcon> = {
   critical: AlertCircle,
@@ -36,7 +42,10 @@ interface AIAssistantSheetProps {
   contextFile: string;
 }
 
-export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps) {
+export function AIAssistantSheet({
+  caseId,
+  contextFile,
+}: AIAssistantSheetProps) {
   const isOpen = useAppStore((state) => state.isAssistantOpen);
   const toggleAssistant = useAppStore((state) => state.toggleAssistant);
   const messages = useAppStore((state) => state.chatMessages);
@@ -58,27 +67,23 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => toggleAssistant(open)}>
-      <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-md"
+      >
         <SheetHeader>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-500">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <SheetTitle>Алетейя AI</SheetTitle>
-          </div>
-
+          <MetaLabel>Ассистент по делу</MetaLabel>
+          <SheetTitle>Алетейя</SheetTitle>
           <SheetDescription asChild>
-            <div className="pl-[42px]">
-              <span className="inline-flex max-w-full items-center gap-1.5 rounded-md border border-stone-200 bg-stone-50 px-2 py-1 text-xs text-stone-600">
-                <FileText className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">Контекст: {contextFile}</span>
-              </span>
+            <div className="flex items-center gap-1.5 text-stone-500">
+              <FileText className="h-3 w-3 shrink-0 text-stone-300" />
+              <span className="truncate">Контекст: {contextFile}</span>
             </div>
           </SheetDescription>
         </SheetHeader>
 
         {/* Лента сообщений */}
-        <ScrollArea className="flex-1 px-5 py-4">
+        <ScrollArea className="min-h-0 flex-1 px-5 py-5">
           <div className="flex flex-col gap-4">
             <AnimatePresence initial={false}>
               {messages.map((message) => (
@@ -86,44 +91,47 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
                   key={message.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  transition={{ duration: 0.26, ease: [0.22, 0.61, 0.36, 1] }}
                   className={cn(
-                    "flex items-start gap-2.5",
-                    message.role === "user" && "flex-row-reverse"
+                    "flex flex-col gap-2",
+                    message.role === "user" ? "items-end" : "items-start"
                   )}
                 >
-                  {message.role === "assistant" && (
-                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-500">
-                      <Sparkles className="h-3.5 w-3.5 text-white" />
-                    </div>
-                  )}
-
                   <div
                     className={cn(
-                      "flex min-w-0 flex-col gap-2",
-                      message.role === "user" ? "max-w-[85%]" : "max-w-[88%]"
+                      "max-w-[88%] rounded-lg px-3.5 py-2.5 text-[13px] leading-relaxed",
+                      message.role === "assistant"
+                        ? "border border-stone-200 bg-white text-stone-900"
+                        : "bg-stone-950 text-white"
                     )}
                   >
-                    <div
-                      className={cn(
-                        "rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
-                        message.role === "assistant"
-                          ? "rounded-tl-sm bg-stone-100 text-stone-900"
-                          : "rounded-tr-sm bg-violet-600 text-white"
-                      )}
-                    >
-                      {message.text}
-                    </div>
-
-                    {/* UI-карточки находок вместо простого текста */}
-                    {message.findings?.map((finding, index) => (
-                      <FindingCard
-                        key={finding.id}
-                        finding={finding}
-                        delay={index * 0.08}
-                      />
-                    ))}
+                    {message.text}
                   </div>
+
+                  {/* Находки — карточками, а не сплошным текстом */}
+                  {message.findings?.map((finding, index) => (
+                    <FindingCard
+                      key={finding.id}
+                      finding={finding}
+                      delay={index * 0.08}
+                    />
+                  ))}
+
+                  {/* Источники: пункт и страница конкретного файла дела */}
+                  {message.citations && message.citations.length > 0 && (
+                    <div className="w-full">
+                      <MetaLabel>Источники</MetaLabel>
+                      <div className="mt-2 flex flex-col gap-1.5">
+                        {message.citations.map((citation, index) => (
+                          <CitationCard
+                            key={citation.id}
+                            citation={citation}
+                            delay={index * 0.08}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -132,25 +140,20 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-start gap-2.5"
+                className="flex items-center gap-1 self-start rounded-lg border border-stone-200 bg-white px-4 py-3"
               >
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-500">
-                  <Sparkles className="h-3.5 w-3.5 text-white" />
-                </div>
-                <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm bg-stone-100 px-4 py-3.5">
-                  {[0, 1, 2].map((dot) => (
-                    <motion.span
-                      key={dot}
-                      className="h-1.5 w-1.5 rounded-full bg-stone-400"
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{
-                        duration: 1.1,
-                        repeat: Infinity,
-                        delay: dot * 0.18,
-                      }}
-                    />
-                  ))}
-                </div>
+                {[0, 1, 2].map((dot) => (
+                  <motion.span
+                    key={dot}
+                    className="h-1 w-1 rounded-full bg-stone-400"
+                    animate={{ opacity: [0.25, 1, 0.25] }}
+                    transition={{
+                      duration: 1.1,
+                      repeat: Infinity,
+                      delay: dot * 0.18,
+                    }}
+                  />
+                ))}
               </motion.div>
             )}
 
@@ -158,8 +161,8 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
           </div>
         </ScrollArea>
 
-        {/* Умный инпут */}
-        <div className="flex flex-col gap-2.5 border-t border-stone-200 px-5 py-4">
+        {/* Ввод */}
+        <div className="flex shrink-0 flex-col gap-2.5 border-t border-stone-200 px-5 py-4">
           <div className="flex flex-wrap gap-1.5">
             {SUGGESTED_PROMPTS.map((prompt) => (
               <button
@@ -167,7 +170,7 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
                 type="button"
                 onClick={() => handleSend(prompt)}
                 disabled={isThinking}
-                className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-600 transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 disabled:opacity-50"
+                className="rounded border border-stone-200 px-2.5 py-1.5 text-xs text-stone-600 transition-colors hover:border-stone-900 hover:text-stone-900 disabled:opacity-40"
               >
                 {prompt}
               </button>
@@ -185,16 +188,16 @@ export function AIAssistantSheet({ caseId, contextFile }: AIAssistantSheetProps)
                 }
               }}
               placeholder="Спросите Алетейю о деле…"
-              className="h-11 w-full rounded-xl border border-stone-200 bg-white pl-4 pr-12 text-sm text-stone-900 outline-none transition-colors placeholder:text-stone-400 focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+              className="h-10 w-full rounded-md border border-stone-200 bg-white pl-3.5 pr-11 text-[13px] text-stone-900 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-900"
             />
             <button
               type="button"
               onClick={() => handleSend(draft)}
               disabled={!draft.trim() || isThinking}
-              className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg bg-violet-600 text-white transition-colors hover:bg-violet-700 disabled:bg-stone-200 disabled:text-stone-400"
+              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded bg-stone-950 text-white transition-colors hover:bg-stone-800 disabled:bg-stone-100 disabled:text-stone-400"
               aria-label="Отправить сообщение"
             >
-              <ArrowUp className="h-4 w-4" />
+              <ArrowUp className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
@@ -218,29 +221,72 @@ function FindingCard({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.24, delay }}
-      className={cn("rounded-xl border p-3.5", meta.cardClassName)}
+      transition={{ duration: 0.26, delay }}
+      className={cn("w-full rounded border p-3.5", meta.cardClassName)}
     >
       <div className="flex items-start gap-2.5">
-        <Icon className={cn("mt-0.5 h-4 w-4 shrink-0", meta.iconClassName)} />
+        <Icon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", meta.iconClassName)} />
+
         <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={cn(
-                "rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+                "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]",
                 meta.badgeClassName
               )}
             >
               {meta.label}
             </span>
-            <span className="text-xs text-stone-500">{finding.clause}</span>
+            <span className="font-mono text-[10px] text-stone-400">
+              {finding.clause}
+            </span>
           </div>
 
-          <p className="text-sm font-medium text-stone-900">{finding.title}</p>
-          <p className="text-sm leading-relaxed text-stone-600">
+          <p className="text-[13px] font-medium text-stone-900">
+            {finding.title}
+          </p>
+          <p className="text-[13px] leading-relaxed text-stone-600">
             {finding.description}
           </p>
         </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/**
+ * Источник ответа. Без него ассистент неотличим от угадывания: видно, из
+ * какого файла, пункта и страницы взята формулировка.
+ */
+function CitationCard({
+  citation,
+  delay,
+}: {
+  citation: Citation;
+  delay: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.26, delay }}
+      className="rounded border border-stone-200 bg-white p-3 transition-colors hover:border-stone-300"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <FileText className="h-3 w-3 shrink-0 text-stone-300" />
+        <span className="min-w-0 truncate text-[11px] font-medium text-stone-800">
+          {citation.document}
+        </span>
+        <span className="ml-auto shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+          {citation.clause} · стр. {citation.page}
+        </span>
+      </div>
+
+      <div className="mt-2 flex gap-2 border-l border-stone-200 pl-2.5">
+        <Quote className="mt-0.5 h-2.5 w-2.5 shrink-0 text-stone-300" />
+        <p className="text-[11px] leading-relaxed text-stone-600">
+          {citation.quote}
+        </p>
       </div>
     </motion.div>
   );

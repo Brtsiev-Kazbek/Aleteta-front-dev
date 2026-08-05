@@ -2,17 +2,10 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowUp,
-  CheckCircle2,
-  FileText,
-  FolderKanban,
-  Loader2,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { ArrowUp, Check, FileText, FolderKanban, Loader2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -23,6 +16,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { AutoGrowTextarea } from "@/components/ui/textarea";
+import { MetaLabel } from "@/components/layout/PanelHeading";
 import { cn, plural } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -36,6 +30,7 @@ const QUICK_PROMPTS = [
 export function CaseSelectionBar() {
   const cases = useAppStore((state) => state.cases);
   const selectedCaseIds = useAppStore((state) => state.selectedCaseIds);
+  const toggleCaseSelection = useAppStore((state) => state.toggleCaseSelection);
   const clearCaseSelection = useAppStore((state) => state.clearCaseSelection);
   const isSheetOpen = useAppStore((state) => state.isBulkSheetOpen);
   const setSheetOpen = useAppStore((state) => state.setBulkSheetOpen);
@@ -73,23 +68,17 @@ export function CaseSelectionBar() {
             transition={{ duration: 0.22, ease: "easeOut" }}
             className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2"
           >
-            <div className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white/95 px-4 py-3 shadow-2xl shadow-stone-400/20 backdrop-blur">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
-                <FolderKanban className="h-4 w-4 text-violet-600" />
-              </div>
+            <div className="shadow-panel flex items-center gap-3 rounded-lg border border-stone-200 bg-white/95 px-4 py-3 backdrop-blur">
+              <FolderKanban className="h-3.5 w-3.5 shrink-0 text-stone-400" />
 
-              <span className="whitespace-nowrap text-sm">
-                <span className="font-semibold text-stone-900">{count}</span>
-                <span className="text-stone-500">
-                  {" "}
-                  {plural(count, "дело", "дела", "дел")} выбрано
-                </span>
+              <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
+                <span className="tabular-nums text-stone-900">{count}</span>{" "}
+                {plural(count, "дело", "дела", "дел")} выбрано
               </span>
 
-              <span className="h-6 w-px bg-stone-200" />
+              <span className="h-5 w-px bg-stone-200" />
 
-              <Button size="sm" className="gap-1.5" onClick={() => setSheetOpen(true)}>
-                <Sparkles className="h-4 w-4" />
+              <Button size="sm" onClick={() => setSheetOpen(true)}>
                 Создать документ
               </Button>
 
@@ -97,7 +86,7 @@ export function CaseSelectionBar() {
                 variant="ghost"
                 size="icon"
                 onClick={clearCaseSelection}
-                className="h-8 w-8 text-stone-400 hover:text-stone-900"
+                className="h-8 w-8"
               >
                 <X className="h-4 w-4" />
                 <span className="sr-only">Снять выделение</span>
@@ -114,29 +103,27 @@ export function CaseSelectionBar() {
       >
         <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
           <SheetHeader>
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
-                {status === "running" ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-violet-600" />
-                ) : (
-                  <Sparkles className="h-4 w-4 text-violet-600" />
-                )}
-              </div>
-              <SheetTitle>
-                {status === "done"
-                  ? "Документы созданы"
-                  : "Документ по нескольким делам"}
-              </SheetTitle>
+            <div className="flex items-center gap-2">
+              <MetaLabel>Работа по нескольким делам</MetaLabel>
+              {status === "running" && (
+                <Loader2 className="h-3 w-3 animate-spin text-stone-400" />
+              )}
             </div>
 
-            <SheetDescription className="pl-[42px]">
+            <SheetTitle>
+              {status === "done"
+                ? "Документы созданы"
+                : "Документ по нескольким делам"}
+            </SheetTitle>
+
+            <SheetDescription>
               {status === "done"
                 ? `Создано ${results.length} ${plural(
                     results.length,
                     "документ",
                     "документа",
                     "документов"
-                  )} — по одному в каждом деле`
+                  )} — по одному в каждом деле, с реквизитами именно этого дела`
                 : `Один запрос — документ появится в каждом из ${count} ${plural(
                     count,
                     "выбранного дела",
@@ -149,8 +136,8 @@ export function CaseSelectionBar() {
           {status === "running" && (
             <div className="px-5 py-6">
               <Progress value={progress} />
-              <p className="mt-3 text-center text-xs text-stone-400">
-                {Math.round(progress)}%
+              <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                Подставляем реквизиты · {Math.round(progress)}%
               </p>
             </div>
           )}
@@ -166,22 +153,23 @@ export function CaseSelectionBar() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.24, delay: index * 0.06 }}
-                        className="flex items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2.5"
+                        className="flex items-center gap-3 rounded border border-stone-200 px-3 py-2.5"
                       >
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-50">
-                          <FileText className="h-4 w-4 text-violet-600" />
-                        </div>
+                        <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
 
                         <div className="flex min-w-0 flex-1 flex-col leading-tight">
-                          <span className="truncate text-sm text-stone-900">
+                          <span className="truncate text-[13px] text-stone-900">
                             {result.name}
                           </span>
-                          <span className="truncate text-xs text-stone-400">
+                          <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
                             {result.caseTitle}
                           </span>
                         </div>
 
-                        <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                        <Check
+                          className="h-3.5 w-3.5 shrink-0 text-emerald-600"
+                          strokeWidth={3}
+                        />
                       </motion.div>
                     ))}
                   </AnimatePresence>
@@ -205,37 +193,58 @@ export function CaseSelectionBar() {
               <>
                 <ScrollArea className="flex-1 px-5 py-4">
                   <div className="flex flex-col gap-4">
-                    {/* Список выбранных дел */}
-                    <div className="flex flex-col gap-1.5">
-                      <span className="text-xs font-medium uppercase tracking-wide text-stone-400">
-                        Выбранные дела
-                      </span>
+                    {/* Список дел: состав можно поправить прямо здесь */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <MetaLabel>Дела для этого документа</MetaLabel>
+                        <span className="font-mono text-[10px] tabular-nums text-stone-400">
+                          {count} из {cases.length}
+                        </span>
+                      </div>
 
-                      {selectedCases.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-2.5 rounded-lg border border-stone-200 px-3 py-2"
-                        >
-                          <FolderKanban className="h-3.5 w-3.5 shrink-0 text-stone-400" />
-                          <span className="truncate text-sm text-stone-700">
-                            {item.title}
-                          </span>
-                        </div>
-                      ))}
+                      <div className="flex flex-col gap-1.5">
+                        {cases.map((item) => {
+                          const isPicked = selectedCaseIds.includes(item.id);
+
+                          return (
+                            <label
+                              key={item.id}
+                              className={cn(
+                                "flex cursor-pointer items-center gap-2.5 rounded border px-3 py-2 transition-colors",
+                                isPicked
+                                  ? "border-stone-900 bg-stone-50"
+                                  : "border-stone-200 hover:border-stone-300"
+                              )}
+                            >
+                              <Checkbox
+                                checked={isPicked}
+                                onCheckedChange={() =>
+                                  toggleCaseSelection(item.id)
+                                }
+                                aria-label={`Включить дело «${item.title}»`}
+                              />
+                              <span
+                                className={cn(
+                                  "truncate text-[13px] transition-colors",
+                                  isPicked ? "text-stone-900" : "text-stone-500"
+                                )}
+                              >
+                                {item.title}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
                     </div>
 
                     {/* Свободный запрос */}
                     <div className="flex flex-col gap-2">
-                      <span className="text-xs font-medium uppercase tracking-wide text-stone-400">
-                        Что сгенерировать
-                      </span>
+                      <MetaLabel>Что сгенерировать</MetaLabel>
 
                       <div
                         className={cn(
-                          "rounded-xl border bg-white p-3 transition-colors",
-                          prompt.trim()
-                            ? "border-violet-300 ring-2 ring-violet-100"
-                            : "border-stone-200"
+                          "rounded-md border bg-white p-3 transition-colors",
+                          prompt.trim() ? "border-stone-900" : "border-stone-200"
                         )}
                       >
                         <AutoGrowTextarea
@@ -249,7 +258,6 @@ export function CaseSelectionBar() {
                           }}
                           maxHeight={160}
                           placeholder="Например: уведомление о переносе сроков исполнения на 30 календарных дней со ссылкой на реквизиты дела…"
-                          className="text-sm"
                         />
                       </div>
 
@@ -259,7 +267,7 @@ export function CaseSelectionBar() {
                             key={item}
                             type="button"
                             onClick={() => setPrompt(item)}
-                            className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-600 transition-colors hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700"
+                            className="rounded border border-stone-200 px-2.5 py-1.5 text-xs text-stone-600 transition-colors hover:border-stone-900 hover:text-stone-900"
                           >
                             {item}
                           </button>
@@ -273,11 +281,17 @@ export function CaseSelectionBar() {
                   <Button
                     className="flex-1 gap-1.5"
                     onClick={handleGenerate}
-                    disabled={!prompt.trim()}
+                    disabled={!prompt.trim() || count === 0}
                   >
                     <ArrowUp className="h-4 w-4" />
-                    Сгенерировать для {count}{" "}
-                    {plural(count, "дела", "дел", "дел")}
+                    {count === 0
+                      ? "Отметьте хотя бы одно дело"
+                      : `Сгенерировать для ${count} ${plural(
+                          count,
+                          "дела",
+                          "дел",
+                          "дел"
+                        )}`}
                   </Button>
                   <Button variant="outline" onClick={handleClose}>
                     Отмена

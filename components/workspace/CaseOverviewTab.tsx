@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { motion } from "framer-motion";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Button } from "@/components/ui/button";
 import { MetaLabel } from "@/components/layout/PanelHeading";
 import { CASE_ACTIVITY, type ActivityKind } from "@/data/mock-data";
@@ -83,11 +85,11 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
         <div className="mt-4 flex items-end gap-4">
           <span
             className={cn(
-              "font-mono text-6xl leading-none tabular-nums tracking-tight",
+              "font-mono text-6xl leading-none tabular-nums tracking-tight transition-colors duration-500",
               isReady ? "text-emerald-600" : "text-stone-900"
             )}
           >
-            {Math.round(stats.percent)}
+            <AnimatedNumber value={Math.round(stats.percent)} />
             <span className="text-2xl text-stone-300">%</span>
           </span>
 
@@ -99,12 +101,13 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
 
         {/* Полоса готовности вместо карточки с прогрессом */}
         <div className="mt-5 h-px w-full bg-stone-200">
-          <div
+          <motion.div
+            animate={{ width: `${stats.percent}%` }}
+            transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
             className={cn(
-              "h-px transition-[width] duration-500",
-              isReady ? "bg-emerald-500" : "bg-violet-600"
+              "h-px",
+              isReady ? "bg-emerald-500" : "bg-stone-900"
             )}
-            style={{ width: `${stats.percent}%` }}
           />
         </div>
 
@@ -115,9 +118,12 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
             { value: stats.valid, label: "готовы" },
             { value: stats.errorFields, label: "полей с ошибками" },
           ].map((tile) => (
-            <div key={tile.label} className="bg-stone-50 px-4 py-5">
+            <div
+              key={tile.label}
+              className="bg-white px-4 py-5 transition-colors hover:bg-stone-50"
+            >
               <span className="font-mono text-2xl tabular-nums text-stone-900">
-                {tile.value}
+                <AnimatedNumber value={tile.value} />
               </span>
               <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
                 {tile.label}
@@ -135,7 +141,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
               <button
                 type="button"
                 onClick={() => setActiveTab("entities")}
-                className="text-xs text-violet-600 transition-colors hover:text-violet-700"
+                className="border-b border-stone-200 pb-0.5 text-xs text-stone-500 transition-colors hover:border-stone-900 hover:text-stone-900"
               >
                 Открыть матрицу
               </button>
@@ -151,28 +157,37 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
             </div>
           ) : (
             <ul className="mt-4 flex flex-col divide-y divide-stone-200 border-t border-stone-200">
-              {problems.map(({ entity, schema, validation }) => (
-                <li
+              {problems.map(({ entity, schema, validation }, index) => (
+                <motion.li
                   key={entity.id}
-                  className="flex items-center gap-4 py-4"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.24, delay: index * 0.05 }}
+                  className="group flex cursor-pointer items-center gap-4 py-4 transition-colors hover:bg-stone-50"
+                  onClick={() => setActiveTab("entities")}
                 >
-                  <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-red-500" />
 
                   <div className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-sm text-stone-900">
                       {entity.data[schema.fields[0]?.key ?? "name"]?.trim() ||
                         `Без наименования · ${schema.label}`}
                     </span>
-                    <span className="truncate text-xs text-red-600">
+                    <span className="mt-0.5 truncate text-xs text-red-600">
                       {validation.errors[0]}
                     </span>
                   </div>
 
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400 transition-colors group-hover:text-stone-900">
                     {validation.errors.length}{" "}
-                    {plural(validation.errors.length, "ошибка", "ошибки", "ошибок")}
+                    {plural(
+                      validation.errors.length,
+                      "ошибка",
+                      "ошибки",
+                      "ошибок"
+                    )}
                   </span>
-                </li>
+                </motion.li>
               ))}
             </ul>
           )}
@@ -207,10 +222,10 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
 
         <Button
           variant="outline"
-          className="mt-6 w-full gap-2 border-stone-200"
+          className="mt-6 w-full gap-2"
           onClick={() => toggleAssistant(true)}
         >
-          <Sparkles className="h-4 w-4 text-violet-600" />
+          <Sparkles className="h-4 w-4 text-stone-400" />
           Спросить Алетейю о деле
         </Button>
 
@@ -236,13 +251,13 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
 
                     <div
                       className={cn(
-                        "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                        "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded border bg-white",
                         item.kind === "ai"
-                          ? "bg-violet-50 text-violet-600"
-                          : "bg-stone-100 text-stone-500"
+                          ? "border-violet-200 text-violet-600"
+                          : "border-stone-200 text-stone-400"
                       )}
                     >
-                      <Icon className="h-3.5 w-3.5" />
+                      <Icon className="h-3 w-3" />
                     </div>
 
                     <div className="flex min-w-0 flex-col">

@@ -1,7 +1,9 @@
-import { FileText, Layers, Plus } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { CustomTypesPanel } from "@/components/dashboard/CustomTypesPanel";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { PanelHeading } from "@/components/layout/PanelHeading";
 import { plural } from "@/lib/utils";
 import { BUILTIN_SCHEMAS } from "@/types";
 
@@ -16,66 +18,58 @@ export default function TemplatesPage() {
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-6xl px-8 py-10">
-          <header className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex flex-col gap-1.5">
-              <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
-                Шаблоны документов
-              </h1>
-              <p className="text-sm text-stone-500">
-                {total} {plural(total, "шаблон", "шаблона", "шаблонов")} —
-                подставляются при массовой генерации по типу сущности. Свои
-                типы добавляются прямо в деле.
-              </p>
-            </div>
+        <div className="mx-auto max-w-6xl px-8 py-12">
+          <PanelHeading
+            eyebrow="Шаблоны"
+            title="Формы, которые подставляются автоматически"
+            description={`${total} ${plural(
+              total,
+              "шаблон",
+              "шаблона",
+              "шаблонов"
+            )} на встроенные типы объектов. Если подходящей формы нет, документ составляется с нуля по свободному запросу.`}
+            action={
+              <Button variant="outline" className="gap-1.5">
+                <Plus className="h-4 w-4" />
+                Новый шаблон
+              </Button>
+            }
+          />
 
-            <Button className="gap-1.5">
-              <Plus className="h-4 w-4" />
-              Новый шаблон
-            </Button>
-          </header>
+          <div className="mt-10 flex flex-col gap-10">
+            {/* Общие пользовательские типы — их заводят с рабочего стола */}
+            <CustomTypesPanel />
 
-          <div className="mt-8 flex flex-col gap-5">
             {BUILTIN_SCHEMAS.map((schema) => (
-              <section
-                key={schema.id}
-                className="rounded-lg border border-stone-200 bg-white"
-              >
-                <div className="flex items-center gap-2.5 border-b border-stone-200 px-5 py-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
-                    <Layers className="h-4 w-4 text-violet-600" />
-                  </div>
-                  <div className="flex flex-col leading-tight">
-                    <h2 className="text-sm font-semibold text-stone-900">
-                      {schema.label}
-                    </h2>
-                    <span className="text-xs text-stone-500">
-                      {schema.templates.length}{" "}
-                      {plural(
-                        schema.templates.length,
-                        "шаблон",
-                        "шаблона",
-                        "шаблонов"
-                      )}{" "}
-                      · {schema.hint}
-                    </span>
-                  </div>
+              <section key={schema.id}>
+                <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-stone-200 pb-3">
+                  <h2 className="text-[15px] font-medium tracking-[-0.01em] text-stone-900">
+                    {schema.label}
+                  </h2>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                    {schema.templates.length}{" "}
+                    {plural(
+                      schema.templates.length,
+                      "шаблон",
+                      "шаблона",
+                      "шаблонов"
+                    )}{" "}
+                    · {schema.hint}
+                  </span>
                 </div>
 
-                <ul className="divide-y divide-stone-200/70">
+                <ul className="flex flex-col divide-y divide-stone-200">
                   {schema.templates.map((template) => (
                     <li
                       key={template}
-                      className="flex items-center gap-3.5 px-5 py-3.5 transition-colors hover:bg-stone-50/70"
+                      className="flex items-center gap-3 py-3.5"
                     >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100">
-                        <FileText className="h-4 w-4 text-stone-500" />
-                      </div>
-                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-stone-900">
+                      <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
+                      <span className="min-w-0 flex-1 truncate text-sm text-stone-900">
                         {template}
                       </span>
-                      <span className="shrink-0 rounded-md border border-stone-200 bg-stone-50 px-2 py-1 text-xs text-stone-500">
-                        .docx
+                      <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                        docx
                       </span>
                     </li>
                   ))}

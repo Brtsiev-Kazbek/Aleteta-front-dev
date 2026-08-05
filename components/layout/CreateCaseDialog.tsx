@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { MetaLabel } from "@/components/layout/PanelHeading";
 import { useAppStore } from "@/store/useAppStore";
 
 /**
@@ -44,9 +45,10 @@ export function CreateCaseDialog() {
     >
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Новое дело</DialogTitle>
+          <MetaLabel>Рабочее пространство</MetaLabel>
+          <DialogTitle className="mt-1">Новое дело</DialogTitle>
           <DialogDescription>
-            Назовите рабочее пространство — файлы и сущности добавите внутри.
+            Назовите рабочее пространство — файлы и объекты добавите внутри.
           </DialogDescription>
         </DialogHeader>
 

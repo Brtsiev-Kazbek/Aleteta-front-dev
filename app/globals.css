@@ -13,26 +13,31 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 9%;
 
-    --primary: 262 83% 58%; /* violet-600 */
+    /*
+     * Основное действие — чёрное, как на лендинге: там кнопка «Сгенерировать
+     * пакет» гаснет в stone-950, а не в фирменный фиолетовый. Фиолетовый
+     * остаётся только тонким акцентом (волосяная линия рубрики, курсор ввода).
+     */
+    --primary: 24 10% 10%; /* stone-950 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 222 47% 11%; /* slate-900-ish */
+    --secondary: 60 5% 96%; /* stone-100 */
+    --secondary-foreground: 24 10% 10%;
 
-    --muted: 240 5% 96%;
+    --muted: 60 5% 96%;
     --muted-foreground: 25 5% 45%; /* stone-500 */
 
-    --accent: 262 83% 96%;
-    --accent-foreground: 262 83% 40%;
+    --accent: 60 5% 96%; /* stone-100 */
+    --accent-foreground: 24 10% 10%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 20 6% 90%; /* stone-200 */
     --input: 20 6% 90%;
-    --ring: 262 83% 58%;
+    --ring: 24 6% 34%; /* stone-600 */
 
-    --radius: 0.625rem;
+    --radius: 0.5rem;
   }
 }
 
@@ -115,6 +120,28 @@
         rgb(139 92 246 / 0.12),
         transparent 62%
       );
+  }
+
+  /*
+   * Тень продуктовой панели — ровно та же, что под превью на лендинге.
+   * Используется на всплывающих панелях приложения, чтобы они читались
+   * как тот же объект, а не как чужая карточка.
+   */
+  .shadow-panel {
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.04),
+      0 16px 48px -16px rgb(0 0 0 / 0.14);
+  }
+
+  /* Волосяная линия перед рубрикой — приём заголовков лендинга. */
+  .rule-before::before {
+    content: "";
+    display: inline-block;
+    width: 1.5rem;
+    height: 1px;
+    margin-right: 0.625rem;
+    vertical-align: middle;
+    background-color: theme("colors.violet.500");
   }
 
   .mask-fade-b {

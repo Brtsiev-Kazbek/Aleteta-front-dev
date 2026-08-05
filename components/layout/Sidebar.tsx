@@ -93,7 +93,7 @@ export function Sidebar() {
           className="group flex min-w-0 items-center gap-2.5"
           aria-label="На главную"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-950 text-sm font-semibold text-white transition-transform duration-300 group-hover:scale-105">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-stone-950 text-[13px] font-medium text-white">
             А
           </span>
 
@@ -106,11 +106,11 @@ export function Sidebar() {
                 transition={{ duration: 0.16 }}
                 className="flex min-w-0 flex-col leading-none"
               >
-                <span className="truncate text-sm font-semibold tracking-tight text-stone-900">
+                <span className="truncate text-sm font-medium tracking-[-0.01em] text-stone-900">
                   Алетейя
                 </span>
-                <span className="mt-0.5 truncate text-[10px] text-stone-400">
-                  AI Document OS
+                <span className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-stone-400">
+                  Демо-режим
                 </span>
               </motion.span>
             )}
@@ -144,7 +144,7 @@ export function Sidebar() {
         )}
       >
         {isExpanded && (
-          <p className="px-3 pb-1 pt-2 text-[10px] font-medium uppercase tracking-wider text-stone-400">
+          <p className="px-3 pb-1.5 pt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-stone-400">
             Рабочая область
           </p>
         )}
@@ -158,19 +158,25 @@ export function Sidebar() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex h-10 items-center rounded-lg transition-colors",
-                  isExpanded ? "w-full gap-3 px-3" : "w-10 justify-center",
+                  "relative flex h-9 items-center rounded-md transition-colors",
+                  isExpanded ? "w-full gap-3 px-3" : "w-9 justify-center",
                   active
-                    ? "bg-violet-50 text-violet-600"
-                    : "text-stone-400 hover:bg-stone-100 hover:text-stone-900"
+                    ? "bg-stone-100 text-stone-900"
+                    : "text-stone-400 hover:bg-stone-50 hover:text-stone-900"
                 )}
               >
-                <item.icon className="h-[18px] w-[18px] shrink-0" />
+                {/* Активный пункт помечен волосяной линией, а не заливкой цветом */}
+                {active && (
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-1/2 h-4 w-px -translate-y-1/2 bg-violet-500"
+                  />
+                )}
+
+                <item.icon className="h-4 w-4 shrink-0" />
 
                 {isExpanded ? (
-                  <span className="truncate text-sm font-medium">
-                    {item.label}
-                  </span>
+                  <span className="truncate text-[13px]">{item.label}</span>
                 ) : (
                   <span className="sr-only">{item.label}</span>
                 )}
@@ -190,7 +196,7 @@ export function Sidebar() {
         <MaybeTooltip show={!isExpanded} label="Казбек Б. — Юрист-партнёр">
           <button
             type="button"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-violet-500 text-xs font-semibold text-white"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-stone-200 text-[11px] font-medium text-stone-600 transition-colors hover:border-stone-300 hover:text-stone-900"
           >
             КБ
             <span className="sr-only">Профиль пользователя</span>
@@ -199,10 +205,10 @@ export function Sidebar() {
 
         {isExpanded && (
           <div className="flex min-w-0 flex-col leading-tight">
-            <span className="truncate text-sm font-medium text-stone-900">
+            <span className="truncate text-[13px] text-stone-900">
               Казбек Б.
             </span>
-            <span className="truncate text-xs text-stone-400">
+            <span className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-stone-400">
               Юрист-партнёр
             </span>
           </div>

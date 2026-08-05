@@ -4,20 +4,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+/*
+ * Кнопки повторяют лендинг: основное действие — плотный чёрный прямоугольник
+ * с малым радиусом, второстепенное — контур по stone-200. Никаких заливок
+ * фирменным цветом и мягких теней: на продуктовых экранах они шумят.
+ */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        default: "bg-stone-950 text-white hover:bg-stone-800",
+        destructive: "bg-red-600 text-white hover:bg-red-700",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900",
+        secondary: "bg-stone-100 text-stone-900 hover:bg-stone-200",
+        ghost: "text-stone-500 hover:bg-stone-100 hover:text-stone-900",
+        link: "text-stone-900 underline-offset-4 hover:underline",
       },
       size: {
         default: "h-9 px-4 py-2",

@@ -15,29 +15,34 @@ export interface Case {
   contextFile: string;
 }
 
+/**
+ * Статусы дела набираются как рубрики лендинга: моноширинная строка на
+ * прозрачном фоне, цветом отмечена только точка. Плашки с заливкой на
+ * продуктовых экранах спорят с содержимым таблиц.
+ */
 export const CASE_STATUS_META: Record<
   CaseStatus,
   { label: string; badgeClassName: string; dotClassName: string }
 > = {
   in_progress: {
     label: "В работе",
-    badgeClassName: "border-indigo-200/70 bg-indigo-50 text-indigo-700",
-    dotClassName: "bg-indigo-500",
+    badgeClassName: "border-stone-200 text-stone-600",
+    dotClassName: "bg-stone-900",
   },
   collecting: {
     label: "Сбор данных",
-    badgeClassName: "border-amber-200/70 bg-amber-50 text-amber-700",
+    badgeClassName: "border-stone-200 text-stone-600",
     dotClassName: "bg-amber-500",
   },
   active: {
     label: "Активно",
-    badgeClassName: "border-emerald-200/70 bg-emerald-50 text-emerald-700",
+    badgeClassName: "border-stone-200 text-stone-600",
     dotClassName: "bg-emerald-500",
   },
   archived: {
     label: "В архиве",
-    badgeClassName: "border-zinc-200 bg-zinc-100 text-zinc-600",
-    dotClassName: "bg-zinc-400",
+    badgeClassName: "border-stone-200 text-stone-400",
+    dotClassName: "bg-stone-300",
   },
 };
 
@@ -259,19 +264,19 @@ export const DOCUMENT_STATUS_META: Record<
 > = {
   draft: {
     label: "Черновик",
-    className: "border-zinc-200 bg-zinc-100 text-zinc-600",
+    className: "border-stone-200 text-stone-400",
   },
   ready: {
     label: "Готов",
-    className: "border-emerald-200/70 bg-emerald-50 text-emerald-700",
+    className: "border-stone-200 text-stone-600",
   },
   signed: {
     label: "Подписан",
-    className: "border-indigo-200/70 bg-indigo-50 text-indigo-700",
+    className: "border-emerald-200 text-emerald-700",
   },
   generating: {
     label: "Генерируется",
-    className: "border-amber-200/70 bg-amber-50 text-amber-700",
+    className: "border-amber-200 text-amber-700",
   },
 };
 
@@ -291,12 +296,26 @@ export interface RiskFinding {
   clause: string;
 }
 
+/**
+ * Ссылка на источник ответа. Ассистент обязан показывать, откуда взял
+ * формулировку: документ, пункт и страница — иначе ответ не проверить.
+ */
+export interface Citation {
+  id: string;
+  document: string;
+  clause: string;
+  page: number;
+  quote: string;
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   text: string;
   /** Если заполнено — сообщение рендерится как набор UI-карточек. */
   findings?: RiskFinding[];
+  /** Источники ответа — пункт и страница конкретного файла дела. */
+  citations?: Citation[];
   timestamp: string;
 }
 
@@ -311,21 +330,21 @@ export const RISK_LEVEL_META: Record<
 > = {
   critical: {
     label: "Критический риск",
-    cardClassName: "border-red-200 bg-red-50/70",
-    badgeClassName: "border-red-200 bg-red-100 text-red-700",
+    cardClassName: "border-red-200 bg-red-50/60",
+    badgeClassName: "border-red-200 bg-red-50 text-red-700",
     iconClassName: "text-red-600",
   },
   warning: {
     label: "Предупреждение",
-    cardClassName: "border-amber-200 bg-amber-50/70",
-    badgeClassName: "border-amber-200 bg-amber-100 text-amber-700",
+    cardClassName: "border-amber-200 bg-amber-50/60",
+    badgeClassName: "border-amber-200 bg-amber-50 text-amber-700",
     iconClassName: "text-amber-600",
   },
   info: {
     label: "Замечание",
-    cardClassName: "border-indigo-200 bg-indigo-50/70",
-    badgeClassName: "border-indigo-200 bg-indigo-100 text-indigo-700",
-    iconClassName: "text-indigo-600",
+    cardClassName: "border-stone-200 bg-stone-50",
+    badgeClassName: "border-stone-200 bg-white text-stone-600",
+    iconClassName: "text-stone-500",
   },
 };
 
@@ -371,6 +390,51 @@ export interface BatchReviewResult {
 }
 
 /* ------------------------------------------------------------------ */
+/*  РАЗБОР ЗАГРУЖЕННОГО ФАЙЛА (перенос реквизитов в карточку)          */
+/* ------------------------------------------------------------------ */
+
+/** Шаги разбора — те же, что показаны на лендинге. */
+export const EXTRACTION_STEPS = [
+  "Распознавание текста",
+  "Поиск реквизитов",
+  "Сверка форматов",
+] as const;
+
+export interface ExtractedField {
+  /** Ключ поля в схеме сущности — по нему значение попадает в карточку. */
+  key: string;
+  label: string;
+  value: string;
+  /**
+   * Значение распознано неуверенно: подставляется, но помечается на
+   * проверку — как и обещано на лендинге.
+   */
+  uncertain: boolean;
+}
+
+/** Правило разбора: какой файл во что превращается. */
+export interface ExtractionRecipe {
+  id: string;
+  /** Подстроки в имени файла, по которым узнаём тип документа. */
+  match: string[];
+  /** Тип сущности, в карточку которого переносятся реквизиты. */
+  schemaId: BuiltinEntityType;
+  /** Как называется карточка-приёмник в интерфейсе. */
+  targetLabel: string;
+  fields: ExtractedField[];
+}
+
+export interface ExtractionState {
+  file: { name: string; sizeBytes: number };
+  recipe: ExtractionRecipe;
+  /** −1 — ещё не начали, далее индекс текущего шага, 3 — разбор закончен. */
+  step: number;
+  status: GenerationStatus;
+  /** Реквизиты уже перенесены в карточку. */
+  applied: boolean;
+}
+
+/* ------------------------------------------------------------------ */
 /*  ГЕНЕРАЦИЯ ПАКЕТА                                                   */
 /* ------------------------------------------------------------------ */
 
@@ -385,4 +449,22 @@ export interface GeneratedDocument {
   /** id сущности либо CUSTOM_REQUEST_GROUP для свободного запроса. */
   entityId: string;
   entityName: string;
+}
+
+/* ------------------------------------------------------------------ */
+/*  ДОКУМЕНТ ПО СВОБОДНОМУ ЗАПРОСУ                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Свободный запрос проходит две видимые стадии: сначала система ищет
+ * подходящий шаблон, потом составляет документ. Пользователю важно знать,
+ * подставились реквизиты в готовую форму или документ собран с нуля.
+ */
+export type FreeformStage = "idle" | "searching" | "composing" | "done";
+
+export interface TemplateMatch {
+  /** Нашёлся ли готовый шаблон под запрос. */
+  found: boolean;
+  /** Название шаблона, если нашёлся. */
+  name: string;
 }

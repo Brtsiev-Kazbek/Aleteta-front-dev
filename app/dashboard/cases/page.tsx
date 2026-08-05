@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/layout/Sidebar";
+import { PanelHeading } from "@/components/layout/PanelHeading";
 import { RecentCases } from "@/components/dashboard/RecentCases";
 
 export default function CasesPage() {
@@ -7,17 +8,14 @@ export default function CasesPage() {
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-6xl px-8 py-10">
-          <header className="flex flex-col gap-1.5">
-            <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
-              Все дела
-            </h1>
-            <p className="text-sm text-stone-500">
-              Рабочие пространства с файлами, сущностями и массовой генерацией.
-            </p>
-          </header>
+        <div className="mx-auto max-w-6xl px-8 py-12">
+          <PanelHeading
+            eyebrow="Дела"
+            title="Все рабочие пространства"
+            description="Отметьте несколько дел — один запрос создаст документ в каждом из них."
+          />
 
-          <div className="mt-8">
+          <div className="mt-10">
             <RecentCases />
           </div>
         </div>

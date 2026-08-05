@@ -13,6 +13,7 @@ import { AIAssistantSheet } from "@/components/workspace/AIAssistantSheet";
 import { BatchGenerationGrid } from "@/components/workspace/BatchGenerationGrid";
 import { CaseDocumentsTab } from "@/components/workspace/CaseDocumentsTab";
 import { CaseOverviewTab } from "@/components/workspace/CaseOverviewTab";
+import { ExtractionSheet } from "@/components/workspace/ExtractionSheet";
 import { GenerationSheet } from "@/components/workspace/GenerationSheet";
 import { useHotkey } from "@/lib/hooks/use-hotkey";
 import { cn } from "@/lib/utils";
@@ -22,7 +23,7 @@ import { CASE_STATUS_META, type Case } from "@/types";
 const TABS: { value: CaseTab; label: string }[] = [
   { value: "overview", label: "Обзор" },
   { value: "documents", label: "Документы" },
-  { value: "entities", label: "Сущности и Генерация" },
+  { value: "entities", label: "Объекты и генерация" },
 ];
 
 /** Запасное дело — если по id ничего не нашлось. */
@@ -87,31 +88,33 @@ export default function CaseWorkspacePage() {
             <div className="flex min-w-0 flex-col">
               {/* Статус в виде метки — как рубрики на лендинге */}
               <div className="flex flex-wrap items-center gap-2.5">
+                <Link
+                  href="/dashboard"
+                  className="group inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400 transition-colors hover:text-stone-900"
+                >
+                  <ChevronRight className="h-3 w-3 rotate-180 transition-transform duration-300 group-hover:-translate-x-0.5" />
+                  Все дела
+                </Link>
+
+                <span aria-hidden className="h-3 w-px bg-stone-200" />
+
                 <span
                   className={cn(
-                    "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium tracking-wide",
+                    "inline-flex shrink-0 items-center gap-2 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em]",
                     statusMeta.badgeClassName
                   )}
                 >
                   <span
                     className={cn(
-                      "h-1.5 w-1.5 rounded-full",
+                      "h-1 w-1 rounded-full",
                       statusMeta.dotClassName
                     )}
                   />
                   {statusMeta.label}
                 </span>
-
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400 transition-colors hover:text-stone-700"
-                >
-                  <ChevronRight className="h-3 w-3 rotate-180" />
-                  Все дела
-                </Link>
               </div>
 
-              <h1 className="mt-3.5 max-w-3xl text-xl font-medium leading-[1.2] tracking-[-0.025em] text-stone-900 sm:text-[1.6rem]">
+              <h1 className="mt-3.5 max-w-3xl text-xl font-medium leading-[1.15] tracking-[-0.03em] text-stone-900 sm:text-[1.6rem]">
                 {caseItem.title}
               </h1>
 
@@ -128,12 +131,9 @@ export default function CaseWorkspacePage() {
               </div>
             </div>
 
-            <Button
-              onClick={handleToggleAssistant}
-              className="shrink-0 gap-2 bg-stone-950 text-white shadow-sm hover:bg-stone-900"
-            >
+            <Button onClick={handleToggleAssistant} className="shrink-0 gap-2">
               <Sparkles className="h-4 w-4" />
-              AI Ассистент
+              Ассистент
               <kbd className="ml-0.5 rounded border border-white/20 bg-white/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70">
                 ⌘J
               </kbd>
@@ -155,20 +155,30 @@ export default function CaseWorkspacePage() {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="relative gap-2 rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 pt-0 text-sm font-medium text-stone-500 shadow-none transition-colors hover:text-stone-900 data-[state=active]:border-violet-600 data-[state=active]:bg-transparent data-[state=active]:text-stone-900 data-[state=active]:shadow-none"
+                    className="relative gap-2 rounded-none border-b border-transparent bg-transparent px-0 pb-3 pt-0 text-sm font-normal text-stone-400 shadow-none transition-colors hover:text-stone-900 data-[state=active]:bg-transparent data-[state=active]:text-stone-900 data-[state=active]:shadow-none"
                   >
                     {tab.label}
                     {count !== null && (
                       <span
                         className={cn(
-                          "rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors",
-                          isActive
-                            ? "bg-violet-50 text-violet-700"
-                            : "bg-stone-100 text-stone-500"
+                          "font-mono text-[10px] tabular-nums transition-colors",
+                          isActive ? "text-stone-900" : "text-stone-300"
                         )}
                       >
                         {count}
                       </span>
+                    )}
+
+                    {/* Подчёркивание переезжает между вкладками */}
+                    {isActive && (
+                      <motion.span
+                        layoutId="case-tab-underline"
+                        className="absolute inset-x-0 -bottom-px h-px bg-stone-900"
+                        transition={{
+                          duration: 0.28,
+                          ease: [0.22, 0.61, 0.36, 1],
+                        }}
+                      />
                     )}
                   </TabsTrigger>
                 );
@@ -178,11 +188,16 @@ export default function CaseWorkspacePage() {
         </header>
 
         {/* Контент вкладки: скроллится только он, body остаётся фиксированным */}
+        {/*
+          Вкладка появляется мягко, но без AnimatePresence с ожиданием ухода:
+          если анимация не проигрывается (фоновая вкладка браузера, троттлинг
+          кадров), контент не должен зависать между состояниями.
+        */}
         <motion.div
           key={activeTab}
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
           className={cn(
             "min-h-0 flex-1 px-8 py-6",
             activeTab === "entities"
@@ -198,6 +213,8 @@ export default function CaseWorkspacePage() {
 
       <AIAssistantSheet caseId={caseId} contextFile={caseItem.contextFile} />
       <GenerationSheet caseId={caseId} />
+      {/* Разбор файла запущен внутри дела — реквизиты идут в это же дело */}
+      <ExtractionSheet caseId={caseId} />
     </div>
   );
 }

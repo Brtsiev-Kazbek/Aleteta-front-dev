@@ -153,29 +153,27 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
       {/* Панель над таблицей */}
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-stone-200 px-4 py-3">
-        <div className="flex flex-col leading-tight">
-          <span className="text-sm font-medium text-stone-900">
-            Сущности дела
+        <div className="flex flex-col">
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+            Объекты дела
           </span>
-          <span className="text-xs text-stone-500">
-            Реквизиты подставляются в шаблоны при массовой генерации
+          <span className="mt-1 text-[13px] text-stone-500">
+            Реквизиты подставляются в шаблоны при генерации пакета
           </span>
         </div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-9 gap-1.5 border-stone-200"
-            >
+            <Button size="sm" variant="outline" className="h-9 gap-1.5">
               <Plus className="h-3.5 w-3.5" />
-              Добавить сущность
+              Добавить объект
             </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-72">
-            <DropdownMenuLabel>Тип сущности</DropdownMenuLabel>
+            <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+              Тип объекта
+            </DropdownMenuLabel>
 
             {availableSchemas.map((schema) => {
               const Icon = getTypeIcon(schema);
@@ -187,7 +185,16 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
                 >
                   <Icon className="mt-0.5 h-4 w-4 shrink-0 text-stone-400" />
                   <span className="flex min-w-0 flex-col">
-                    <span className="truncate font-medium">{schema.label}</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="truncate font-medium">
+                        {schema.label}
+                      </span>
+                      {schema.isCustom && (
+                        <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.1em] text-violet-600">
+                          свой
+                        </span>
+                      )}
+                    </span>
                     <span className="truncate text-xs text-stone-400">
                       {schema.hint}
                     </span>
@@ -200,13 +207,13 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
 
             <DropdownMenuItem
               onSelect={() => setCustomSchemaOpen(true)}
-              className="items-start gap-2.5 py-2.5 text-violet-700 focus:bg-violet-50 focus:text-violet-700"
+              className="items-start gap-2.5 py-2.5"
             >
-              <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
               <span className="flex min-w-0 flex-col">
                 <span className="font-medium">Создать свой тип</span>
-                <span className="truncate text-xs text-violet-400">
-                  Произвольный набор реквизитов
+                <span className="truncate text-xs text-stone-400">
+                  Появится в списке во всех делах
                 </span>
               </span>
             </DropdownMenuItem>
@@ -221,16 +228,15 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
       */}
       <div className="scrollable-area relative min-h-0 flex-1 overflow-auto">
         {entities.length === 0 ? (
-          <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-3 p-10 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-stone-100">
-              <Inbox className="h-5 w-5 text-stone-400" />
-            </div>
-            <p className="text-sm font-medium text-stone-900">
-              В деле пока нет сущностей
+          <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-2.5 p-10 text-center">
+            <Inbox className="h-5 w-5 text-stone-300" />
+            <p className="mt-1 text-sm text-stone-900">
+              В деле пока нет объектов
             </p>
-            <p className="max-w-sm text-sm text-stone-500">
-              Добавьте участок, контрагента, правообладателя — или опишите свой
-              тип с нужными реквизитами.
+            <p className="max-w-sm text-[13px] leading-relaxed text-stone-500">
+              Добавьте участок, контрагента или сотрудника, опишите свой тип —
+              либо загрузите файл во вкладке «Документы», и реквизиты
+              перенесутся сюда сами.
             </p>
           </div>
         ) : (
@@ -247,85 +253,94 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
         )}
       </div>
 
-      {/* Липкая панель валидации и запуска генерации */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-stone-200 bg-white/95 px-4 py-3.5 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <div
+      {/* Липкая панель готовности и запуска генерации */}
+      <div className="shrink-0 border-t border-stone-200 bg-white/95 backdrop-blur">
+        {/* Полоса готовности — состояние видно раньше, чем прочитан текст */}
+        <div className="h-px w-full bg-stone-200">
+          <motion.div
+            animate={{
+              width: `${
+                stats.total === 0 ? 0 : (stats.valid / stats.total) * 100
+              }%`,
+            }}
+            transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg",
-              stats.allValid
-                ? "bg-emerald-50 text-emerald-600"
-                : "bg-red-50 text-red-600"
+              "h-px",
+              stats.allValid ? "bg-emerald-500" : "bg-stone-900"
             )}
-          >
-            {stats.allValid ? (
-              <CheckCircle2 className="h-4 w-4" />
-            ) : (
-              <AlertTriangle className="h-4 w-4" />
-            )}
-          </div>
-
-          <div className="flex flex-col leading-tight">
-            <span className="text-sm">
-              <span className="text-stone-500">Готово к генерации: </span>
-              <span className="font-semibold text-stone-900">
-                {stats.valid} / {stats.total}
-              </span>
-            </span>
-            <span className="text-xs text-stone-400">
-              {stats.allValid
-                ? "Все обязательные реквизиты заполнены"
-                : `${stats.errorFields} ${plural(
-                    stats.errorFields,
-                    "поле требует",
-                    "поля требуют",
-                    "полей требуют"
-                  )} заполнения`}
-            </span>
-          </div>
+          />
         </div>
 
-        <div className="flex items-center gap-2">
-          {!stats.allValid && stats.total > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={jumpToFirstError}
-              className="h-9 gap-1.5 border-red-200 bg-red-50/60 text-red-700 hover:bg-red-50"
-            >
-              <AlertTriangle className="h-3.5 w-3.5" />
-              Исправить
-            </Button>
-          )}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5">
+          <div className="flex items-center gap-2.5">
+            {stats.allValid ? (
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+            ) : (
+              <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+            )}
 
-          {stats.allValid ? (
-            <Button
-              size="sm"
-              className="h-9 gap-1.5"
-              onClick={() => startGeneration(caseId)}
-            >
-              <Sparkles className="h-4 w-4" />
-              Сгенерировать пакет
-            </Button>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span tabIndex={0} className="inline-block">
-                  <Button
-                    size="sm"
-                    disabled
-                    className="pointer-events-none h-9 gap-1.5"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Сгенерировать пакет
-                  </Button>
+            <div className="flex flex-col leading-tight">
+              <span className="font-mono text-[13px] tabular-nums text-stone-900">
+                {stats.valid} / {stats.total}
+                <span className="ml-2 font-sans text-[13px] text-stone-500">
+                  готово к генерации
                 </span>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                Заполните обязательные поля у всех сущностей
-              </TooltipContent>
-            </Tooltip>
-          )}
+              </span>
+              <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                {stats.allValid
+                  ? "Все обязательные реквизиты заполнены"
+                  : `${stats.errorFields} ${plural(
+                      stats.errorFields,
+                      "поле требует",
+                      "поля требуют",
+                      "полей требуют"
+                    )} заполнения`}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {!stats.allValid && stats.total > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={jumpToFirstError}
+                className="h-9 gap-1.5 border-red-200 text-red-700 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+              >
+                <AlertTriangle className="h-3.5 w-3.5" />
+                К первой ошибке
+              </Button>
+            )}
+
+            {stats.allValid ? (
+              <Button
+                size="sm"
+                className="h-9 gap-1.5"
+                onClick={() => startGeneration(caseId)}
+              >
+                <Sparkles className="h-4 w-4" />
+                Сгенерировать пакет
+              </Button>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span tabIndex={0} className="inline-block">
+                    <Button
+                      size="sm"
+                      disabled
+                      className="pointer-events-none h-9 gap-1.5"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Сгенерировать пакет
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  Заполните обязательные поля у всех объектов
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
       </div>
 
@@ -382,13 +397,13 @@ function EntityGroupTable({
         return (
           <div className="flex h-11 items-center px-3">
             {validation?.isValid ? (
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200/70 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Валидно
+              <span className="inline-flex items-center gap-1.5 rounded border border-emerald-200 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-emerald-700">
+                <CheckCircle2 className="h-3 w-3" />
+                Готово
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-red-200/70 bg-red-50 px-2 py-1 text-xs font-medium text-red-700">
-                <AlertTriangle className="h-3.5 w-3.5" />
+              <span className="inline-flex items-center gap-1.5 rounded border border-red-200 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-red-700">
+                <AlertTriangle className="h-3 w-3" />
                 {errorCount} {plural(errorCount, "ошибка", "ошибки", "ошибок")}
               </span>
             )}
@@ -449,16 +464,16 @@ function EntityGroupTable({
   return (
     <section className="border-b border-stone-200 last:border-b-0">
       {/* Заголовок группы */}
-      <div className="sticky left-0 flex items-center gap-2 bg-stone-50/80 px-4 py-2.5">
-        <Icon className="h-3.5 w-3.5 shrink-0 text-stone-400" />
-        <span className="text-xs font-medium uppercase tracking-wide text-stone-500">
+      <div className="sticky left-0 flex items-center gap-2 bg-stone-50 px-4 py-2.5">
+        <Icon className="h-3 w-3 shrink-0 text-stone-400" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-500">
           {schema.label}
         </span>
-        <span className="rounded bg-stone-200/70 px-1.5 py-0.5 text-[10px] font-medium text-stone-600">
+        <span className="font-mono text-[10px] tabular-nums text-stone-300">
           {entities.length}
         </span>
         {schema.isCustom && (
-          <span className="rounded border border-violet-200 bg-violet-50 px-1.5 py-0.5 text-[10px] font-medium text-violet-700">
+          <span className="rounded border border-violet-200 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-violet-700">
             свой тип
           </span>
         )}
@@ -480,9 +495,9 @@ function EntityGroupTable({
                       left: meta?.stickyLeft,
                     }}
                     className={cn(
-                      "h-9 whitespace-nowrap border-y border-stone-200 bg-white px-3 text-left text-xs font-medium text-stone-400",
+                      "h-9 whitespace-nowrap border-y border-stone-200 bg-white px-3 text-left font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-stone-400",
                       isSticky &&
-                        "sticky z-10 shadow-[1px_0_0_0_rgb(228,228,231)]"
+                        "sticky z-10 shadow-[1px_0_0_0_rgb(231,229,228)]"
                     )}
                   >
                     {header.isPlaceholder
@@ -524,7 +539,7 @@ function EntityGroupTable({
                     className={cn(
                       "border-b border-stone-200/70 p-0 align-middle",
                       isSticky &&
-                        "sticky z-10 bg-white shadow-[1px_0_0_0_rgb(228,228,231)] group-hover:bg-[#fafafa]"
+                        "sticky z-10 bg-white shadow-[1px_0_0_0_rgb(231,229,228)] group-hover:bg-stone-50/70"
                     )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -597,7 +612,7 @@ function EntityCell({
               setEditingCell(null);
             }
           }}
-          className="h-full w-full rounded-md border-2 border-violet-500 bg-white px-2.5 text-sm text-stone-900 shadow-[0_0_0_3px_rgba(99,102,241,0.12)] outline-none placeholder:text-stone-300"
+          className="h-full w-full rounded border border-stone-900 bg-white px-2.5 text-sm text-stone-900 shadow-[0_0_0_3px_rgba(28,25,23,0.08)] outline-none placeholder:text-stone-300"
         />
       </div>
     );
@@ -637,9 +652,9 @@ function EntityCell({
         onClick={() =>
           setEditingCell({ entityId: entity.id, field: field.key })
         }
-        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400"
+        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-400"
       >
-        <Plus className="h-3.5 w-3.5 shrink-0 text-stone-300 transition-colors group-hover/cell:text-violet-500" />
+        <Plus className="h-3.5 w-3.5 shrink-0 text-stone-200 transition-colors group-hover/cell:text-stone-900" />
         <span className="truncate text-sm text-stone-300 transition-colors group-hover/cell:text-stone-500">
           Добавить
         </span>
@@ -651,7 +666,7 @@ function EntityCell({
     <button
       type="button"
       onClick={() => setEditingCell({ entityId: entity.id, field: field.key })}
-      className="flex h-11 w-full items-center px-3 text-left transition-colors hover:bg-violet-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400"
+      className="flex h-11 w-full items-center px-3 text-left transition-colors hover:bg-stone-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-400"
     >
       <span className="truncate text-sm text-stone-900">{value}</span>
     </button>

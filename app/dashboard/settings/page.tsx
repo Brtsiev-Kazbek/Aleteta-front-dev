@@ -2,6 +2,7 @@ import { Bell, Building2, KeyRound, ShieldCheck, UserRound } from "lucide-react"
 import type { LucideIcon } from "lucide-react";
 
 import { Sidebar } from "@/components/layout/Sidebar";
+import { PanelHeading } from "@/components/layout/PanelHeading";
 
 interface SettingsSection {
   icon: LucideIcon;
@@ -68,44 +69,38 @@ export default function SettingsPage() {
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-3xl px-8 py-10">
-          <header className="flex flex-col gap-1.5">
-            <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
-              Настройки
-            </h1>
-            <p className="text-sm text-stone-500">
-              Профиль, реквизиты организации и правила обработки документов.
-            </p>
-          </header>
+        <div className="mx-auto max-w-3xl px-8 py-12">
+          <PanelHeading
+            eyebrow="Настройки"
+            title="Профиль и реквизиты организации"
+            description="Эти значения подставляются в документы вместо ручного ввода."
+          />
 
-          <div className="mt-8 flex flex-col gap-5">
+          <div className="mt-10 flex flex-col gap-10">
             {SECTIONS.map((section) => (
-              <section
-                key={section.title}
-                className="rounded-lg border border-stone-200 bg-white"
-              >
-                <div className="flex items-start gap-3 border-b border-stone-200 px-5 py-4">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-100">
-                    <section.icon className="h-4 w-4 text-stone-500" />
-                  </div>
-                  <div className="flex flex-col leading-tight">
-                    <h2 className="text-sm font-semibold text-stone-900">
+              <section key={section.title}>
+                <div className="flex items-start gap-2.5 border-b border-stone-200 pb-3">
+                  <section.icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-stone-400" />
+                  <div className="flex min-w-0 flex-col">
+                    <h2 className="text-[15px] font-medium tracking-[-0.01em] text-stone-900">
                       {section.title}
                     </h2>
-                    <span className="mt-0.5 text-xs text-stone-500">
+                    <span className="mt-1 text-[13px] text-stone-500">
                       {section.description}
                     </span>
                   </div>
                 </div>
 
-                <dl className="divide-y divide-stone-200/70">
+                <dl className="flex flex-col divide-y divide-stone-200">
                   {section.rows.map((row) => (
                     <div
                       key={row.label}
-                      className="flex items-baseline justify-between gap-4 px-5 py-3.5"
+                      className="flex items-baseline justify-between gap-4 py-3.5"
                     >
-                      <dt className="text-sm text-stone-500">{row.label}</dt>
-                      <dd className="truncate text-sm font-medium text-stone-900">
+                      <dt className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                        {row.label}
+                      </dt>
+                      <dd className="truncate text-sm text-stone-900">
                         {row.value}
                       </dd>
                     </div>

@@ -2,15 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowUp,
-  CheckCircle2,
-  Download,
-  FileText,
-  Loader2,
-  Sparkles,
-  Wand2,
-} from "lucide-react";
+import { ArrowUp, Check, Download, FileText, Loader2, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -23,6 +15,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { AutoGrowTextarea } from "@/components/ui/textarea";
+import { MetaLabel } from "@/components/layout/PanelHeading";
 import { cn, plural } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 import type { GeneratedDocument } from "@/types";
@@ -34,6 +27,8 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
   const progress = useAppStore((state) => state.generationProgress);
   const documents = useAppStore((state) => state.generatedDocuments);
   const isCustomGenerating = useAppStore((state) => state.isCustomGenerating);
+  const freeformStage = useAppStore((state) => state.freeformStage);
+  const templateMatch = useAppStore((state) => state.templateMatch);
   const generateCustomDocument = useAppStore(
     (state) => state.generateCustomDocument
   );
@@ -67,26 +62,27 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
 
   return (
     <Sheet open={isOpen} onOpenChange={setOpen}>
-      <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-md"
+      >
         <SheetHeader>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
-              {status === "running" ? (
-                <Loader2 className="h-4 w-4 animate-spin text-violet-600" />
-              ) : (
-                <Sparkles className="h-4 w-4 text-violet-600" />
-              )}
-            </div>
-            <SheetTitle>
-              {status === "running"
-                ? "Генерация пакета документов"
-                : "Пакет документов готов"}
-            </SheetTitle>
+          <div className="flex items-center gap-2">
+            <MetaLabel>Пакет документов</MetaLabel>
+            {status === "running" && (
+              <Loader2 className="h-3 w-3 animate-spin text-stone-400" />
+            )}
           </div>
 
-          <SheetDescription className="pl-[42px]">
+          <SheetTitle>
             {status === "running"
-              ? "Подставляем реквизиты сущностей в шаблоны…"
+              ? "Собираем пакет документов"
+              : "Пакет документов готов"}
+          </SheetTitle>
+
+          <SheetDescription>
+            {status === "running"
+              ? "Подставляем реквизиты объектов в шаблоны…"
               : `Создано ${documents.length} ${plural(
                   documents.length,
                   "документ",
@@ -94,9 +90,9 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                   "документов"
                 )} для ${grouped.length} ${plural(
                   grouped.length,
-                  "сущности",
-                  "сущностей",
-                  "сущностей"
+                  "объекта",
+                  "объектов",
+                  "объектов"
                 )}`}
           </SheetDescription>
         </SheetHeader>
@@ -104,7 +100,7 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
         {status === "running" && (
           <div className="px-5 py-6">
             <Progress value={progress} />
-            <p className="mt-3 text-center text-xs text-stone-400">
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
               {Math.round(progress)}%
             </p>
           </div>
@@ -112,14 +108,12 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
 
         {status === "done" && (
           <>
-            <ScrollArea className="flex-1 px-5 py-4">
+            <ScrollArea className="min-h-0 flex-1 px-5 py-4">
               <div className="flex flex-col gap-5">
-                {/* Ключ по id: у сущностей могут совпадать наименования */}
+                {/* Ключ по id: у объектов могут совпадать наименования */}
                 {grouped.map((group, groupIndex) => (
                   <div key={group.entityId} className="flex flex-col gap-2">
-                    <p className="text-xs font-medium uppercase tracking-wide text-stone-400">
-                      {group.entityName}
-                    </p>
+                    <MetaLabel>{group.entityName}</MetaLabel>
 
                     <AnimatePresence initial={false}>
                       {group.docs.map((doc, docIndex) => (
@@ -129,17 +123,18 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{
                             duration: 0.24,
-                            delay: groupIndex * 0.08 + docIndex * 0.05,
+                            delay: groupIndex * 0.06 + docIndex * 0.04,
                           }}
-                          className="flex items-center gap-3 rounded-lg border border-stone-200 bg-white px-3 py-2.5 transition-colors hover:border-violet-200 hover:bg-violet-50/30"
+                          className="flex items-center gap-3 rounded border border-stone-200 px-3 py-2.5 transition-colors hover:border-stone-300"
                         >
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-50">
-                            <FileText className="h-4 w-4 text-violet-600" />
-                          </div>
-                          <span className="flex-1 truncate text-sm text-stone-900">
+                          <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
+                          <span className="min-w-0 flex-1 truncate text-[13px] text-stone-900">
                             {doc.name}
                           </span>
-                          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+                          <Check
+                            className="h-3.5 w-3.5 shrink-0 text-emerald-600"
+                            strokeWidth={3}
+                          />
                         </motion.div>
                       ))}
                     </AnimatePresence>
@@ -149,20 +144,13 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
             </ScrollArea>
 
             {/* Свободный запрос: пакет не ограничен готовыми шаблонами */}
-            <div className="border-t border-stone-200 px-5 py-4">
-              <div className="mb-2 flex items-center gap-1.5">
-                <Wand2 className="h-3.5 w-3.5 text-violet-600" />
-                <span className="text-xs font-medium text-stone-700">
-                  Нужен документ не из списка?
-                </span>
-              </div>
+            <div className="shrink-0 border-t border-stone-200 px-5 py-4">
+              <MetaLabel>Нужен документ не из списка?</MetaLabel>
 
               <div
                 className={cn(
-                  "rounded-xl border bg-white p-2.5 transition-colors",
-                  prompt.trim()
-                    ? "border-violet-300 ring-2 ring-violet-100"
-                    : "border-stone-200"
+                  "mt-2.5 rounded-md border bg-white p-2.5 transition-colors",
+                  prompt.trim() ? "border-stone-900" : "border-stone-200"
                 )}
               >
                 <AutoGrowTextarea
@@ -177,11 +165,10 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                   disabled={isCustomGenerating}
                   maxHeight={140}
                   placeholder="Опишите документ: дополнительное соглашение о рассрочке платежа на 6 месяцев со штрафом 0,1% за просрочку…"
-                  className="text-sm"
                 />
 
                 <div className="mt-2 flex items-center justify-between gap-2 border-t border-stone-100 pt-2">
-                  <span className="text-[11px] text-stone-400">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
                     Enter — сгенерировать
                   </span>
                   <Button
@@ -195,13 +182,55 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                     ) : (
                       <ArrowUp className="h-3.5 w-3.5" />
                     )}
-                    {isCustomGenerating ? "Создаём…" : "Добавить в пакет"}
+                    {isCustomGenerating ? "Составляем…" : "Добавить в пакет"}
                   </Button>
                 </div>
               </div>
+
+              {/* Поиск подходящей формы — видно, откуда взялся документ */}
+              <AnimatePresence>
+                {freeformStage !== "idle" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="mt-2.5 flex items-center gap-2"
+                  >
+                    <Search
+                      className={cn(
+                        "h-3 w-3 shrink-0",
+                        freeformStage === "searching"
+                          ? "animate-pulse text-stone-900"
+                          : "text-stone-400"
+                      )}
+                    />
+
+                    {freeformStage === "searching" ? (
+                      <span className="text-[11px] text-stone-500">
+                        Проверяю, есть ли подходящий шаблон…
+                      </span>
+                    ) : templateMatch?.found ? (
+                      <span className="text-[11px] text-stone-600">
+                        Шаблон найден:{" "}
+                        <span className="text-stone-900">
+                          {templateMatch.name}
+                        </span>{" "}
+                        — реквизиты подставлены
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-stone-600">
+                        Шаблона нет —{" "}
+                        <span className="font-medium text-violet-700">
+                          документ составлен с нуля
+                        </span>
+                      </span>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            <div className="flex items-center gap-2 border-t border-stone-200 px-5 py-4">
+            <div className="flex shrink-0 items-center gap-2 border-t border-stone-200 px-5 py-4">
               <Button className="flex-1 gap-1.5">
                 <Download className="h-4 w-4" />
                 Скачать всё (.zip)

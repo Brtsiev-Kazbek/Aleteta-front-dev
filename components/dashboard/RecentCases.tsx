@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, CalendarDays, Layers } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CaseSelectionBar } from "@/components/dashboard/CaseSelectionBar";
 import { cn, formatDate, plural } from "@/lib/utils";
@@ -26,8 +25,8 @@ export function RecentCases() {
   return (
     <>
       {/* Выбор всех дел для массовой генерации */}
-      <div className="mb-3 flex items-center gap-2">
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-stone-500 transition-colors hover:text-stone-900">
+      <div className="mb-3 flex items-center gap-3 border-b border-stone-200 pb-3">
+        <label className="flex cursor-pointer items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400 transition-colors hover:text-stone-900">
           <Checkbox
             checked={allSelected}
             onCheckedChange={() => toggleAllCases(allIds)}
@@ -37,13 +36,13 @@ export function RecentCases() {
         </label>
 
         {selectedCaseIds.length > 0 && (
-          <span className="rounded-md border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700">
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-900">
             Выбрано: {selectedCaseIds.length}
           </span>
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 lg:grid-cols-2 xl:grid-cols-3">
         {cases.map((caseItem, index) => {
         const statusMeta = CASE_STATUS_META[caseItem.status];
         const caseEntities = entities.filter(
@@ -62,10 +61,8 @@ export function RecentCases() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: index * 0.06 }}
             className={cn(
-              "flex flex-col rounded-2xl border bg-white p-6 transition-all duration-300",
-              isSelected
-                ? "border-violet-300 ring-2 ring-violet-100"
-                : "border-stone-200 hover:-translate-y-1 hover:shadow-lg"
+              "flex flex-col p-5 transition-colors",
+              isSelected ? "bg-stone-50" : "bg-white hover:bg-stone-50/60"
             )}
           >
             <div className="flex items-start justify-between gap-3">
@@ -78,13 +75,13 @@ export function RecentCases() {
 
                 <span
                   className={cn(
-                    "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium tracking-wide",
+                    "inline-flex items-center gap-2 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em]",
                     statusMeta.badgeClassName
                   )}
                 >
                   <span
                     className={cn(
-                      "h-1.5 w-1.5 rounded-full",
+                      "h-1 w-1 rounded-full",
                       statusMeta.dotClassName
                     )}
                   />
@@ -93,14 +90,14 @@ export function RecentCases() {
               </div>
 
               {invalidCount > 0 && (
-                <span className="shrink-0 rounded-md border border-red-200 bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-700">
+                <span className="shrink-0 rounded border border-red-200 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-red-700">
                   {invalidCount}{" "}
                   {plural(invalidCount, "ошибка", "ошибки", "ошибок")}
                 </span>
               )}
             </div>
 
-            <h3 className="mt-4 line-clamp-2 text-[15px] font-medium leading-snug tracking-[-0.01em] text-stone-900">
+            <h3 className="mt-4 line-clamp-2 text-[15px] font-medium leading-snug tracking-[-0.015em] text-stone-900">
               {caseItem.title}
             </h3>
 
@@ -108,7 +105,7 @@ export function RecentCases() {
               {caseItem.description}
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
               {caseItem.tags.map((tag) => (
                 <span
                   key={tag}
@@ -119,29 +116,25 @@ export function RecentCases() {
               ))}
             </div>
 
-            <div className="mt-4 flex items-center gap-4 border-t border-stone-100 pt-3.5 text-xs text-stone-400">
+            <div className="mt-auto flex items-center gap-4 pt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
               <span className="inline-flex items-center gap-1.5">
-                <CalendarDays className="h-3.5 w-3.5" />
+                <CalendarDays className="h-3 w-3" />
                 {formatDate(caseItem.createdAt)}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Layers className="h-3.5 w-3.5" />
+                <Layers className="h-3 w-3" />
                 {caseEntities.length}{" "}
-                {plural(caseEntities.length, "сущность", "сущности", "сущностей")}
+                {plural(caseEntities.length, "объект", "объекта", "объектов")}
               </span>
             </div>
 
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="mt-4 w-full gap-1.5 border-stone-200"
+            <Link
+              href={`/cases/${caseItem.id}`}
+              className="group mt-4 inline-flex w-fit items-center gap-1.5 border-b border-stone-200 pb-0.5 text-[13px] text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-900"
             >
-              <Link href={`/cases/${caseItem.id}`}>
-                Открыть
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
+              Открыть дело
+              <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
           </motion.article>
         );
         })}

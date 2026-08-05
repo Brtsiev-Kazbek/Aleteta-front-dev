@@ -1,16 +1,21 @@
 import { create } from "zustand";
 
 import {
+  ASSISTANT_CITATIONS,
   ASSISTANT_RISK_FINDINGS,
+  EXTRACTION_RECIPES,
   INITIAL_CHAT_MESSAGES,
+  INN_CITATION,
   MOCK_CASES,
   MOCK_DOCUMENTS,
   MOCK_ENTITIES,
 } from "@/data/mock-data";
+import { matchFreeformTemplate } from "@/lib/templates";
 import { plural } from "@/lib/utils";
 import { findSchema, withValidation } from "@/lib/validation";
 import {
   CUSTOM_REQUEST_GROUP,
+  EXTRACTION_STEPS,
   type BatchReviewResult,
   type Case,
   type ChatMessage,
@@ -18,8 +23,12 @@ import {
   type Entity,
   type EntityFieldSchema,
   type EntitySchema,
+  type ExtractionRecipe,
+  type ExtractionState,
+  type FreeformStage,
   type GeneratedDocument,
   type GenerationStatus,
+  type TemplateMatch,
 } from "@/types";
 
 export type CaseTab = "overview" | "documents" | "entities";
@@ -73,6 +82,17 @@ interface AppState {
   isGenerationSheetOpen: boolean;
   /** Идёт генерация документа по свободному запросу пользователя. */
   isCustomGenerating: boolean;
+  /** Стадия свободного запроса: поиск шаблона → составление → готово. */
+  freeformStage: FreeformStage;
+  /** Нашёлся ли готовый шаблон под последний свободный запрос. */
+  templateMatch: TemplateMatch | null;
+
+  /* --- Разбор загруженного файла --- */
+  extraction: ExtractionState | null;
+  isExtractionOpen: boolean;
+
+  /* --- Разбор договора прямо из дела --- */
+  reviewDocumentId: string | null;
 
   /* --- Массовая генерация по выбранным делам --- */
   selectedCaseIds: string[];
@@ -87,6 +107,9 @@ interface AppState {
   batchReviewStatus: GenerationStatus;
   batchReviewProgress: number;
   batchReviewResults: BatchReviewResult[];
+  /** Очередь проверки: видно, какой документ разбирается прямо сейчас. */
+  batchReviewQueue: { id: string; title: string }[];
+  batchReviewCursor: number;
 
   /* --- Оболочка --- */
   isSidebarExpanded: boolean;
@@ -100,15 +123,31 @@ interface AppState {
   duplicateEntity: (entityId: string) => void;
   setEditingCell: (cell: EditingCell | null) => void;
 
-  /** Создаёт пользовательский тип и сразу добавляет сущность этого типа. */
-  createCustomSchema: (caseId: string, draft: CustomSchemaDraft) => void;
+  /**
+   * Создаёт пользовательский тип объекта. Тип общий для всей рабочей
+   * области: он появляется в списке типов любого дела. Если передан `caseId`,
+   * в это дело дополнительно добавляется пустой объект нового типа.
+   */
+  createCustomSchema: (draft: CustomSchemaDraft, caseId?: string) => void;
   setCustomSchemaOpen: (open: boolean) => void;
+  /** Удаляет пользовательский тип вместе с объектами этого типа. */
+  deleteCustomSchema: (schemaId: string) => void;
 
   createCase: (title: string) => Case;
   addDocument: (document: Omit<Document, "id" | "createdAt">) => Document;
   /** Загрузка готовых файлов во вкладку «Документы» дела. */
   addDocuments: (caseId: string, files: UploadedFile[]) => void;
   deleteDocument: (documentId: string) => void;
+
+  /** Разбирает файл и предлагает перенести реквизиты в карточку объекта. */
+  startExtraction: (file: UploadedFile) => void;
+  setExtractionOpen: (open: boolean) => void;
+  /** Переносит распознанные реквизиты в новую сущность дела. */
+  applyExtraction: (caseId: string) => void;
+
+  /** Открывает разбор конкретного документа дела по пунктам. */
+  openDocumentReview: (documentId: string) => void;
+  closeDocumentReview: () => void;
 
   setActiveTab: (tab: CaseTab) => void;
   toggleAssistant: (open?: boolean) => void;
@@ -121,6 +160,8 @@ interface AppState {
   generateCustomDocument: (caseId: string, prompt: string) => void;
 
   toggleDocumentSelection: (documentId: string) => void;
+  /** Выделяет сразу набор документов — например, все файлы дела. */
+  selectDocuments: (documentIds: string[]) => void;
   clearDocumentSelection: () => void;
   startBatchReview: (caseId: string) => void;
   setBatchReviewOpen: (open: boolean) => void;
@@ -195,6 +236,45 @@ function stopBulkTimer() {
   }
 }
 
+/** Таймер разбора загруженного файла. */
+let extractionTimerId: number | null = null;
+
+function stopExtractionTimer() {
+  if (extractionTimerId !== null) {
+    window.clearInterval(extractionTimerId);
+    extractionTimerId = null;
+  }
+}
+
+/** Таймеры стадий свободного запроса — гасятся при закрытии шторки. */
+let freeformTimers: number[] = [];
+
+function stopFreeformTimers() {
+  for (const id of freeformTimers) window.clearTimeout(id);
+  freeformTimers = [];
+}
+
+/**
+ * Подбирает рецепт разбора по имени файла. Если тип документа не узнан,
+ * берём следующий рецепт по кругу: демонстрация должна показывать разные
+ * карточки-приёмники, а не одну и ту же выписку.
+ */
+let recipeCursor = 0;
+
+function pickRecipe(fileName: string): ExtractionRecipe {
+  const lower = fileName.toLowerCase();
+  const matched = EXTRACTION_RECIPES.find((recipe) =>
+    recipe.match.some((keyword) => lower.includes(keyword))
+  );
+  if (matched) return matched;
+
+  const fallback =
+    EXTRACTION_RECIPES[recipeCursor % EXTRACTION_RECIPES.length] ??
+    EXTRACTION_RECIPES[0]!;
+  recipeCursor += 1;
+  return fallback;
+}
+
 /** Тип документа по расширению — для колонки во вкладке «Документы». */
 function detectDocumentType(fileName: string): string {
   const extension = fileName.split(".").pop()?.toLowerCase() ?? "";
@@ -261,6 +341,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   isCreateCaseOpen: false,
   isCustomSchemaOpen: false,
 
+  freeformStage: "idle",
+  templateMatch: null,
+  extraction: null,
+  isExtractionOpen: false,
+  reviewDocumentId: null,
+  batchReviewQueue: [],
+  batchReviewCursor: 0,
+
   updateEntityField: (entityId, field, value) => {
     const custom = get().customSchemas;
     set({
@@ -297,8 +385,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
 
-  createCustomSchema: (caseId, draft) => {
-    const label = draft.label.trim() || "Своя сущность";
+  createCustomSchema: (draft, caseId) => {
+    const label = draft.label.trim() || "Свой тип объекта";
 
     const fields: EntityFieldSchema[] = draft.fields
       .filter((field) => field.label.trim())
@@ -338,6 +426,15 @@ export const useAppStore = create<AppState>((set, get) => ({
       templates: [`Документ по сущности «${label}»`],
     };
 
+    // Тип создаётся всегда, объект — только если тип заводят внутри дела.
+    if (!caseId) {
+      set({
+        customSchemas: [...get().customSchemas, schema],
+        isCustomSchemaOpen: false,
+      });
+      return;
+    }
+
     const entity = withValidation(
       {
         id: nextId("entity"),
@@ -360,6 +457,15 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   setCustomSchemaOpen: (open) => set({ isCustomSchemaOpen: open }),
+
+  deleteCustomSchema: (schemaId) =>
+    set({
+      customSchemas: get().customSchemas.filter(
+        (schema) => schema.id !== schemaId
+      ),
+      // Объекты осиротевшего типа держать негде — убираем вместе с типом.
+      entities: get().entities.filter((entity) => entity.type !== schemaId),
+    }),
 
   deleteEntity: (entityId) => {
     set({
@@ -440,7 +546,94 @@ export const useAppStore = create<AppState>((set, get) => ({
   deleteDocument: (documentId) =>
     set({
       documents: get().documents.filter((item) => item.id !== documentId),
+      selectedDocumentIds: get().selectedDocumentIds.filter(
+        (id) => id !== documentId
+      ),
+      reviewDocumentId:
+        get().reviewDocumentId === documentId ? null : get().reviewDocumentId,
     }),
+
+  startExtraction: (file) => {
+    stopExtractionTimer();
+
+    set({
+      isExtractionOpen: true,
+      extraction: {
+        file,
+        recipe: pickRecipe(file.name),
+        step: 0,
+        status: "running",
+        applied: false,
+      },
+    });
+
+    extractionTimerId = window.setInterval(() => {
+      const current = get().extraction;
+      if (!current) {
+        stopExtractionTimer();
+        return;
+      }
+
+      const nextStep = current.step + 1;
+
+      if (nextStep < EXTRACTION_STEPS.length) {
+        set({ extraction: { ...current, step: nextStep } });
+        return;
+      }
+
+      stopExtractionTimer();
+      set({
+        extraction: {
+          ...current,
+          step: EXTRACTION_STEPS.length,
+          status: "done",
+        },
+      });
+    }, 850);
+  },
+
+  setExtractionOpen: (open) => {
+    if (!open) {
+      stopExtractionTimer();
+      set({ isExtractionOpen: false, extraction: null });
+      return;
+    }
+    set({ isExtractionOpen: true });
+  },
+
+  applyExtraction: (caseId) => {
+    const current = get().extraction;
+    if (!current || current.status !== "done" || current.applied) return;
+
+    const schema = findSchema(get().customSchemas, current.recipe.schemaId);
+
+    const data: Record<string, string> = {};
+    for (const field of current.recipe.fields) {
+      data[field.key] = field.value;
+    }
+
+    const entity = withValidation(
+      {
+        id: nextId("entity"),
+        caseId,
+        type: schema.id,
+        data,
+        validationErrors: [],
+      },
+      schema
+    );
+
+    set({
+      entities: [...get().entities, entity],
+      extraction: { ...current, applied: true },
+      // Реквизиты переносятся в матрицу — показываем её сразу.
+      activeTab: "entities",
+    });
+  },
+
+  openDocumentReview: (documentId) => set({ reviewDocumentId: documentId }),
+
+  closeDocumentReview: () => set({ reviewDocumentId: null }),
 
   setActiveTab: (tab) => set({ activeTab: tab }),
 
@@ -486,6 +679,22 @@ export const useAppStore = create<AppState>((set, get) => ({
           id: nextId("message"),
           role: "assistant",
           text: "Просканировал файлы дела. ИНН найден в уставных документах: 1513000000 (ООО «Альфа-Консалт»). Значение подставлено в карточку контрагента.",
+          citations: [INN_CITATION],
+          timestamp: new Date().toISOString(),
+        };
+      } else if (
+        lower.includes("формулировк") ||
+        lower.includes("найди") ||
+        lower.includes("найти") ||
+        lower.includes("где ")
+      ) {
+        // Поиск формулировки по всем файлам дела — ответ обязательно
+        // сопровождается ссылкой на пункт и страницу источника.
+        reply = {
+          id: nextId("message"),
+          role: "assistant",
+          text: "Нашёл в материалах дела два фрагмента по вашему запросу. Формулировки привожу дословно — ниже указано, откуда они взяты.",
+          citations: ASSISTANT_CITATIONS,
           timestamp: new Date().toISOString(),
         };
       } else if (lower.includes("заполн") || lower.includes("пуст")) {
@@ -494,6 +703,9 @@ export const useAppStore = create<AppState>((set, get) => ({
           id: nextId("message"),
           role: "assistant",
           text: "Заполнил пустые обязательные поля значениями из выписки ЕГРН. Проверьте подставленные данные в таблице — все строки готовы к генерации.",
+          citations: ASSISTANT_CITATIONS.filter((item) =>
+            item.document.includes("ЕГРН")
+          ),
           timestamp: new Date().toISOString(),
         };
       } else if (invalid.length > 0) {
@@ -612,7 +824,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   setGenerationSheetOpen: (open) => {
-    if (!open) stopGenerationTimer();
+    if (!open) {
+      stopGenerationTimer();
+      stopFreeformTimers();
+    }
     set({
       isGenerationSheetOpen: open,
       ...(open
@@ -621,6 +836,8 @@ export const useAppStore = create<AppState>((set, get) => ({
             generationStatus: "idle",
             generationProgress: 0,
             isCustomGenerating: false,
+            freeformStage: "idle",
+            templateMatch: null,
           }),
     });
   },
@@ -629,39 +846,60 @@ export const useAppStore = create<AppState>((set, get) => ({
     const request = prompt.trim();
     if (!request || get().isCustomGenerating) return;
 
-    set({ isCustomGenerating: true });
+    stopFreeformTimers();
 
-    window.setTimeout(() => {
-      const title = titleFromPrompt(request);
-      const id = nextId("generated");
-      const name = `${title}.docx`;
-      const createdAt = new Date().toISOString();
+    // Сначала показываем поиск шаблона: пользователю важно понимать,
+    // подставились реквизиты в готовую форму или документ пишется с нуля.
+    set({
+      isCustomGenerating: true,
+      freeformStage: "searching",
+      templateMatch: null,
+    });
 
-      set({
-        isCustomGenerating: false,
-        generatedDocuments: [
-          ...get().generatedDocuments,
-          {
-            id,
-            name,
-            entityId: CUSTOM_REQUEST_GROUP,
-            entityName: "По вашему запросу",
-          },
-        ],
-        documents: [
-          {
-            id,
-            caseId,
-            title: name,
-            type: "Свободный запрос",
-            status: "ready",
-            url: "#",
-            createdAt,
-          },
-          ...get().documents,
-        ],
-      });
-    }, 1400);
+    freeformTimers.push(
+      window.setTimeout(() => {
+        set({
+          freeformStage: "composing",
+          templateMatch: matchFreeformTemplate(request),
+        });
+      }, 900)
+    );
+
+    freeformTimers.push(
+      window.setTimeout(() => {
+        const title = titleFromPrompt(request);
+        const id = nextId("generated");
+        const name = `${title}.docx`;
+        const createdAt = new Date().toISOString();
+        const match = get().templateMatch;
+
+        set({
+          isCustomGenerating: false,
+          freeformStage: "done",
+          generatedDocuments: [
+            ...get().generatedDocuments,
+            {
+              id,
+              name,
+              entityId: CUSTOM_REQUEST_GROUP,
+              entityName: "По вашему запросу",
+            },
+          ],
+          documents: [
+            {
+              id,
+              caseId,
+              title: name,
+              type: match?.found ? match.name : "Составлен с нуля",
+              status: "ready",
+              url: "#",
+              createdAt,
+            },
+            ...get().documents,
+          ],
+        });
+      }, 2400)
+    );
   },
 
   toggleDocumentSelection: (documentId) => {
@@ -673,13 +911,23 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
 
+  selectDocuments: (documentIds) =>
+    set({ selectedDocumentIds: documentIds }),
+
   clearDocumentSelection: () => set({ selectedDocumentIds: [] }),
 
   setBatchReviewOpen: (open) => {
     if (!open) stopBatchReviewTimer();
     set({
       isBatchReviewOpen: open,
-      ...(open ? {} : { batchReviewStatus: "idle", batchReviewProgress: 0 }),
+      ...(open
+        ? {}
+        : {
+            batchReviewStatus: "idle",
+            batchReviewProgress: 0,
+            batchReviewCursor: 0,
+            batchReviewQueue: [],
+          }),
     });
   },
 
@@ -698,36 +946,49 @@ export const useAppStore = create<AppState>((set, get) => ({
       batchReviewStatus: "running",
       batchReviewProgress: 0,
       batchReviewResults: [],
+      batchReviewCursor: 0,
+      batchReviewQueue: targets.map((item) => ({
+        id: item.id,
+        title: item.title,
+      })),
     });
 
+    /*
+     * Документы проверяются по одному: очередь видно на экране, а замечания
+     * прибавляются по мере разбора — так же, как в демонстрации на лендинге.
+     * Количество замечаний выводится детерминированно из имени файла,
+     * чтобы результат не «прыгал» при повторном запуске.
+     */
     batchReviewTimerId = window.setInterval(() => {
-      const progress = get().batchReviewProgress + 13;
+      const cursor = get().batchReviewCursor;
+      const document = targets[cursor];
 
-      if (progress < 100) {
-        set({ batchReviewProgress: progress });
+      if (!document) {
+        stopBatchReviewTimer();
+        set({ batchReviewStatus: "done", batchReviewProgress: 100 });
         return;
       }
 
-      stopBatchReviewTimer();
+      const seed = document.title.length + cursor;
+      const result: BatchReviewResult = {
+        documentId: document.id,
+        title: document.title,
+        critical: seed % 3 === 0 ? 1 : 0,
+        warning: (seed % 3) + 1,
+      };
 
-      // Демо-разбор: количество замечаний выводится детерминированно из имени,
-      // чтобы результат не «прыгал» при каждом повторном запуске.
-      const results: BatchReviewResult[] = targets.map((document, index) => {
-        const seed = document.title.length + index;
-        return {
-          documentId: document.id,
-          title: document.title,
-          critical: seed % 3 === 0 ? 1 : 0,
-          warning: (seed % 3) + 1,
-        };
-      });
+      const nextCursor = cursor + 1;
+      const isLast = nextCursor >= targets.length;
+
+      if (isLast) stopBatchReviewTimer();
 
       set({
-        batchReviewProgress: 100,
-        batchReviewStatus: "done",
-        batchReviewResults: results,
+        batchReviewResults: [...get().batchReviewResults, result],
+        batchReviewCursor: nextCursor,
+        batchReviewProgress: (nextCursor / targets.length) * 100,
+        batchReviewStatus: isLast ? "done" : "running",
       });
-    }, 140);
+    }, 780);
   },
 
   toggleCaseSelection: (caseId) => {
