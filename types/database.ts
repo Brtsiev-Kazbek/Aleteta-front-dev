@@ -44,7 +44,7 @@ export type JobStatus = "queued" | "running" | "done" | "failed" | "cancelled";
 /*  СТРОКИ ТАБЛИЦ                                                      */
 /* ------------------------------------------------------------------ */
 
-export interface ProfileRow {
+export type ProfileRow = {
   id: string;
   email: string;
   full_name: string | null;
@@ -56,7 +56,7 @@ export interface ProfileRow {
   updated_at: string;
 }
 
-export interface WorkspaceRow {
+export type WorkspaceRow = {
   id: string;
   name: string;
   slug: string;
@@ -70,7 +70,7 @@ export interface WorkspaceRow {
   archived_at: string | null;
 }
 
-export interface WorkspaceMemberRow {
+export type WorkspaceMemberRow = {
   workspace_id: string;
   user_id: string;
   role: WorkspaceRole;
@@ -78,7 +78,7 @@ export interface WorkspaceMemberRow {
   created_at: string;
 }
 
-export interface WorkspaceInviteRow {
+export type WorkspaceInviteRow = {
   id: string;
   workspace_id: string;
   email: string;
@@ -92,7 +92,7 @@ export interface WorkspaceInviteRow {
 }
 
 /** Описание одного реквизита внутри `entity_types.fields`. */
-export interface EntityFieldDefinition {
+export type EntityFieldDefinition = {
   key: string;
   label: string;
   required: boolean;
@@ -103,7 +103,7 @@ export interface EntityFieldDefinition {
   patternError?: string;
 }
 
-export interface EntityTypeRow {
+export type EntityTypeRow = {
   id: string;
   /** NULL — встроенный тип, доступный всем пространствам. */
   workspace_id: string | null;
@@ -119,7 +119,7 @@ export interface EntityTypeRow {
   archived_at: string | null;
 }
 
-export interface CaseRow {
+export type CaseRow = {
   id: string;
   workspace_id: string;
   title: string;
@@ -132,7 +132,7 @@ export interface CaseRow {
   archived_at: string | null;
 }
 
-export interface EntityRow {
+export type EntityRow = {
   id: string;
   workspace_id: string;
   case_id: string;
@@ -146,7 +146,7 @@ export interface EntityRow {
   updated_at: string;
 }
 
-export interface DocumentRow {
+export type DocumentRow = {
   id: string;
   workspace_id: string;
   case_id: string;
@@ -167,7 +167,7 @@ export interface DocumentRow {
   deleted_at: string | null;
 }
 
-export interface ChatMessageRow {
+export type ChatMessageRow = {
   id: string;
   workspace_id: string;
   case_id: string;
@@ -180,7 +180,7 @@ export interface ChatMessageRow {
   created_at: string;
 }
 
-export interface ActivityRow {
+export type ActivityRow = {
   id: string;
   workspace_id: string;
   case_id: string | null;
@@ -191,7 +191,7 @@ export interface ActivityRow {
   created_at: string;
 }
 
-export interface AiJobRow {
+export type AiJobRow = {
   id: string;
   workspace_id: string;
   case_id: string | null;
@@ -216,7 +216,7 @@ export interface AiJobRow {
   finished_at: string | null;
 }
 
-export interface DocumentReviewRow {
+export type DocumentReviewRow = {
   id: string;
   workspace_id: string;
   case_id: string | null;
@@ -232,7 +232,7 @@ export interface DocumentReviewRow {
   finished_at: string | null;
 }
 
-export interface ReviewFindingRow {
+export type ReviewFindingRow = {
   id: string;
   review_id: string;
   workspace_id: string;
@@ -246,7 +246,7 @@ export interface ReviewFindingRow {
   created_at: string;
 }
 
-export interface CourtPracticeRow {
+export type CourtPracticeRow = {
   id: string;
   source: string;
   external_id: string | null;
@@ -259,13 +259,13 @@ export interface CourtPracticeRow {
   created_at: string;
 }
 
-export interface FindingPracticeRow {
+export type FindingPracticeRow = {
   finding_id: string;
   practice_id: string;
   relevance: number | null;
 }
 
-export interface DocumentChunkRow {
+export type DocumentChunkRow = {
   id: string;
   workspace_id: string;
   case_id: string;
@@ -283,7 +283,7 @@ export interface DocumentChunkRow {
 /*  ПРЕДСТАВЛЕНИЯ И ФУНКЦИИ                                            */
 /* ------------------------------------------------------------------ */
 
-export interface WorkspaceStatsRow {
+export type WorkspaceStatsRow = {
   workspace_id: string;
   name: string;
   plan: string;
@@ -299,7 +299,7 @@ export interface WorkspaceStatsRow {
   created_at: string;
 }
 
-export interface AiUsageDailyRow {
+export type AiUsageDailyRow = {
   workspace_id: string;
   day: string;
   task: AiTask;
@@ -314,7 +314,7 @@ export interface AiUsageDailyRow {
   avg_seconds: number | null;
 }
 
-export interface PlatformOverviewRow {
+export type PlatformOverviewRow = {
   users: number;
   users_new_7d: number;
   workspaces: number;
@@ -327,7 +327,7 @@ export interface PlatformOverviewRow {
   ai_failure_rate: number;
 }
 
-export interface PlatformWorkspaceRow {
+export type PlatformWorkspaceRow = {
   workspace_id: string;
   name: string;
   slug: string;
@@ -341,7 +341,7 @@ export interface PlatformWorkspaceRow {
   created_at: string;
 }
 
-export interface CaseChunkMatch {
+export type CaseChunkMatch = {
   id: string;
   document_id: string;
   text: string;
@@ -369,18 +369,21 @@ export interface Database {
         Insert: Omit<ProfileRow, "created_at" | "updated_at" | "platform_role"> &
           Partial<Pick<ProfileRow, "platform_role">>;
         Update: Partial<Omit<ProfileRow, "id" | "created_at">>;
+        Relationships: [];
       };
       workspaces: {
         Row: WorkspaceRow;
         Insert: Omit<WorkspaceRow, Generated | "archived_at" | "plan"> &
           Partial<Pick<WorkspaceRow, "id" | "plan">>;
         Update: Partial<Omit<WorkspaceRow, "id" | "created_at">>;
+        Relationships: [];
       };
       workspace_members: {
         Row: WorkspaceMemberRow;
         Insert: Omit<WorkspaceMemberRow, "created_at" | "role" | "invited_by"> &
           Partial<Pick<WorkspaceMemberRow, "role" | "invited_by">>;
         Update: Partial<Pick<WorkspaceMemberRow, "role">>;
+        Relationships: [];
       };
       workspace_invites: {
         Row: WorkspaceInviteRow;
@@ -390,6 +393,7 @@ export interface Database {
         > &
           Partial<Pick<WorkspaceInviteRow, "role" | "expires_at">>;
         Update: Partial<Pick<WorkspaceInviteRow, "role" | "accepted_at" | "accepted_by">>;
+        Relationships: [];
       };
       entity_types: {
         Row: EntityTypeRow;
@@ -399,12 +403,14 @@ export interface Database {
         > &
           Partial<Pick<EntityTypeRow, "is_custom" | "hint" | "templates">>;
         Update: Partial<Omit<EntityTypeRow, "id" | "created_at" | "workspace_id">>;
+        Relationships: [];
       };
       cases: {
         Row: CaseRow;
         Insert: Omit<CaseRow, Generated | "archived_at" | "status" | "tags"> &
           Partial<Pick<CaseRow, "status" | "tags">>;
         Update: Partial<Omit<CaseRow, "id" | "created_at" | "workspace_id">>;
+        Relationships: [];
       };
       entities: {
         Row: EntityRow;
@@ -414,6 +420,7 @@ export interface Database {
         > &
           Partial<Pick<EntityRow, "workspace_id" | "uncertain_fields">>;
         Update: Partial<Pick<EntityRow, "data" | "uncertain_fields" | "type_id">>;
+        Relationships: [];
       };
       documents: {
         Row: DocumentRow;
@@ -423,18 +430,21 @@ export interface Database {
         > &
           Partial<Pick<DocumentRow, "workspace_id" | "status" | "source" | "bucket">>;
         Update: Partial<Omit<DocumentRow, "id" | "created_at" | "workspace_id">>;
+        Relationships: [];
       };
       chat_messages: {
         Row: ChatMessageRow;
         Insert: Omit<ChatMessageRow, "id" | "created_at" | "workspace_id"> &
           Partial<Pick<ChatMessageRow, "workspace_id">>;
         Update: never;
+        Relationships: [];
       };
       activity: {
         Row: ActivityRow;
         Insert: Omit<ActivityRow, "id" | "created_at" | "meta"> &
           Partial<Pick<ActivityRow, "meta">>;
         Update: never;
+        Relationships: [];
       };
       ai_jobs: {
         Row: AiJobRow;
@@ -444,6 +454,7 @@ export interface Database {
         > &
           Partial<Pick<AiJobRow, "status" | "progress">>;
         Update: Partial<Omit<AiJobRow, "id" | "created_at" | "workspace_id">>;
+        Relationships: [];
       };
       document_reviews: {
         Row: DocumentReviewRow;
@@ -453,33 +464,43 @@ export interface Database {
         > &
           Partial<Pick<DocumentReviewRow, "workspace_id" | "status">>;
         Update: Partial<Omit<DocumentReviewRow, "id" | "created_at">>;
+        Relationships: [];
       };
       review_findings: {
         Row: ReviewFindingRow;
         Insert: Omit<ReviewFindingRow, "id" | "created_at" | "workspace_id"> &
           Partial<Pick<ReviewFindingRow, "workspace_id">>;
         Update: Partial<Omit<ReviewFindingRow, "id" | "created_at">>;
+        Relationships: [];
       };
       court_practice: {
         Row: CourtPracticeRow;
         Insert: Omit<CourtPracticeRow, "id" | "created_at">;
         Update: Partial<Omit<CourtPracticeRow, "id" | "created_at">>;
+        Relationships: [];
       };
       finding_practice: {
         Row: FindingPracticeRow;
         Insert: FindingPracticeRow;
         Update: Partial<Pick<FindingPracticeRow, "relevance">>;
+        Relationships: [];
       };
       document_chunks: {
         Row: DocumentChunkRow;
         Insert: Omit<DocumentChunkRow, "id" | "created_at" | "workspace_id"> &
           Partial<Pick<DocumentChunkRow, "workspace_id">>;
         Update: Partial<Omit<DocumentChunkRow, "id" | "created_at">>;
+        Relationships: [];
       };
     };
     Views: {
-      workspace_stats: { Row: WorkspaceStatsRow };
-      ai_usage_daily: { Row: AiUsageDailyRow };
+      /*
+       * Relationships обязателен: без него схема не удовлетворяет
+       * GenericSchema из postgrest-js, и все таблицы выводятся как `never`.
+       * Связи здесь не описываем — вложенные выборки не используются.
+       */
+      workspace_stats: { Row: WorkspaceStatsRow; Relationships: [] };
+      ai_usage_daily: { Row: AiUsageDailyRow; Relationships: [] };
     };
     Functions: {
       search_case_chunks: {

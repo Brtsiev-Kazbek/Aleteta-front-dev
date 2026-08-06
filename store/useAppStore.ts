@@ -175,6 +175,25 @@ interface AppState {
 
   toggleSidebar: (expanded?: boolean) => void;
   setCreateCaseOpen: (open: boolean) => void;
+
+  /**
+   * Замена встроенного набора данными из базы.
+   *
+   * Интерфейс целиком построен вокруг этого стора, поэтому подключение базы
+   * сделано подменой содержимого, а не переписыванием компонентов: серверная
+   * страница читает данные и передаёт их сюда один раз при загрузке.
+   */
+  hydrate: (snapshot: StoreSnapshot) => void;
+  /** Данные пришли из базы, а не из встроенного набора. */
+  isBackedByDatabase: boolean;
+}
+
+/** Срез данных, приходящий с сервера. Отсутствующие части остаются как есть. */
+export interface StoreSnapshot {
+  cases?: Case[];
+  entities?: Entity[];
+  documents?: Document[];
+  customSchemas?: EntitySchema[];
 }
 
 let idCounter = 0;
@@ -336,6 +355,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   batchReviewStatus: "idle",
   batchReviewProgress: 0,
   batchReviewResults: [],
+
+  isBackedByDatabase: false,
 
   isSidebarExpanded: false,
   isCreateCaseOpen: false,
@@ -1074,4 +1095,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
 
   setCreateCaseOpen: (open) => set({ isCreateCaseOpen: open }),
+
+  hydrate: (snapshot) =>
+    set((state) => ({
+      cases: snapshot.cases ?? state.cases,
+      entities: snapshot.entities ?? state.entities,
+      documents: snapshot.documents ?? state.documents,
+      customSchemas: snapshot.customSchemas ?? state.customSchemas,
+      isBackedByDatabase: true,
+    })),
 }));
