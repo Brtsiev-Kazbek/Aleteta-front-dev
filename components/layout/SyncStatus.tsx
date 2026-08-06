@@ -1,0 +1,69 @@
+"use client";
+
+import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle, Loader2, X } from "lucide-react";
+
+import { useAppStore } from "@/store/useAppStore";
+
+/**
+ * Состояние записи в базу.
+ *
+ * Правки применяются к интерфейсу сразу, поэтому неудачную запись человек без
+ * подсказки не заметит: значение вернулось к прежнему, а почему — непонятно.
+ * Это единственное место, где такие отказы становятся видимыми, поэтому
+ * компонент висит рядом с сайдбаром и показывается на всех экранах приложения.
+ */
+export function SyncStatus() {
+  const error = useAppStore((state) => state.syncError);
+  const dismiss = useAppStore((state) => state.dismissSyncError);
+  const pending = useAppStore((state) => state.pendingWrites);
+  const isRemote = useAppStore((state) => state.isBackedByDatabase);
+
+  return (
+    <div className="pointer-events-none fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 flex-col items-center gap-2">
+      <AnimatePresence initial={false}>
+        {/* Индикатор сохранения — только когда база подключена. */}
+        {isRemote && pending > 0 && !error && (
+          <motion.div
+            key="pending"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.18 }}
+            className="flex items-center gap-2 rounded-md border border-stone-200 bg-white px-3 py-1.5 shadow-sm"
+          >
+            <Loader2 className="h-3 w-3 animate-spin text-stone-400" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
+              Сохраняется
+            </span>
+          </motion.div>
+        )}
+
+        {error && (
+          <motion.div
+            key="error"
+            role="alert"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.18 }}
+            className="pointer-events-auto flex max-w-lg items-start gap-2.5 rounded-md border border-red-200 bg-white py-2.5 pl-3 pr-2 shadow-sm"
+          >
+            <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-500" />
+            <span className="text-[13px] leading-relaxed text-stone-700">
+              {error}
+            </span>
+            <button
+              type="button"
+              onClick={dismiss}
+              className="ml-1 shrink-0 rounded p-1 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900"
+              aria-label="Скрыть сообщение"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

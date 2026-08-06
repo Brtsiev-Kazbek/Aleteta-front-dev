@@ -31,7 +31,7 @@ export function FinalCTA() {
 
             <div className="flex flex-col items-start gap-4 lg:col-span-5 lg:items-end">
               <Link
-                href="/dashboard"
+                href="/auth/register"
                 className="group inline-flex h-12 items-center gap-2 rounded-md bg-stone-950 px-7 text-sm font-medium text-white transition-colors hover:bg-stone-900"
               >
                 Начать работу

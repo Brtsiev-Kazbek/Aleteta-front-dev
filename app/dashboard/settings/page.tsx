@@ -1,71 +1,55 @@
-import { Bell, Building2, KeyRound, ShieldCheck, UserRound } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Building2, LayoutGrid, ShieldCheck, UserRound, Users } from "lucide-react";
 
 import { Sidebar } from "@/components/layout/Sidebar";
 import { PanelHeading } from "@/components/layout/PanelHeading";
+import { MembersPanel } from "@/components/settings/MembersPanel";
+import { OrganizationForm } from "@/components/settings/OrganizationForm";
+import { ProfileForm } from "@/components/settings/ProfileForm";
+import { SecurityPanel } from "@/components/settings/SecurityPanel";
+import { SettingsSection } from "@/components/settings/SettingsSection";
+import { StoreBootstrap } from "@/components/layout/StoreBootstrap";
+import { WorkspaceSwitcher } from "@/components/settings/WorkspaceSwitcher";
+import { loadSettings } from "@/lib/data/workspace";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
-interface SettingsSection {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  rows: { label: string; value: string }[];
-}
+export const metadata = {
+  title: "Настройки — Алетейя",
+};
 
-const SECTIONS: SettingsSection[] = [
-  {
-    icon: UserRound,
-    title: "Профиль",
-    description: "Данные пользователя, отображаемые в делах и документах.",
-    rows: [
-      { label: "Имя", value: "Казбек Б." },
-      { label: "Должность", value: "Юрист-партнёр" },
-      { label: "Электронная почта", value: "kazbek@aleteya.ru" },
-    ],
-  },
-  {
-    icon: Building2,
-    title: "Организация",
-    description: "Реквизиты, которые подставляются в шаблоны документов.",
-    rows: [
-      { label: "Наименование", value: "ООО «Алетейя Лигал»" },
-      { label: "ИНН", value: "1513000000" },
-      { label: "Адрес", value: "г. Владикавказ, ул. Мира, д. 10" },
-    ],
-  },
-  {
-    icon: ShieldCheck,
-    title: "Доступ и журналы",
-    description: "Кто работает с делами и как долго хранится история действий.",
-    rows: [
-      { label: "Участников в рабочем пространстве", value: "4" },
-      { label: "Двухфакторная аутентификация", value: "Включена" },
-      { label: "Срок хранения журнала действий", value: "90 дней" },
-    ],
-  },
-  {
-    icon: Bell,
-    title: "Уведомления",
-    description: "Когда Алетейя присылает оповещения.",
-    rows: [
-      { label: "Завершение генерации пакета", value: "Включено" },
-      { label: "Найдены критические риски", value: "Включено" },
-      { label: "Еженедельная сводка по делам", value: "Отключено" },
-    ],
-  },
-  {
-    icon: KeyRound,
-    title: "Доступ по API",
-    description: "Интеграция Алетейи с вашими системами.",
-    rows: [
-      { label: "Ключ API", value: "alt_live_••••••••••••4f2c" },
-      { label: "Создан", value: "12 мая 2026 г." },
-    ],
-  },
-];
+/*
+ * Страница читает профиль и состав пространства, то есть данные конкретного
+ * человека: кешировать её нельзя даже на секунду.
+ */
+export const dynamic = "force-dynamic";
 
-export default function SettingsPage() {
+const ROLE_LABELS: Record<string, string> = {
+  owner: "Владелец",
+  admin: "Администратор",
+  member: "Участник",
+  viewer: "Наблюдатель",
+};
+
+export default async function SettingsPage() {
+  // Без базы настраивать нечего: показываем, чего не хватает, вместо ошибки.
+  if (!isSupabaseConfigured()) {
+    return <NotConfigured />;
+  }
+
+  const settings = await loadSettings();
+  const canManage = settings.myRole === "owner" || settings.myRole === "admin";
+
   return (
     <div className="flex h-screen overflow-hidden bg-stone-50">
+      {/* Сайдбару нужно имя вошедшего — данные дел здесь не читаем. */}
+      <StoreBootstrap
+        snapshot={{
+          viewer: {
+            fullName: settings.profile.fullName,
+            email: settings.profile.email,
+            workspaceName: settings.workspace.name,
+          },
+        }}
+      />
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
@@ -76,39 +60,122 @@ export default function SettingsPage() {
             description="Эти значения подставляются в документы вместо ручного ввода."
           />
 
-          <div className="mt-10 flex flex-col gap-10">
-            {SECTIONS.map((section) => (
-              <section key={section.title}>
-                <div className="flex items-start gap-2.5 border-b border-stone-200 pb-3">
-                  <section.icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-stone-400" />
-                  <div className="flex min-w-0 flex-col">
-                    <h2 className="text-[15px] font-medium tracking-[-0.01em] text-stone-900">
-                      {section.title}
-                    </h2>
-                    <span className="mt-1 text-[13px] text-stone-500">
-                      {section.description}
-                    </span>
-                  </div>
-                </div>
+          <div className="mt-10 flex flex-col gap-12">
+            <SettingsSection
+              icon={UserRound}
+              title="Профиль"
+              description="Данные пользователя, отображаемые в делах и документах."
+              aside={
+                settings.profile.isPlatformAdmin ? (
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-violet-600">
+                    администратор установки
+                  </span>
+                ) : null
+              }
+            >
+              <ProfileForm
+                fullName={settings.profile.fullName}
+                jobTitle={settings.profile.jobTitle}
+                email={settings.profile.email}
+              />
+            </SettingsSection>
 
-                <dl className="flex flex-col divide-y divide-stone-200">
-                  {section.rows.map((row) => (
-                    <div
-                      key={row.label}
-                      className="flex items-baseline justify-between gap-4 py-3.5"
-                    >
-                      <dt className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
-                        {row.label}
-                      </dt>
-                      <dd className="truncate text-sm text-stone-900">
-                        {row.value}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </section>
-            ))}
+            <SettingsSection
+              icon={Building2}
+              title="Организация"
+              description="Реквизиты, которые подставляются в шаблоны документов."
+              aside={
+                <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                  тариф: {settings.workspace.plan}
+                </span>
+              }
+            >
+              <OrganizationForm
+                workspace={settings.workspace}
+                canEdit={canManage}
+              />
+            </SettingsSection>
+
+            <SettingsSection
+              icon={Users}
+              title="Участники"
+              description="Кто работает с делами этого пространства."
+              aside={
+                <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                  вы — {ROLE_LABELS[settings.myRole] ?? settings.myRole}
+                </span>
+              }
+            >
+              <MembersPanel
+                members={settings.members}
+                invites={settings.invites}
+                canManage={canManage}
+              />
+            </SettingsSection>
+
+            <SettingsSection
+              icon={LayoutGrid}
+              title="Рабочие пространства"
+              description="Где вы состоите и где работаете сейчас."
+            >
+              <WorkspaceSwitcher
+                workspaces={settings.workspaces}
+                currentId={settings.workspace.id}
+              />
+            </SettingsSection>
+
+            <SettingsSection
+              icon={ShieldCheck}
+              title="Доступ"
+              description="Пароль и адрес почты, по которому вы входите."
+            >
+              <SecurityPanel email={settings.profile.email} />
+
+              <form
+                action="/auth/signout"
+                method="post"
+                className="mt-8 flex items-center justify-between gap-4 border-t border-stone-200 pt-5"
+              >
+                <span className="text-[13px] text-stone-500">
+                  Выйти из аккаунта на этом устройстве.
+                </span>
+                <button
+                  type="submit"
+                  className="shrink-0 border-b border-stone-300 pb-0.5 text-[13px] text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-900"
+                >
+                  Выйти
+                </button>
+              </form>
+            </SettingsSection>
           </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+/** Стенд без переменных окружения: настройки читать неоткуда. */
+function NotConfigured() {
+  return (
+    <div className="flex h-screen overflow-hidden bg-stone-50">
+      <Sidebar />
+
+      <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-3xl px-8 py-12">
+          <PanelHeading
+            eyebrow="Настройки"
+            title="База не подключена"
+            description="Приложение открыто на встроенном наборе данных — сохранять настройки некуда."
+          />
+
+          <p className="mt-8 text-sm leading-relaxed text-stone-600">
+            Скопируйте <code className="text-stone-900">.env.example</code> в{" "}
+            <code className="text-stone-900">.env.local</code>, заполните адрес
+            проекта и ключи Supabase и примените миграции — порядок описан в{" "}
+            <code className="text-stone-900">docs/SUPABASE.md</code>. После
+            этого профиль, реквизиты организации и состав участников появятся
+            здесь.
+          </p>
         </div>
       </main>
     </div>

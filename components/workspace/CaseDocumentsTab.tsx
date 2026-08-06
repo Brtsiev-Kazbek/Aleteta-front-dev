@@ -30,6 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { createDocumentUrlAction } from "@/app/actions/documents";
 import { ReviewSplitView } from "@/components/documents/ReviewSplitView";
 import { MetaLabel } from "@/components/layout/PanelHeading";
 import { BatchReviewSheet } from "@/components/workspace/BatchReviewSheet";
@@ -59,6 +60,10 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const openDocumentReview = useAppStore((state) => state.openDocumentReview);
   const closeDocumentReview = useAppStore((state) => state.closeDocumentReview);
 
+  const isBackedByDatabase = useAppStore((state) => state.isBackedByDatabase);
+  const setSyncError = (message: string) =>
+    useAppStore.setState({ syncError: message });
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -80,12 +85,33 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
     const files = Array.from(list).map((file) => ({
       name: file.name,
       sizeBytes: file.size,
+      file,
     }));
 
-    addDocuments(caseId, files);
+    // Содержимое передаём дальше: загрузку в хранилище делает стор.
+    void addDocuments(caseId, files);
 
     const first = files[0];
     if (first) startExtraction(first);
+  }
+
+  /**
+   * Скачивание.
+   *
+   * Бакет закрытый, постоянного адреса у файла нет: сервер выдаёт временную
+   * ссылку, и её открываем в новой вкладке. Пока базы нет, скачивать нечего —
+   * во встроенном наборе файлов не существует.
+   */
+  async function handleDownload(documentId: string) {
+    if (!isBackedByDatabase) return;
+
+    const result = await createDocumentUrlAction(documentId);
+    if (!result.ok || !result.data) {
+      setSyncError(result.error ?? "Не удалось получить ссылку на файл.");
+      return;
+    }
+
+    window.open(result.data, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -275,7 +301,9 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                       <ScanLine className="h-4 w-4 text-stone-400" />
                       Извлечь реквизиты
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => void handleDownload(document.id)}
+                    >
                       <Download className="h-4 w-4 text-stone-400" />
                       Скачать
                     </DropdownMenuItem>

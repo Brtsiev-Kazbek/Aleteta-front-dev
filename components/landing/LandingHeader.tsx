@@ -76,7 +76,7 @@ export function LandingHeader() {
 
         <div className="flex items-center gap-5">
           <Link
-            href="/dashboard"
+            href="/auth/login"
             className={cn(
               "hidden text-[13px] transition-colors sm:block",
               isScrolled
@@ -88,7 +88,7 @@ export function LandingHeader() {
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/auth/register"
             className={cn(
               "inline-flex h-9 items-center rounded-md px-4 text-[13px] font-medium transition-colors",
               isScrolled

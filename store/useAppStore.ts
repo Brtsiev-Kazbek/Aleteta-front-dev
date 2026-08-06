@@ -1,5 +1,22 @@
 import { create } from "zustand";
 
+import { createCaseAction } from "@/app/actions/cases";
+import {
+  addEntityAction,
+  archiveEntitySchemaAction,
+  createEntitySchemaAction,
+  deleteEntityAction,
+  duplicateEntityAction,
+  updateEntityDataAction,
+  updateEntityFieldAction,
+} from "@/app/actions/entities";
+import {
+  deleteDocumentAction,
+  prepareDocumentUploadAction,
+  registerDocumentAction,
+} from "@/app/actions/documents";
+import type { ActionResult } from "@/lib/actions/result";
+import { createClient } from "@/lib/supabase/client";
 import {
   ASSISTANT_CITATIONS,
   ASSISTANT_RISK_FINDINGS,
@@ -56,6 +73,11 @@ export interface BulkGenerationResult {
 export interface UploadedFile {
   name: string;
   sizeBytes: number;
+  /**
+   * Само содержимое. Есть только у файла, выбранного человеком: на
+   * демонстрационных примерах его нет, и в хранилище такой файл не уезжает.
+   */
+  file?: File;
 }
 
 interface AppState {
@@ -116,6 +138,18 @@ interface AppState {
   isCreateCaseOpen: boolean;
   isCustomSchemaOpen: boolean;
 
+  /* --- Обмен с базой --- */
+  /**
+   * Отказ последней записи. Правка в интерфейсе применяется сразу, не дожидаясь
+   * ответа базы, — иначе таблица «залипает» на каждой ячейке. Плата за это:
+   * если запись не прошла, человека нужно об этом известить, а изменение
+   * откатить.
+   */
+  syncError: string | null;
+  dismissSyncError: () => void;
+  /** Сколько записей сейчас в полёте — для индикатора «сохраняется». */
+  pendingWrites: number;
+
   /* --- Действия --- */
   updateEntityField: (entityId: string, field: string, value: string) => void;
   addEntity: (caseId: string, typeId: string) => void;
@@ -128,15 +162,22 @@ interface AppState {
    * области: он появляется в списке типов любого дела. Если передан `caseId`,
    * в это дело дополнительно добавляется пустой объект нового типа.
    */
-  createCustomSchema: (draft: CustomSchemaDraft, caseId?: string) => void;
+  createCustomSchema: (
+    draft: CustomSchemaDraft,
+    caseId?: string
+  ) => Promise<void>;
   setCustomSchemaOpen: (open: boolean) => void;
   /** Удаляет пользовательский тип вместе с объектами этого типа. */
   deleteCustomSchema: (schemaId: string) => void;
 
-  createCase: (title: string) => Case;
+  /**
+   * Создаёт дело. Возвращает `null`, если база отказала: переходить на страницу
+   * дела, которого нет, нельзя.
+   */
+  createCase: (title: string) => Promise<Case | null>;
   addDocument: (document: Omit<Document, "id" | "createdAt">) => Document;
   /** Загрузка готовых файлов во вкладку «Документы» дела. */
-  addDocuments: (caseId: string, files: UploadedFile[]) => void;
+  addDocuments: (caseId: string, files: UploadedFile[]) => Promise<void>;
   deleteDocument: (documentId: string) => void;
 
   /** Разбирает файл и предлагает перенести реквизиты в карточку объекта. */
@@ -186,10 +227,20 @@ interface AppState {
   hydrate: (snapshot: StoreSnapshot) => void;
   /** Данные пришли из базы, а не из встроенного набора. */
   isBackedByDatabase: boolean;
+  /** Вошедший пользователь. Пока данных нет — null, меню показывает заглушку. */
+  viewer: Viewer | null;
+}
+
+/** Вошедший пользователь: имя в меню и название текущего пространства. */
+export interface Viewer {
+  fullName: string;
+  email: string;
+  workspaceName: string;
 }
 
 /** Срез данных, приходящий с сервера. Отсутствующие части остаются как есть. */
 export interface StoreSnapshot {
+  viewer?: Viewer;
   cases?: Case[];
   entities?: Entity[];
   documents?: Document[];
@@ -200,6 +251,77 @@ let idCounter = 0;
 function nextId(prefix: string): string {
   idCounter += 1;
   return `${prefix}-${Date.now()}-${idCounter}`;
+}
+
+/* ------------------------------------------------------------------ */
+/*  ОБМЕН С БАЗОЙ                                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Изменения применяются к состоянию сразу, а запись в базу идёт следом.
+ *
+ * Обратный порядок — ждать ответ и только потом рисовать — на таблице
+ * реквизитов невыносим: каждое поле замирало бы на время круга до сервера.
+ * Расплата за отзывчивость честная: если база отказала, изменение
+ * откатывается, а человек видит причину.
+ *
+ * Когда базы нет (демонстрационный стенд, свежий клон без переменных
+ * окружения), сюда просто не заходят: `isBackedByDatabase` остаётся false, и
+ * стор работает как раньше — на встроенном наборе.
+ */
+async function sync<T>(
+  request: Promise<ActionResult<T>>,
+  handlers: {
+    /** Что сделать с тем, что вернула база: обычно — подменить временный id. */
+    onSuccess?: (data: T) => void;
+    /** Откат: изменение, применённое до ответа, оказалось непринятым. */
+    onFailure?: () => void;
+    fallback: string;
+  }
+): Promise<T | null> {
+  useAppStore.setState((state) => ({ pendingWrites: state.pendingWrites + 1 }));
+
+  try {
+    const result = await request;
+
+    if (!result.ok) {
+      handlers.onFailure?.();
+      useAppStore.setState({ syncError: result.error || handlers.fallback });
+      return null;
+    }
+
+    const data = (result.data ?? null) as T | null;
+    if (data !== null) handlers.onSuccess?.(data);
+    return data;
+  } catch (caught) {
+    handlers.onFailure?.();
+    useAppStore.setState({
+      syncError: caught instanceof Error ? caught.message : handlers.fallback,
+    });
+    return null;
+  } finally {
+    useAppStore.setState((state) => ({
+      pendingWrites: Math.max(0, state.pendingWrites - 1),
+    }));
+  }
+}
+
+/** Работает ли стор поверх базы или показывает встроенный набор. */
+function isRemote(): boolean {
+  return useAppStore.getState().isBackedByDatabase;
+}
+
+/** Подменяет временный идентификатор на выданный базой — в каждом списке. */
+function replaceEntityId(temporaryId: string, entity: Entity) {
+  useAppStore.setState((state) => ({
+    entities: state.entities.map((item) =>
+      item.id === temporaryId ? entity : item
+    ),
+    editingCell:
+      state.editingCell?.entityId === temporaryId
+        ? { entityId: entity.id, field: state.editingCell.field }
+        : state.editingCell,
+  }));
 }
 
 /** Значения, которые «AI» подставляет в пустые поля по запросу пользователя. */
@@ -357,6 +479,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   batchReviewResults: [],
 
   isBackedByDatabase: false,
+  viewer: null,
+  syncError: null,
+  pendingWrites: 0,
 
   isSidebarExpanded: false,
   isCreateCaseOpen: false,
@@ -370,8 +495,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   batchReviewQueue: [],
   batchReviewCursor: 0,
 
+  dismissSyncError: () => set({ syncError: null }),
+
   updateEntityField: (entityId, field, value) => {
     const custom = get().customSchemas;
+    const previous = get().entities.find((entity) => entity.id === entityId);
+
     set({
       entities: get().entities.map((entity) =>
         entity.id === entityId
@@ -381,6 +510,24 @@ export const useAppStore = create<AppState>((set, get) => ({
             )
           : entity
       ),
+    });
+
+    if (!isRemote() || !previous) return;
+
+    void sync(updateEntityFieldAction(entityId, field, value), {
+      /*
+       * Ответ базы кладём целиком: список ошибок в нём пересчитан триггером,
+       * и он главнее того, что насчитал браузер. Расхождение возможно — в базе
+       * шаблон проверки хранится строкой POSIX, а не выражением JavaScript.
+       */
+      onSuccess: (entity) => replaceEntityId(entityId, entity),
+      onFailure: () =>
+        set({
+          entities: get().entities.map((entity) =>
+            entity.id === entityId ? previous : entity
+          ),
+        }),
+      fallback: "Не удалось сохранить значение.",
     });
   },
 
@@ -404,9 +551,24 @@ export const useAppStore = create<AppState>((set, get) => ({
         ? { entityId: entity.id, field: schema.fields[0].key }
         : null,
     });
+
+    if (!isRemote()) return;
+
+    void sync(addEntityAction(caseId, typeId), {
+      onSuccess: (created) => replaceEntityId(entity.id, created),
+      onFailure: () =>
+        set({
+          entities: get().entities.filter((item) => item.id !== entity.id),
+          editingCell:
+            get().editingCell?.entityId === entity.id
+              ? null
+              : get().editingCell,
+        }),
+      fallback: "Не удалось добавить объект.",
+    });
   },
 
-  createCustomSchema: (draft, caseId) => {
+  createCustomSchema: async (draft, caseId) => {
     const label = draft.label.trim() || "Свой тип объекта";
 
     const fields: EntityFieldSchema[] = draft.fields
@@ -447,52 +609,128 @@ export const useAppStore = create<AppState>((set, get) => ({
       templates: [`Документ по сущности «${label}»`],
     };
 
-    // Тип создаётся всегда, объект — только если тип заводят внутри дела.
-    if (!caseId) {
-      set({
-        customSchemas: [...get().customSchemas, schema],
-        isCustomSchemaOpen: false,
-      });
-      return;
-    }
-
-    const entity = withValidation(
-      {
-        id: nextId("entity"),
-        caseId,
-        type: schema.id,
-        data: {},
-        validationErrors: [],
-      },
-      schema
-    );
+    // Объект нового типа заводим только если тип создают внутри дела.
+    const entity = caseId
+      ? withValidation(
+          {
+            id: nextId("entity"),
+            caseId,
+            type: schema.id,
+            data: {},
+            validationErrors: [],
+          },
+          schema
+        )
+      : null;
 
     set({
       customSchemas: [...get().customSchemas, schema],
-      entities: [...get().entities, entity],
+      entities: entity ? [...get().entities, entity] : get().entities,
       isCustomSchemaOpen: false,
-      editingCell: safeFields[0]
-        ? { entityId: entity.id, field: safeFields[0].key }
-        : null,
+      editingCell:
+        entity && safeFields[0]
+          ? { entityId: entity.id, field: safeFields[0].key }
+          : get().editingCell,
+    });
+
+    if (!isRemote()) return;
+
+    const created = await sync(
+      createEntitySchemaAction(
+        label,
+        draft.fields.map(({ label: fieldLabel, required }) => ({
+          label: fieldLabel,
+          required,
+        }))
+      ),
+      {
+        /*
+         * Тип получил настоящий идентификатор — переписываем его и у самого
+         * типа, и у объектов, которые успели на него сослаться. Иначе объект
+         * останется висеть на временном идентификаторе, и после перезагрузки
+         * страницы схема для него не найдётся.
+         */
+        onSuccess: (saved) =>
+          set({
+            customSchemas: get().customSchemas.map((item) =>
+              item.id === schema.id ? saved : item
+            ),
+            entities: get().entities.map((item) =>
+              item.type === schema.id ? { ...item, type: saved.id } : item
+            ),
+          }),
+        onFailure: () =>
+          set({
+            customSchemas: get().customSchemas.filter(
+              (item) => item.id !== schema.id
+            ),
+            entities: get().entities.filter((item) => item.type !== schema.id),
+          }),
+        fallback: "Не удалось создать тип.",
+      }
+    );
+
+    if (!created || !caseId || !entity) return;
+
+    await sync(addEntityAction(caseId, created.id), {
+      onSuccess: (saved) => replaceEntityId(entity.id, saved),
+      onFailure: () =>
+        set({
+          entities: get().entities.filter((item) => item.id !== entity.id),
+        }),
+      fallback: "Тип создан, но объект добавить не удалось.",
     });
   },
 
   setCustomSchemaOpen: (open) => set({ isCustomSchemaOpen: open }),
 
-  deleteCustomSchema: (schemaId) =>
+  deleteCustomSchema: (schemaId) => {
+    const schema = get().customSchemas.find((item) => item.id === schemaId);
+    const orphaned = get().entities.filter((entity) => entity.type === schemaId);
+
     set({
       customSchemas: get().customSchemas.filter(
-        (schema) => schema.id !== schemaId
+        (item) => item.id !== schemaId
       ),
       // Объекты осиротевшего типа держать негде — убираем вместе с типом.
       entities: get().entities.filter((entity) => entity.type !== schemaId),
-    }),
+    });
+
+    if (!isRemote() || !schema) return;
+
+    void sync(archiveEntitySchemaAction(schemaId), {
+      onFailure: () =>
+        set({
+          customSchemas: [...get().customSchemas, schema],
+          entities: [...get().entities, ...orphaned],
+        }),
+      fallback: "Не удалось удалить тип.",
+    });
+  },
 
   deleteEntity: (entityId) => {
+    const removed = get().entities.find((entity) => entity.id === entityId);
+    const position = get().entities.findIndex(
+      (entity) => entity.id === entityId
+    );
+
     set({
       entities: get().entities.filter((entity) => entity.id !== entityId),
       editingCell:
         get().editingCell?.entityId === entityId ? null : get().editingCell,
+    });
+
+    if (!isRemote() || !removed) return;
+
+    void sync(deleteEntityAction(entityId), {
+      onFailure: () => {
+        // Возвращаем на то же место: строка, «перепрыгнувшая» в конец таблицы,
+        // читается как ещё одна ошибка.
+        const entities = [...get().entities];
+        entities.splice(Math.max(0, position), 0, removed);
+        set({ entities });
+      },
+      fallback: "Не удалось удалить объект.",
     });
   },
 
@@ -518,11 +756,22 @@ export const useAppStore = create<AppState>((set, get) => ({
     entities.splice(index + 1, 0, copy);
 
     set({ entities });
+
+    if (!isRemote()) return;
+
+    void sync(duplicateEntityAction(entityId), {
+      onSuccess: (saved) => replaceEntityId(copy.id, saved),
+      onFailure: () =>
+        set({
+          entities: get().entities.filter((entity) => entity.id !== copy.id),
+        }),
+      fallback: "Не удалось скопировать объект.",
+    });
   },
 
   setEditingCell: (cell) => set({ editingCell: cell }),
 
-  createCase: (title) => {
+  createCase: async (title) => {
     const newCase: Case = {
       id: nextId("case"),
       title: title.trim() || "Новое дело",
@@ -534,7 +783,27 @@ export const useAppStore = create<AppState>((set, get) => ({
       contextFile: "Файлы не загружены",
     };
     set({ cases: [newCase, ...get().cases] });
-    return newCase;
+
+    if (!isRemote()) return newCase;
+
+    /*
+     * Здесь ответ базы ждём, в отличие от правки ячейки: сразу после создания
+     * дела человека переносит на его страницу, а идти на страницу дела с
+     * временным идентификатором некуда — после перезагрузки его не найти.
+     */
+    const saved = await sync(createCaseAction(newCase.title), {
+      onSuccess: (created) =>
+        set({
+          cases: get().cases.map((item) =>
+            item.id === newCase.id ? created : item
+          ),
+        }),
+      onFailure: () =>
+        set({ cases: get().cases.filter((item) => item.id !== newCase.id) }),
+      fallback: "Не удалось создать дело.",
+    });
+
+    return saved;
   },
 
   addDocument: (document) => {
@@ -547,7 +816,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     return created;
   },
 
-  addDocuments: (caseId, files) => {
+  addDocuments: async (caseId, files) => {
     if (files.length === 0) return;
 
     const createdAt = new Date().toISOString();
@@ -562,9 +831,79 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
 
     set({ documents: [...created, ...get().documents] });
+
+    if (!isRemote()) return;
+
+    /*
+     * Файл уезжает в хранилище прямо из браузера, минуя серверное действие:
+     * предел на тело действия — мегабайты, а скан договора весит десятки.
+     * Сервер выдаёт путь и заводит строку, содержимое идёт напрямую.
+     */
+    await Promise.all(
+      files.map(async (picked, index) => {
+        const placeholder = created[index];
+        if (!placeholder) return;
+
+        const drop = () =>
+          set({
+            documents: get().documents.filter(
+              (item) => item.id !== placeholder.id
+            ),
+          });
+
+        // У демонстрационного примера содержимого нет — грузить нечего.
+        if (!picked.file) {
+          drop();
+          return;
+        }
+
+        const target = await sync(
+          prepareDocumentUploadAction(caseId, picked.name),
+          { onFailure: drop, fallback: "Не удалось подготовить загрузку." }
+        );
+        if (!target) return;
+
+        const supabase = createClient();
+        const { error } = await supabase.storage
+          .from(target.bucket)
+          .upload(target.path, picked.file, {
+            contentType: picked.file.type || undefined,
+            upsert: false,
+          });
+
+        if (error) {
+          drop();
+          set({ syncError: `Файл «${picked.name}» не загрузился: ${error.message}` });
+          return;
+        }
+
+        await sync(
+          registerDocumentAction({
+            caseId,
+            title: picked.name,
+            kind: detectDocumentType(picked.name),
+            path: target.path,
+            mimeType: picked.file.type || undefined,
+            sizeBytes: picked.sizeBytes,
+          }),
+          {
+            onSuccess: (document) =>
+              set({
+                documents: get().documents.map((item) =>
+                  item.id === placeholder.id ? document : item
+                ),
+              }),
+            onFailure: drop,
+            fallback: "Файл загружен, но запись о нём не сохранилась.",
+          }
+        );
+      })
+    );
   },
 
-  deleteDocument: (documentId) =>
+  deleteDocument: (documentId) => {
+    const removed = get().documents.find((item) => item.id === documentId);
+
     set({
       documents: get().documents.filter((item) => item.id !== documentId),
       selectedDocumentIds: get().selectedDocumentIds.filter(
@@ -572,7 +911,15 @@ export const useAppStore = create<AppState>((set, get) => ({
       ),
       reviewDocumentId:
         get().reviewDocumentId === documentId ? null : get().reviewDocumentId,
-    }),
+    });
+
+    if (!isRemote() || !removed) return;
+
+    void sync(deleteDocumentAction(documentId), {
+      onFailure: () => set({ documents: [removed, ...get().documents] }),
+      fallback: "Не удалось удалить документ.",
+    });
+  },
 
   startExtraction: (file) => {
     stopExtractionTimer();
@@ -650,6 +997,32 @@ export const useAppStore = create<AppState>((set, get) => ({
       // Реквизиты переносятся в матрицу — показываем её сразу.
       activeTab: "entities",
     });
+
+    if (!isRemote()) return;
+
+    /*
+     * Двумя запросами, а не одним: объект сначала должен появиться в базе,
+     * чтобы получить идентификатор, и только потом в него ложатся реквизиты.
+     * Вставить всё разом мешает триггер — он считает валидность по типу, а тип
+     * известен только после вставки.
+     */
+    void (async () => {
+      const created = await sync(addEntityAction(caseId, schema.id), {
+        onSuccess: (saved) => replaceEntityId(entity.id, saved),
+        onFailure: () =>
+          set({
+            entities: get().entities.filter((item) => item.id !== entity.id),
+          }),
+        fallback: "Не удалось перенести реквизиты.",
+      });
+
+      if (!created) return;
+
+      await sync(updateEntityDataAction(created.id, data), {
+        onSuccess: (saved) => replaceEntityId(created.id, saved),
+        fallback: "Объект создан, но реквизиты не сохранились.",
+      });
+    })();
   },
 
   openDocumentReview: (documentId) => set({ reviewDocumentId: documentId }),
@@ -753,6 +1126,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   fillEmptyFieldsWithAI: (caseId) => {
+    // Что именно подставили — нужно и для отката, и для записи в базу.
+    const patches = new Map<string, Record<string, string>>();
+
     set({
       entities: get().entities.map((entity) => {
         if (entity.caseId !== caseId) return entity;
@@ -760,16 +1136,32 @@ export const useAppStore = create<AppState>((set, get) => ({
 
         // Подставляем значения только в поля, которые есть в схеме этого типа.
         const schema = findSchema(get().customSchemas, entity.type);
-        const data = { ...entity.data };
+        const patch: Record<string, string> = {};
         for (const field of schema.fields) {
           const suggestion = AI_SUGGESTED_VALUES[field.key];
-          if (suggestion && !(data[field.key] ?? "").trim()) {
-            data[field.key] = suggestion;
+          if (suggestion && !(entity.data[field.key] ?? "").trim()) {
+            patch[field.key] = suggestion;
           }
         }
-        return withValidation({ ...entity, data }, schema);
+
+        if (Object.keys(patch).length === 0) return entity;
+        patches.set(entity.id, patch);
+
+        return withValidation(
+          { ...entity, data: { ...entity.data, ...patch } },
+          schema
+        );
       }),
     });
+
+    if (!isRemote()) return;
+
+    for (const [entityId, patch] of patches) {
+      void sync(updateEntityDataAction(entityId, patch), {
+        onSuccess: (saved) => replaceEntityId(entityId, saved),
+        fallback: "Не удалось сохранить подставленные реквизиты.",
+      });
+    }
   },
 
   startGeneration: (caseId) => {
@@ -1098,6 +1490,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   hydrate: (snapshot) =>
     set((state) => ({
+      viewer: snapshot.viewer ?? state.viewer,
       cases: snapshot.cases ?? state.cases,
       entities: snapshot.entities ?? state.entities,
       documents: snapshot.documents ?? state.documents,

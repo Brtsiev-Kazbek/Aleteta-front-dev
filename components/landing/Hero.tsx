@@ -107,7 +107,7 @@ export function Hero() {
           className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center"
         >
           <MagneticLink
-            href="/dashboard"
+            href="/auth/register"
             className="group inline-flex h-11 items-center gap-2 rounded-md bg-white px-6 text-sm font-medium text-stone-950 transition-colors hover:bg-stone-200"
           >
             Начать работу

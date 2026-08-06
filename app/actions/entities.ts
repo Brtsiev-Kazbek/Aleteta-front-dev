@@ -2,10 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  actionError,
+  actionFail,
+  actionOk,
+  type ActionResult,
+} from "@/lib/actions/result";
 import { requireSession } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
 import { toEntity, toEntitySchema } from "@/lib/data/mappers";
-import type { ActionResult } from "@/app/actions/cases";
 import type { Entity, EntitySchema } from "@/types";
 
 /**
@@ -36,16 +41,57 @@ export async function addEntityAction(
       .select("*")
       .single();
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return actionFail(error.message);
 
     revalidatePath(`/cases/${caseId}`);
-    return { ok: true, data: toEntity(data) };
+    return actionOk(toEntity(data));
   } catch (caught) {
-    return {
-      ok: false,
-      error:
-        caught instanceof Error ? caught.message : "Не удалось добавить объект.",
-    };
+    return actionError(caught, "Не удалось добавить объект.");
+  }
+}
+
+/**
+ * Правка нескольких реквизитов разом.
+ *
+ * Нужна там, где значения приходят пачкой: перенос распознанного из файла,
+ * заполнение пустых полей моделью. Поштучные запросы в этом случае не просто
+ * медленнее — между ними объект успевает побывать в наполовину заполненном
+ * состоянии, и лента активности пишет по строке на каждое поле.
+ */
+export async function updateEntityDataAction(
+  entityId: string,
+  patch: Record<string, string>
+): Promise<ActionResult<Entity>> {
+  if (Object.keys(patch).length === 0) {
+    return actionFail("Нечего сохранять.");
+  }
+
+  try {
+    await requireSession();
+    const supabase = createClient();
+
+    const { data: current, error: readError } = await supabase
+      .from("entities")
+      .select("case_id, data")
+      .eq("id", entityId)
+      .maybeSingle();
+
+    if (readError) return actionFail(readError.message);
+    if (!current) return actionFail("Объект не найден.");
+
+    const { data, error } = await supabase
+      .from("entities")
+      .update({ data: { ...current.data, ...patch } })
+      .eq("id", entityId)
+      .select("*")
+      .single();
+
+    if (error) return actionFail(error.message);
+
+    revalidatePath(`/cases/${current.case_id}`);
+    return actionOk(toEntity(data));
+  } catch (caught) {
+    return actionError(caught, "Не удалось сохранить реквизиты.");
   }
 }
 
@@ -65,8 +111,8 @@ export async function updateEntityFieldAction(
       .eq("id", entityId)
       .maybeSingle();
 
-    if (readError) return { ok: false, error: readError.message };
-    if (!current) return { ok: false, error: "Объект не найден." };
+    if (readError) return actionFail(readError.message);
+    if (!current) return actionFail("Объект не найден.");
 
     const { data, error } = await supabase
       .from("entities")
@@ -75,16 +121,12 @@ export async function updateEntityFieldAction(
       .select("*")
       .single();
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return actionFail(error.message);
 
     revalidatePath(`/cases/${current.case_id}`);
-    return { ok: true, data: toEntity(data) };
+    return actionOk(toEntity(data));
   } catch (caught) {
-    return {
-      ok: false,
-      error:
-        caught instanceof Error ? caught.message : "Не удалось сохранить значение.",
-    };
+    return actionError(caught, "Не удалось сохранить значение.");
   }
 }
 
@@ -102,16 +144,12 @@ export async function deleteEntityAction(
       .maybeSingle();
 
     const { error } = await supabase.from("entities").delete().eq("id", entityId);
-    if (error) return { ok: false, error: error.message };
+    if (error) return actionFail(error.message);
 
     if (current) revalidatePath(`/cases/${current.case_id}`);
-    return { ok: true, data: null };
+    return actionOk(null);
   } catch (caught) {
-    return {
-      ok: false,
-      error:
-        caught instanceof Error ? caught.message : "Не удалось удалить объект.",
-    };
+    return actionError(caught, "Не удалось удалить объект.");
   }
 }
 
@@ -128,8 +166,8 @@ export async function duplicateEntityAction(
       .eq("id", entityId)
       .maybeSingle();
 
-    if (readError) return { ok: false, error: readError.message };
-    if (!source) return { ok: false, error: "Объект не найден." };
+    if (readError) return actionFail(readError.message);
+    if (!source) return actionFail("Объект не найден.");
 
     // Имя берём из первого поля схемы: у своих типов ключа `name` нет.
     const { data: type } = await supabase
@@ -156,16 +194,12 @@ export async function duplicateEntityAction(
       .select("*")
       .single();
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return actionFail(error.message);
 
     revalidatePath(`/cases/${source.case_id}`);
-    return { ok: true, data: toEntity(data) };
+    return actionOk(toEntity(data));
   } catch (caught) {
-    return {
-      ok: false,
-      error:
-        caught instanceof Error ? caught.message : "Не удалось скопировать объект.",
-    };
+    return actionError(caught, "Не удалось скопировать объект.");
   }
 }
 
@@ -221,15 +255,68 @@ export async function createEntitySchemaAction(
       .select("*")
       .single();
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return actionFail(error.message);
 
     revalidatePath("/dashboard");
-    return { ok: true, data: toEntitySchema(data) };
+    return actionOk(toEntitySchema(data));
   } catch (caught) {
-    return {
-      ok: false,
-      error:
-        caught instanceof Error ? caught.message : "Не удалось создать тип.",
-    };
+    return actionError(caught, "Не удалось создать тип.");
+  }
+}
+
+/**
+ * Удаление пользовательского типа.
+ *
+ * Тип не стирается из базы, а помечается архивным. Причин две. Первая: на него
+ * ссылаются объекты, и внешний ключ стоит с `on delete restrict` — стереть
+ * строку всё равно не выйдет, пока жив хоть один объект. Вторая: удаление типа
+ * с уже заполненными объектами — не то действие, которое стоит делать
+ * необратимым по одному нажатию.
+ *
+ * Объекты этого типа удаляются: держать их без описания реквизитов негде,
+ * в интерфейсе они превращаются в строки без колонок.
+ */
+export async function archiveEntitySchemaAction(
+  schemaId: string
+): Promise<ActionResult<null>> {
+  try {
+    const session = await requireSession();
+    const supabase = createClient();
+
+    const { data: type, error: readError } = await supabase
+      .from("entity_types")
+      .select("id, workspace_id, is_custom")
+      .eq("id", schemaId)
+      .maybeSingle();
+
+    if (readError) return actionFail(readError.message);
+    if (!type) return actionFail("Тип не найден.");
+
+    // Встроенные типы приходят миграцией и общие для всех пространств.
+    if (!type.is_custom || type.workspace_id === null) {
+      return actionFail("Встроенный тип удалить нельзя.");
+    }
+    if (type.workspace_id !== session.workspaceId) {
+      return actionFail("Тип принадлежит другому пространству.");
+    }
+
+    const { error: entitiesError } = await supabase
+      .from("entities")
+      .delete()
+      .eq("type_id", schemaId);
+
+    if (entitiesError) return actionFail(entitiesError.message);
+
+    const { error } = await supabase
+      .from("entity_types")
+      .update({ archived_at: new Date().toISOString() })
+      .eq("id", schemaId);
+
+    if (error) return actionFail(error.message);
+
+    revalidatePath("/dashboard");
+    return actionOk(null);
+  } catch (caught) {
+    return actionError(caught, "Не удалось удалить тип.");
   }
 }

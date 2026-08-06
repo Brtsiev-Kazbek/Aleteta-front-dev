@@ -8,6 +8,11 @@ import { cn } from "@/lib/utils";
 export interface PickedFile {
   name: string;
   sizeBytes: number;
+  /**
+   * Само содержимое. Есть только у выбранного человеком файла: у
+   * демонстрационного примера его нет, и в хранилище такой файл не уезжает.
+   */
+  file?: File;
 }
 
 interface FileDropzoneProps {
@@ -41,7 +46,7 @@ export function FileDropzone({
   function handleFiles(list: FileList | null) {
     const picked = list?.[0];
     if (!picked) return;
-    onPick({ name: picked.name, sizeBytes: picked.size });
+    onPick({ name: picked.name, sizeBytes: picked.size, file: picked });
   }
 
   return (

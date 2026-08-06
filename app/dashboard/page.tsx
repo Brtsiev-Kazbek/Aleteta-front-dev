@@ -8,6 +8,14 @@ import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { RecentCases } from "@/components/dashboard/RecentCases";
 import { Reveal } from "@/components/landing/Reveal";
 
+/*
+ * Страница читает данные вошедшего, поэтому всегда отрисовывается по запросу.
+ * Без этой пометки сборка без переменных окружения зафиксировала бы страницу
+ * как статическую — и на боевом сервере, где база подключена, она отдавала бы
+ * встроенный набор вместо настоящих дел.
+ */
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const snapshot = await loadWorkspaceSnapshot();
 

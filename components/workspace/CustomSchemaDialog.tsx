@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -46,6 +46,7 @@ export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
   const [label, setLabel] = useState("");
   const [fields, setFields] = useState<DraftField[]>(INITIAL_FIELDS);
   const [nextFieldId, setNextFieldId] = useState(3);
+  const [isPending, setPending] = useState(false);
 
   function reset() {
     setLabel("");
@@ -71,18 +72,30 @@ export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
     setFields((current) => current.filter((field) => field.id !== id));
   }
 
-  function handleCreate() {
-    createCustomSchema(
-      {
-        label,
-        fields: fields.map(({ label: fieldLabel, required }) => ({
-          label: fieldLabel,
-          required,
-        })),
-      },
-      caseId
-    );
-    reset();
+  async function handleCreate() {
+    if (isPending) return;
+    setPending(true);
+
+    try {
+      /*
+       * Ждём ответа базы: тип получает настоящий идентификатор, и объекты,
+       * созданные следом, должны ссылаться уже на него. Отказ показывает общее
+       * уведомление о неудачной записи — оно же вернёт список в прежний вид.
+       */
+      await createCustomSchema(
+        {
+          label,
+          fields: fields.map(({ label: fieldLabel, required }) => ({
+            label: fieldLabel,
+            required,
+          })),
+        },
+        caseId
+      );
+      reset();
+    } finally {
+      setPending(false);
+    }
   }
 
   const filledFields = fields.filter((field) => field.label.trim()).length;
@@ -94,6 +107,7 @@ export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
+        if (isPending) return;
         setOpen(open);
         if (!open) reset();
       }}
@@ -203,10 +217,19 @@ export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={isPending}
+          >
             Отмена
           </Button>
-          <Button onClick={handleCreate} disabled={filledFields === 0}>
+          <Button
+            onClick={handleCreate}
+            disabled={filledFields === 0 || isPending}
+            className="gap-2"
+          >
+            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {caseId ? "Создать тип и объект" : "Создать тип"}
           </Button>
         </DialogFooter>

@@ -22,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CreateCaseDialog } from "@/components/layout/CreateCaseDialog";
+import { SyncStatus } from "@/components/layout/SyncStatus";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -52,6 +53,16 @@ export function Sidebar() {
   const isExpanded = useAppStore((state) => state.isSidebarExpanded);
   const toggleSidebar = useAppStore((state) => state.toggleSidebar);
   const setCreateCaseOpen = useAppStore((state) => state.setCreateCaseOpen);
+  const viewer = useAppStore((state) => state.viewer);
+  const isBackedByDatabase = useAppStore((state) => state.isBackedByDatabase);
+
+  // Инициалы: имя приходит одной строкой, разбираем на слова.
+  const initials = (viewer?.fullName ?? "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
 
   /*
    * Состояние читаем из localStorage уже после монтирования: если читать его
@@ -110,7 +121,9 @@ export function Sidebar() {
                   Алетейя
                 </span>
                 <span className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-stone-400">
-                  Демо-режим
+                  {isBackedByDatabase
+                    ? (viewer?.workspaceName ?? "Рабочее пространство")
+                    : "Демо-режим"}
                 </span>
               </motion.span>
             )}
@@ -193,23 +206,27 @@ export function Sidebar() {
           isExpanded ? "px-4" : "justify-center px-0"
         )}
       >
-        <MaybeTooltip show={!isExpanded} label="Казбек Б. — Юрист-партнёр">
-          <button
-            type="button"
+        <MaybeTooltip
+          show={!isExpanded}
+          label={viewer ? `${viewer.fullName} — настройки` : "Настройки профиля"}
+        >
+          {/* Ведёт в настройки: это единственное место, где профиль правится. */}
+          <Link
+            href="/dashboard/settings"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-stone-200 text-[11px] font-medium text-stone-600 transition-colors hover:border-stone-300 hover:text-stone-900"
           >
-            КБ
+            {initials || "А"}
             <span className="sr-only">Профиль пользователя</span>
-          </button>
+          </Link>
         </MaybeTooltip>
 
         {isExpanded && (
           <div className="flex min-w-0 flex-col leading-tight">
             <span className="truncate text-[13px] text-stone-900">
-              Казбек Б.
+              {viewer?.fullName ?? "Гость"}
             </span>
             <span className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-stone-400">
-              Юрист-партнёр
+              {viewer?.email ?? "демонстрационный стенд"}
             </span>
           </div>
         )}
@@ -217,6 +234,8 @@ export function Sidebar() {
 
       {/* Диалог создания дела доступен со всех экранов приложения */}
       <CreateCaseDialog />
+      {/* Сообщения о неудачной записи — на всех экранах приложения. */}
+      <SyncStatus />
 
       {/* Переключатель */}
       <div className="shrink-0 border-t border-stone-200 p-2">

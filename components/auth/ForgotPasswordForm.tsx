@@ -1,0 +1,122 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import Link from "next/link";
+import { ArrowRight, Loader2, MailCheck } from "lucide-react";
+
+import { requestPasswordResetAction } from "@/app/actions/auth";
+import {
+  FormError,
+  FormHeading,
+  TextField,
+} from "@/components/auth/fields";
+import { Button } from "@/components/ui/button";
+import { validateEmail } from "@/lib/auth/validation";
+
+/**
+ * Запрос ссылки на смену пароля.
+ *
+ * После отправки экран одинаков и для известного адреса, и для незнакомого:
+ * иначе форма превращается в проверку «а зарегистрирован ли такой человек».
+ */
+export function ForgotPasswordForm() {
+  const [email, setEmail] = useState("");
+  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isSent, setSent] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (isPending) return;
+
+    const addressError = validateEmail(email);
+    setFieldError(addressError);
+    if (addressError) return;
+
+    setError(null);
+
+    startTransition(async () => {
+      const result = await requestPasswordResetAction(email);
+      if (result.ok) setSent(true);
+      else setError(result.error ?? "Не удалось отправить письмо.");
+    });
+  }
+
+  if (isSent) {
+    return (
+      <div className="flex flex-col">
+        <FormHeading eyebrow="Восстановление" title="Проверьте почту" />
+
+        <div className="mt-6 flex items-start gap-3 border-t border-stone-200 pt-5">
+          <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+          <p className="text-sm leading-relaxed text-stone-600">
+            Если аккаунт с адресом{" "}
+            <span className="text-stone-900">{email.trim()}</span> существует, на
+            него отправлена ссылка для смены пароля. Ссылка действует час.
+          </p>
+        </div>
+
+        <Link
+          href="/auth/login"
+          className="mt-6 w-fit border-b border-stone-300 pb-0.5 text-sm text-stone-600 transition-colors hover:border-stone-900 hover:text-stone-900"
+        >
+          Вернуться ко входу
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col" noValidate>
+      <FormHeading
+        eyebrow="Восстановление"
+        title="Забыли пароль?"
+        description="Пришлём ссылку, по которой можно задать новый."
+      />
+
+      <div className="mt-8">
+        <TextField
+          label="Почта"
+          type="email"
+          inputMode="email"
+          required
+          value={email}
+          error={fieldError}
+          onChange={(event) => {
+            setEmail(event.target.value);
+            if (fieldError) setFieldError(null);
+          }}
+          placeholder="you@example.ru"
+          autoComplete="email"
+          autoFocus
+        />
+      </div>
+
+      {error && (
+        <div className="mt-5">
+          <FormError>{error}</FormError>
+        </div>
+      )}
+
+      <Button type="submit" disabled={isPending} className="mt-7 h-11 gap-2">
+        {isPending ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <ArrowRight className="h-4 w-4" />
+        )}
+        Прислать ссылку
+      </Button>
+
+      <Link
+        href="/auth/login"
+        className="mt-6 w-fit text-sm text-stone-500 transition-colors hover:text-stone-900"
+      >
+        Вспомнили пароль?{" "}
+        <span className="border-b border-stone-300 pb-0.5 text-stone-900">
+          Войти
+        </span>
+      </Link>
+    </form>
+  );
+}

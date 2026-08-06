@@ -34,6 +34,11 @@ export async function loadWorkspaceSnapshot(): Promise<StoreSnapshot | null> {
     ]);
 
     return {
+      viewer: {
+        fullName: session.fullName,
+        email: session.email,
+        workspaceName: session.workspaceName,
+      },
       cases,
       entities,
       documents,

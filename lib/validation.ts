@@ -81,3 +81,30 @@ export function findFirstInvalidCell(
   }
   return null;
 }
+
+/** ИНН: 10 знаков у организации, 12 у предпринимателя. Проверяем и контрольные цифры. */
+export function validateInn(value: string): string | null {
+  const inn = value.trim();
+  if (!inn) return null;
+  if (!/^\d{10}$|^\d{12}$/.test(inn)) {
+    return "ИНН состоит из 10 цифр у организации или 12 у предпринимателя.";
+  }
+
+  const digits = inn.split("").map(Number);
+  const checksum = (weights: number[]): number =>
+    weights.reduce((sum, weight, index) => sum + weight * digits[index]!, 0) % 11 % 10;
+
+  if (digits.length === 10) {
+    if (checksum([2, 4, 10, 3, 5, 9, 4, 6, 8]) !== digits[9]) {
+      return "ИНН не проходит проверку контрольной цифры.";
+    }
+    return null;
+  }
+
+  const first = checksum([7, 2, 4, 10, 3, 5, 9, 4, 6, 8]);
+  const second = checksum([3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8]);
+  if (first !== digits[10] || second !== digits[11]) {
+    return "ИНН не проходит проверку контрольных цифр.";
+  }
+  return null;
+}

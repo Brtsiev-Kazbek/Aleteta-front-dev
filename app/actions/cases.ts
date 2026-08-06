@@ -2,16 +2,23 @@
 
 import { revalidatePath } from "next/cache";
 
+import {
+  actionError,
+  actionFail,
+  actionOk,
+  type ActionResult,
+} from "@/lib/actions/result";
 import { requireSession } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
 import { toCase } from "@/lib/data/mappers";
-import type { Case } from "@/types";
+import type { Case, CaseStatus } from "@/types";
 
-export interface ActionResult<T> {
-  ok: boolean;
-  data?: T;
-  error?: string;
-}
+/*
+ * Тип ответа переехал в lib/actions/result — им пользуются и действия, не
+ * связанные с делами. Реэкспорт оставлен, чтобы не править импорты по всему
+ * дереву: типы стираются при сборке, файлу с «use server» это не мешает.
+ */
+export type { ActionResult };
 
 /**
  * Создание дела.
@@ -24,7 +31,7 @@ export async function createCaseAction(
   title: string
 ): Promise<ActionResult<Case>> {
   const trimmed = title.trim();
-  if (!trimmed) return { ok: false, error: "Название дела не может быть пустым." };
+  if (!trimmed) return actionFail("Название дела не может быть пустым.");
 
   try {
     const session = await requireSession();
@@ -42,7 +49,7 @@ export async function createCaseAction(
       .select("*")
       .single();
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return actionFail(error.message);
 
     // Лента активности: дело появилось.
     await supabase.from("activity").insert({
@@ -56,13 +63,75 @@ export async function createCaseAction(
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/cases");
 
-    return { ok: true, data: toCase(data) };
+    return actionOk(toCase(data));
   } catch (caught) {
-    return {
-      ok: false,
-      error:
-        caught instanceof Error ? caught.message : "Не удалось создать дело.",
-    };
+    return actionError(caught, "Не удалось создать дело.");
+  }
+}
+
+export interface CasePatch {
+  title?: string;
+  description?: string;
+  status?: CaseStatus;
+  tags?: string[];
+}
+
+/** Правка карточки дела: название, описание, статус, метки. */
+export async function updateCaseAction(
+  caseId: string,
+  patch: CasePatch
+): Promise<ActionResult<Case>> {
+  const update: {
+    title?: string;
+    description?: string;
+    status?: CaseStatus;
+    tags?: string[];
+  } = {};
+
+  if (patch.title !== undefined) {
+    const title = patch.title.trim();
+    if (!title) return actionFail("Название дела не может быть пустым.");
+    update.title = title.slice(0, 300);
+  }
+
+  if (patch.description !== undefined) {
+    update.description = patch.description.trim().slice(0, 4000);
+  }
+
+  if (patch.status !== undefined) update.status = patch.status;
+
+  if (patch.tags !== undefined) {
+    // Пустые и повторяющиеся метки в базе только мешают фильтрам.
+    update.tags = Array.from(
+      new Set(patch.tags.map((tag) => tag.trim()).filter(Boolean))
+    ).slice(0, 12);
+  }
+
+  if (Object.keys(update).length === 0) {
+    return actionFail("Нечего сохранять.");
+  }
+
+  try {
+    await requireSession();
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from("cases")
+      .update(update)
+      .eq("id", caseId)
+      .select("*")
+      .maybeSingle();
+
+    if (error) return actionFail(error.message);
+    if (!data) return actionFail("Дело не найдено или недоступно.");
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/cases");
+    revalidatePath(`/cases/${caseId}`);
+
+    return actionOk(toCase(data));
+  } catch (caught) {
+    return actionError(caught, "Не удалось сохранить дело.");
   }
 }
 
@@ -79,15 +148,12 @@ export async function deleteCaseAction(
       .update({ archived_at: new Date().toISOString() })
       .eq("id", caseId);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return actionFail(error.message);
 
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/cases");
-    return { ok: true, data: null };
+    return actionOk(null);
   } catch (caught) {
-    return {
-      ok: false,
-      error: caught instanceof Error ? caught.message : "Не удалось удалить дело.",
-    };
+    return actionError(caught, "Не удалось удалить дело.");
   }
 }

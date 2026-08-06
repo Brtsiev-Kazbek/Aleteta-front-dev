@@ -163,7 +163,7 @@ export function Pricing() {
                 </ul>
 
                 <Link
-                  href="/dashboard"
+                  href="/auth/register"
                   className={cn(
                     "mt-7 inline-flex h-11 items-center justify-center rounded-md text-sm font-medium transition-colors",
                     plan.highlighted

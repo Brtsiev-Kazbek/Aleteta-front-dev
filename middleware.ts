@@ -23,6 +23,13 @@ function isPublic(pathname: string): boolean {
   );
 }
 
+/*
+ * Формы входа и регистрации вошедшему показывать незачем: он попал на них по
+ * старой закладке или по кнопке «назад». Смена пароля в этот список не входит
+ * — на неё как раз приходят с действующей сессией восстановления.
+ */
+const GUEST_ONLY = ["/auth/login", "/auth/register", "/auth/forgot-password"];
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -66,6 +73,13 @@ export async function middleware(request: NextRequest) {
     // Возврат туда, куда человек шёл, после успешного входа.
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (user && GUEST_ONLY.includes(pathname)) {
+    const target = request.nextUrl.clone();
+    target.pathname = "/dashboard";
+    target.search = "";
+    return NextResponse.redirect(target);
   }
 
   return response;

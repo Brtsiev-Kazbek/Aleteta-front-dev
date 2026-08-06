@@ -4,10 +4,22 @@ import { Button } from "@/components/ui/button";
 import { CustomTypesPanel } from "@/components/dashboard/CustomTypesPanel";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { PanelHeading } from "@/components/layout/PanelHeading";
+import { StoreBootstrap } from "@/components/layout/StoreBootstrap";
+import { loadWorkspaceSnapshot } from "@/lib/data/bootstrap";
 import { plural } from "@/lib/utils";
 import { BUILTIN_SCHEMAS } from "@/types";
 
-export default function TemplatesPage() {
+/*
+ * Страница читает данные вошедшего, поэтому всегда отрисовывается по запросу.
+ * Без этой пометки сборка без переменных окружения зафиксировала бы страницу
+ * как статическую — и на боевом сервере, где база подключена, она отдавала бы
+ * встроенный набор вместо настоящих дел.
+ */
+export const dynamic = "force-dynamic";
+
+export default async function TemplatesPage() {
+  const snapshot = await loadWorkspaceSnapshot();
+
   const total = BUILTIN_SCHEMAS.reduce(
     (sum, schema) => sum + schema.templates.length,
     0
@@ -15,6 +27,7 @@ export default function TemplatesPage() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-stone-50">
+      {snapshot && <StoreBootstrap snapshot={snapshot} />}
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">

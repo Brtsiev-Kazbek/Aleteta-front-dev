@@ -1,36 +1,83 @@
 import { NextResponse, type NextRequest } from "next/server";
+import type { EmailOtpType } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Обмен одноразового кода на сессию.
+ * Переход по ссылке из письма.
  *
- * Сюда попадают по ссылке из письма — подтверждение адреса, сброс пароля,
- * вход по magic link. Код обменивается на cookie, после чего человека
- * возвращают туда, куда он шёл изначально.
+ * Сюда попадают из всех писем: подтверждение адреса, смена пароля, смена
+ * почты, приглашение. Ссылка бывает двух видов, и оба нужно уметь принять:
+ *
+ *   ?code=…                   — обмен кода на сессию (поток PKCE);
+ *   ?token_hash=…&type=…      — одноразовый код подтверждения.
+ *
+ * Какой из них придёт, зависит от настроек шаблонов писем в проекте, а не от
+ * нашего кода. Поддерживаем оба — иначе смена шаблона тихо ломает вход.
  */
+
+const OTP_TYPES: EmailOtpType[] = [
+  "signup",
+  "invite",
+  "magiclink",
+  "recovery",
+  "email_change",
+];
+
+/** Открытый редирект недопустим: принимаем только внутренние пути. */
+function safeNext(value: string | null): string {
+  if (!value) return "/dashboard";
+  if (!value.startsWith("/") || value.startsWith("//")) return "/dashboard";
+  return value;
+}
+
+function loginWithError(origin: string, code: string): NextResponse {
+  const url = new URL("/auth/login", origin);
+  url.searchParams.set("error", code);
+  return NextResponse.redirect(url);
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
+
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const tokenHash = searchParams.get("token_hash");
+  const rawType = searchParams.get("type");
+  const next = safeNext(searchParams.get("next"));
 
-  // Открытый редирект недопустим: принимаем только внутренние пути.
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
-
-  if (!code) {
-    const url = new URL("/auth/login", origin);
-    url.searchParams.set("error", "missing_code");
-    return NextResponse.redirect(url);
+  // Отказ приходит и от самой службы аутентификации — например, когда человек
+  // открыл просроченную ссылку.
+  const providerError = searchParams.get("error");
+  if (providerError) {
+    return loginWithError(origin, providerError);
   }
 
   const supabase = createClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-  if (error) {
-    const url = new URL("/auth/login", origin);
-    url.searchParams.set("error", "exchange_failed");
-    return NextResponse.redirect(url);
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) return loginWithError(origin, "exchange_failed");
+    return NextResponse.redirect(new URL(next, origin));
   }
 
-  return NextResponse.redirect(new URL(safeNext, origin));
+  if (tokenHash && rawType) {
+    const type = OTP_TYPES.find((item) => item === rawType);
+    if (!type) return loginWithError(origin, "exchange_failed");
+
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash: tokenHash,
+    });
+    if (error) return loginWithError(origin, "exchange_failed");
+
+    /*
+     * У письма о смене пароля своя цель: человека ждёт форма нового пароля,
+     * а не дашборд. Тип ссылки надёжнее параметра next — в шаблоне письма его
+     * могли и не проставить.
+     */
+    const target = type === "recovery" ? "/auth/reset-password" : next;
+    return NextResponse.redirect(new URL(target, origin));
+  }
+
+  return loginWithError(origin, "missing_code");
 }

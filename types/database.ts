@@ -524,6 +524,11 @@ export interface Database {
         Args: { days?: number };
         Returns: { day: string; signups: number }[];
       };
+      /** Принимает приглашения, адресованные почте вошедшего. Возвращает их число. */
+      accept_pending_invites: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
     };
     Enums: {
       workspace_role: WorkspaceRole;

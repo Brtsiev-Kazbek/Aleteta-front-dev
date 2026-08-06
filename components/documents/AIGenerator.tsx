@@ -132,10 +132,15 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
     URL.revokeObjectURL(url);
   }
 
-  function handleCreateCase() {
+  async function handleCreateCase() {
     const title =
       prompt.trim().slice(0, 90) || "Дело из сгенерированного документа";
-    const created = createCase(title);
+
+    const created = await createCase(title);
+    // Дело не создалось — причину показывает общее уведомление об ошибке
+    // записи, и уводить человека с экрана в этом случае нельзя.
+    if (!created) return;
+
     onClose?.();
     router.push(`/cases/${created.id}`);
   }
