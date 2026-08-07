@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
+import { DemoStage } from "@/components/landing/DemoStage";
 import { SectionHeading } from "@/components/landing/SectionHeading";
 import { cn } from "@/lib/utils";
 
@@ -176,7 +177,7 @@ export function FeatureShowcase({
               transition={{ duration: 0.3 }}
               className="min-h-[420px] lg:col-span-8"
             >
-              {active.demo}
+              <DemoStage>{active.demo}</DemoStage>
             </motion.div>
           </AnimatePresence>
         </div>
