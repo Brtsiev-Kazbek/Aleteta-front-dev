@@ -63,7 +63,7 @@ export function FAQ() {
   const [openId, setOpenId] = useState<string | null>(ITEMS[0]?.id ?? null);
 
   return (
-    <section id="faq" className="mx-auto max-w-3xl px-6 py-24">
+    <section id="faq" className="mx-auto max-w-3xl px-6 py-20">
       <SectionHeading eyebrow="Вопросы" title="Частые вопросы" />
 
       <div className="mt-12 flex flex-col border-t border-stone-200">

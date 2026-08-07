@@ -58,7 +58,7 @@ const FACTS = [
 export function SocialProof() {
   return (
     <section className="bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         {/* Показатели */}
         <Reveal>
           <div className="grid grid-cols-1 border-y border-stone-200 sm:grid-cols-3">

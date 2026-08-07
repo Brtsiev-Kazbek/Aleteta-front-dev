@@ -64,7 +64,7 @@ export function FeatureShowcase({
 
   return (
     <section id={id} className={cn("border-b border-stone-200", className)}>
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index={index}
           eyebrow={eyebrow}
@@ -73,7 +73,7 @@ export function FeatureShowcase({
         />
 
         <div
-          className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-12"
+          className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12"
           onMouseEnter={() => setPaused(true)}
         >
           {/* Навигация */}

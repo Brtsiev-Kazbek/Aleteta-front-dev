@@ -78,7 +78,7 @@ const PLANS: Plan[] = [
 export function Pricing() {
   return (
     <section id="pricing" className="bg-stone-50">
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="12"
           eyebrow="Тарифы"
@@ -86,7 +86,7 @@ export function Pricing() {
           description="Без привязки карты на старте. Отказаться можно в любой момент."
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 lg:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 lg:grid-cols-3">
           {PLANS.map((plan, index) => (
             <Reveal key={plan.id} delay={index * 0.08}>
               <div

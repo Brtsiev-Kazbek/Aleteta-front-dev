@@ -75,7 +75,7 @@ export function CapabilityIndex() {
 
   return (
     <section id="capabilities" className="bg-stone-50">
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="07"
           eyebrow="Полный перечень"
@@ -83,7 +83,7 @@ export function CapabilityIndex() {
           description="Ничего из перечисленного не требует отдельной настройки или доработки."
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 md:grid-cols-2 lg:grid-cols-4">
           {GROUPS.map((group, groupIndex) => {
             const isDimmed = activeGroup !== null && activeGroup !== group.id;
 

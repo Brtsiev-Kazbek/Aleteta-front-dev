@@ -40,7 +40,7 @@ const PAINS: Pain[] = [
 export function ProblemSection() {
   return (
     <section className="bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="01"
           eyebrow="Проблема"
@@ -48,7 +48,7 @@ export function ProblemSection() {
           description="Не потому, что задача сложная. Потому, что она повторяется."
         />
 
-        <div className="mt-14 grid grid-cols-1 border-t border-stone-200 md:grid-cols-2">
+        <div className="mt-12 grid grid-cols-1 border-t border-stone-200 md:grid-cols-2">
           {PAINS.map((pain, index) => (
             <Reveal
               key={pain.title}

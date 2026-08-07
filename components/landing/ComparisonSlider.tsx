@@ -63,7 +63,7 @@ export function ComparisonSlider() {
 
   return (
     <section className="bg-stone-50">
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="02"
           eyebrow="Сравнение"

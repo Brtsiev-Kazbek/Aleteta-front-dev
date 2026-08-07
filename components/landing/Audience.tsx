@@ -104,7 +104,7 @@ export function Audience() {
 
   return (
     <section id="audience" className="bg-stone-50">
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="09"
           eyebrow="Кому подходит"
@@ -112,7 +112,7 @@ export function Audience() {
           description="Выберите роль — покажем, что именно меняется в работе."
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-12">
+        <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12">
           {/* Роли */}
           <Reveal className="lg:col-span-4">
             <div className="flex flex-col border-l border-stone-200">

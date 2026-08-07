@@ -27,7 +27,7 @@ const PILLARS = [
 export function SolutionIntro() {
   return (
     <section className="bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <SectionHeading

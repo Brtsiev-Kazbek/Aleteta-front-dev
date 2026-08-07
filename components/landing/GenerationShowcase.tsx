@@ -76,7 +76,7 @@ export function GenerationShowcase() {
         className="pointer-events-none absolute inset-0 bg-grid-dark opacity-60"
       />
 
-      <div className="relative mx-auto max-w-6xl px-6 py-24">
+      <div className="relative mx-auto max-w-6xl px-6 py-20">
         <Reveal>
           <div className="flex items-center gap-3">
             <span className="font-mono text-[11px] tabular-nums text-violet-400">
@@ -93,7 +93,7 @@ export function GenerationShowcase() {
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-12">
+        <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* Источник */}
           <Reveal className="lg:col-span-4">
             <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-600">

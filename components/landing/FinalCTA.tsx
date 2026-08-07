@@ -8,7 +8,7 @@ import { Reveal } from "@/components/landing/Reveal";
 export function FinalCTA() {
   return (
     <section className="border-b border-stone-200 bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-24">
+      <div className="mx-auto max-w-6xl px-6 py-20">
         <Reveal>
           <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12">
             <div className="lg:col-span-7">

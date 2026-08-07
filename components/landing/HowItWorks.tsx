@@ -59,7 +59,7 @@ export function HowItWorks() {
         </motion.div>
       )}
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6 py-24">
+      <div className="relative z-10 mx-auto max-w-6xl px-6 py-20">
         <Reveal>
           <div className="flex items-center gap-3">
             <span className="font-mono text-[11px] tabular-nums text-violet-400">
