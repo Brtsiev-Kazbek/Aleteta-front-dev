@@ -10,15 +10,17 @@ import {
 } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { MagneticLink } from "@/components/landing/MagneticLink";
 import { ProductPreview } from "@/components/landing/ProductPreview";
 
+/** Последние два куска идут акцентом: в них и заключено обещание продукта. */
 const HEADLINE = [
-  "Интеллектуальная",
-  "операционная",
-  "система",
-  "для ваших дел",
-  "и документов",
+  { text: "Интеллектуальная", accent: false },
+  { text: "операционная", accent: false },
+  { text: "система", accent: false },
+  { text: "для ваших дел", accent: true },
+  { text: "и документов", accent: true },
 ];
 
 /** Только проверяемые утверждения о продукте. */
@@ -46,7 +48,7 @@ export function Hero() {
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-grid-dark" />
         <div
-          className="absolute inset-x-0 top-0 h-[46rem]"
+          className="aurora-drift absolute inset-x-0 top-0 h-[46rem]"
           style={{
             backgroundImage:
               "radial-gradient(48rem 26rem at 22% 6%, rgba(139,92,246,0.20), transparent 62%), radial-gradient(40rem 24rem at 82% 18%, rgba(217,119,6,0.10), transparent 62%)",
@@ -74,7 +76,7 @@ export function Hero() {
         <h1 className="mt-7 max-w-4xl text-[2.5rem] font-medium leading-[1.06] tracking-[-0.035em] text-white sm:text-6xl">
           {HEADLINE.map((chunk, index) => (
             <motion.span
-              key={chunk}
+              key={chunk.text}
               initial={reduceMotion ? undefined : { opacity: 0, y: 26 }}
               animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
               transition={{
@@ -82,9 +84,12 @@ export function Hero() {
                 delay: 0.12 + index * 0.07,
                 ease: [0.22, 0.61, 0.36, 1],
               }}
-              className="mr-[0.28em] inline-block"
+              className={cn(
+                "mr-[0.28em] inline-block",
+                chunk.accent && "text-gradient"
+              )}
             >
-              {chunk}
+              {chunk.text}
             </motion.span>
           ))}
         </h1>
@@ -122,6 +127,10 @@ export function Hero() {
               Посмотреть, как это работает
             </span>
           </Link>
+
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-600 sm:ml-2">
+            Без карты · Настройка не нужна
+          </span>
         </motion.div>
 
         <motion.ul
@@ -133,8 +142,12 @@ export function Hero() {
           {FACTS.map((fact) => (
             <li
               key={fact}
-              className="font-mono text-[11px] uppercase tracking-[0.12em] text-stone-500"
+              className="group flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-stone-500 transition-colors hover:text-stone-300"
             >
+              <span
+                aria-hidden
+                className="h-1 w-1 rounded-full bg-violet-500/70 transition-colors group-hover:bg-violet-400"
+              />
               {fact}
             </li>
           ))}

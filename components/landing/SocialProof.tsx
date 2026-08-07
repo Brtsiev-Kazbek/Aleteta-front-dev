@@ -86,6 +86,7 @@ export function SocialProof() {
 
         <SectionHeading
           className="mt-20"
+          index="11"
           eyebrow="Отзывы"
           title="Что говорят пользователи"
           description="Продукт в раннем доступе — раздел заполняется по мере пилотных внедрений."

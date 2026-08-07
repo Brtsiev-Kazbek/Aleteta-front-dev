@@ -43,6 +43,7 @@ export default function LandingPage() {
         {/* 04 — подготовка и выпуск документов */}
         <FeatureShowcase
           id="features"
+          index="04"
           eyebrow="Подготовка документов"
           title="Пять инструментов для выпуска документов"
           description="Демонстрации ниже показывают реальные экраны продукта."
@@ -55,6 +56,7 @@ export default function LandingPage() {
         {/* 06 — анализ, проверка и правовая позиция */}
         <FeatureShowcase
           id="analysis"
+          index="06"
           eyebrow="Анализ и проверка"
           title="Четыре инструмента для работы с чужими документами"
           description="Разбор по пунктам, судебная практика и проверка сразу нескольких договоров."

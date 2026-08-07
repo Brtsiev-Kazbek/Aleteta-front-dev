@@ -65,6 +65,7 @@ export function ComparisonSlider() {
     <section className="bg-stone-50">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeading
+          index="02"
           eyebrow="Сравнение"
           title="Одни и те же данные — до и после"
           description="Потяните разделитель. Слева таблица, собранная вручную. Справа — она же после проверки реквизитов."

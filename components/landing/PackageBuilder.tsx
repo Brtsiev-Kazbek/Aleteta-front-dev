@@ -87,6 +87,7 @@ export function PackageBuilder() {
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeading
+          index="08"
           eyebrow="Расчёт"
           title="Посчитайте на своём объёме"
           description="Укажите объекты и свою оценку трудозатрат. Расчёт показан по шагам — его можно проверить."

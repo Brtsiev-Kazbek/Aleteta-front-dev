@@ -91,6 +91,62 @@
 }
 
 @layer utilities {
+  /*
+   * Акцент на части заголовка. Градиент вместо сплошного цвета: на тёмном
+   * фоне ровная заливка фирменным фиолетовым выглядит плоско, а переход
+   * даёт объём, не превращая текст в украшение.
+   */
+  .text-gradient {
+    background-image: linear-gradient(
+      100deg,
+      rgb(196 181 253),
+      rgb(167 139 250) 45%,
+      rgb(129 140 248)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /*
+   * Медленный дрейф свечения. Движение почти незаметное — оно не должно
+   * тянуть внимание на себя, только не давать фону выглядеть картинкой.
+   */
+  .aurora-drift {
+    animation: aurora 24s ease-in-out infinite alternate;
+  }
+
+  /*
+   * Подъём карточки под курсором. Тень и рамка меняются вместе: одна тень
+   * без рамки читается как размытие, одна рамка без тени — как выделение
+   * текста.
+   */
+  .card-lift {
+    transition:
+      transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1),
+      border-color 0.28s ease,
+      box-shadow 0.28s ease;
+  }
+
+  .card-lift:hover {
+    transform: translateY(-3px);
+    border-color: rgb(168 162 158 / 0.7);
+    box-shadow:
+      0 1px 2px rgb(28 25 23 / 0.04),
+      0 12px 32px -12px rgb(28 25 23 / 0.16);
+  }
+
+@keyframes aurora {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+    opacity: 0.85;
+  }
+  to {
+    transform: translate3d(3%, 2%, 0) scale(1.08);
+    opacity: 1;
+  }
+}
+
   /* Тонкая сетка на светлом фоне. */
   .bg-grid {
     background-image:
@@ -196,8 +252,14 @@
 
   @media (prefers-reduced-motion: reduce) {
     .animate-marquee,
-    .animate-marquee-reverse {
+    .animate-marquee-reverse,
+    .aurora-drift {
       animation: none;
+    }
+
+    /* Подъём карточки — тоже движение: оставляем только смену рамки. */
+    .card-lift:hover {
+      transform: none;
     }
   }
 }

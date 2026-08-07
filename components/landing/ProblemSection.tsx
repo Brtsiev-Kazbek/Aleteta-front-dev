@@ -42,6 +42,7 @@ export function ProblemSection() {
     <section className="bg-white">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeading
+          index="01"
           eyebrow="Проблема"
           title="Документы отнимают больше времени, чем работа с делом"
           description="Не потому, что задача сложная. Потому, что она повторяется."

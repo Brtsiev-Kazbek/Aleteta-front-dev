@@ -17,6 +17,8 @@ export interface Feature {
 
 interface FeatureShowcaseProps {
   id?: string;
+  /** Номер раздела на странице. */
+  index?: string;
   eyebrow: string;
   title: string;
   description?: string;
@@ -32,6 +34,7 @@ const AUTO_ADVANCE_MS = 9000;
  */
 export function FeatureShowcase({
   id,
+  index,
   eyebrow,
   title,
   description,
@@ -62,6 +65,7 @@ export function FeatureShowcase({
     <section id={id} className={cn("border-b border-stone-200", className)}>
       <div className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeading
+          index={index}
           eyebrow={eyebrow}
           title={title}
           description={description}

@@ -80,6 +80,7 @@ export function Pricing() {
     <section id="pricing" className="bg-stone-50">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeading
+          index="12"
           eyebrow="Тарифы"
           title="Начните бесплатно, платите когда увидите пользу"
           description="Без привязки карты на старте. Отказаться можно в любой момент."
@@ -90,10 +91,23 @@ export function Pricing() {
             <Reveal key={plan.id} delay={index * 0.08}>
               <div
                 className={cn(
-                  "flex h-full flex-col p-7 lg:p-8",
-                  plan.highlighted ? "bg-stone-950" : "bg-white"
+                  /*
+                    Тарифы сложены в сетку без промежутков, поэтому подъём
+                    карточки здесь неуместен — он разорвал бы полотно. Отклик
+                    даём заливкой: колонка под курсором чуть светлеет.
+                  */
+                  "group relative flex h-full flex-col p-7 transition-colors lg:p-8",
+                  plan.highlighted
+                    ? "bg-stone-950"
+                    : "bg-white hover:bg-stone-50/80"
                 )}
               >
+                {plan.highlighted && (
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent"
+                  />
+                )}
                 <div className="flex items-baseline justify-between gap-3">
                   <h3
                     className={cn(

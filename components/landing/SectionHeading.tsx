@@ -4,6 +4,9 @@ import { cn } from "@/lib/utils";
 import { Reveal } from "@/components/landing/Reveal";
 
 interface SectionHeadingProps {
+  /** Порядковый номер раздела: «01», «02». Страница длинная, и нумерация
+   *  подсказывает, сколько уже пройдено. */
+  index?: string;
   eyebrow: string;
   title: ReactNode;
   description?: string;
@@ -17,6 +20,7 @@ interface SectionHeadingProps {
  * Единый ритм для всех разделов страницы.
  */
 export function SectionHeading({
+  index,
   eyebrow,
   title,
   description,
@@ -34,22 +38,52 @@ export function SectionHeading({
         className
       )}
     >
-      <span
+      <div
         className={cn(
-          "inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium tracking-wide",
-          isDark
-            ? "border-white/10 bg-white/5 text-violet-300"
-            : "border-violet-200/70 bg-violet-50 text-violet-700"
+          "flex items-center gap-3",
+          align === "center" && "justify-center"
         )}
       >
+        {index && (
+          <span
+            className={cn(
+              "font-mono text-[11px] tabular-nums",
+              isDark ? "text-stone-600" : "text-stone-300"
+            )}
+          >
+            {index}
+          </span>
+        )}
+
         <span
           className={cn(
-            "h-1.5 w-1.5 rounded-full",
-            isDark ? "bg-violet-400" : "bg-violet-500"
+            "inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium tracking-wide",
+            isDark
+              ? "border-white/10 bg-white/5 text-violet-300"
+              : "border-violet-200/70 bg-violet-50 text-violet-700"
+          )}
+        >
+          <span
+            className={cn(
+              "h-1.5 w-1.5 rounded-full",
+              isDark ? "bg-violet-400" : "bg-violet-500"
+            )}
+          />
+          {eyebrow}
+        </span>
+
+        {/* Линия добирает строку до края: рубрика перестаёт висеть в пустоте. */}
+        <span
+          aria-hidden
+          className={cn(
+            "h-px flex-1",
+            isDark
+              ? "bg-gradient-to-r from-stone-800 to-transparent"
+              : "bg-gradient-to-r from-stone-200 to-transparent",
+            align === "center" && "hidden"
           )}
         />
-        {eyebrow}
-      </span>
+      </div>
 
       <h2
         className={cn(

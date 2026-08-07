@@ -77,6 +77,7 @@ export function CapabilityIndex() {
     <section id="capabilities" className="bg-stone-50">
       <div className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeading
+          index="07"
           eyebrow="Полный перечень"
           title={`${total} возможностей — весь цикл работы с документами`}
           description="Ничего из перечисленного не требует отдельной настройки или доработки."
