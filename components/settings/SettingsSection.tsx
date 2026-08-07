@@ -8,12 +8,15 @@ import type { LucideIcon } from "lucide-react";
  * собственными отступами. Общий каркас держит страницу единообразной.
  */
 export function SettingsSection({
+  id,
   icon: Icon,
   title,
   description,
   aside,
   children,
 }: {
+  /** Якорь для боковой навигации. */
+  id: string;
   icon: LucideIcon;
   title: string;
   description: string;
@@ -22,7 +25,11 @@ export function SettingsSection({
   children: ReactNode;
 }) {
   return (
-    <section>
+    /*
+     * scroll-mt: без отступа переход по якорю прижимает заголовок к самому
+     * краю прокручиваемой области, и раздел выглядит обрезанным.
+     */
+    <section id={id} className="scroll-mt-8">
       <div className="flex items-start justify-between gap-4 border-b border-stone-200 pb-3">
         <div className="flex items-start gap-2.5">
           <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-stone-400" />

@@ -14,6 +14,18 @@ import { measurePassword } from "@/lib/auth/validation";
  * форма из пяти строк, «проверьте данные» заставляет искать проблему глазами.
  */
 
+/*
+ * Поля форм заметно выше продуктовых: на экране входа их три, а не тридцать,
+ * и попадание пальцем важнее плотности. Кольцо фокуса — не украшение: рамка
+ * толщиной в пиксель на светлом фоне почти не читается, а по клавиатуре
+ * ходить по форме надо не глядя.
+ */
+const FIELD_CLASSES =
+  "h-11 rounded-md transition-shadow focus-visible:border-stone-900 focus-visible:ring-4 focus-visible:ring-stone-900/5";
+
+const FIELD_ERROR_CLASSES =
+  "border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/10";
+
 export function Field({
   label,
   error,
@@ -47,7 +59,10 @@ export function Field({
       {children}
 
       {error && (
-        <span className="text-[12px] leading-relaxed text-red-700">{error}</span>
+        <span className="flex items-start gap-1.5 text-[12px] leading-relaxed text-red-700">
+          <span aria-hidden className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-red-500" />
+          {error}
+        </span>
       )}
     </div>
   );
@@ -68,7 +83,7 @@ export function TextField({
       <Input
         id={id}
         aria-invalid={error ? true : undefined}
-        className={cn("h-10", error && "border-red-300", className)}
+        className={cn(FIELD_CLASSES, error && FIELD_ERROR_CLASSES, className)}
         {...props}
       />
     </Field>
@@ -109,14 +124,19 @@ export function PasswordField({
           id={id}
           type={isVisible ? "text" : "password"}
           aria-invalid={error ? true : undefined}
-          className={cn("h-10 pr-10", error && "border-red-300", className)}
+          className={cn(
+            FIELD_CLASSES,
+            "pr-11",
+            error && FIELD_ERROR_CLASSES,
+            className
+          )}
           {...props}
         />
 
         <button
           type="button"
           onClick={() => setVisible((current) => !current)}
-          className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-stone-400 transition-colors hover:text-stone-900"
+          className="absolute inset-y-1 right-1 flex w-9 items-center justify-center rounded text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900"
           aria-label={isVisible ? "Скрыть пароль" : "Показать пароль"}
         >
           {isVisible ? (

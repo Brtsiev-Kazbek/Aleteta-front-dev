@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, MailPlus, UserMinus, X } from "lucide-react";
+import { ChevronDown, Loader2, MailPlus, UserMinus, X } from "lucide-react";
 
 import {
   cancelInviteAction,
@@ -12,7 +12,7 @@ import {
 } from "@/app/actions/workspace";
 import { FormError, FormSuccess, TextField } from "@/components/auth/fields";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { validateEmail } from "@/lib/auth/validation";
 import type { SettingsInvite, SettingsMember } from "@/lib/data/workspace";
 import type { WorkspaceRole } from "@/types/database";
@@ -26,6 +26,63 @@ const ROLE_LABELS: Record<WorkspaceRole, string> = {
 
 /** Роли, которые можно назначить приглашением или сменой. Владельца — нет. */
 const ASSIGNABLE: WorkspaceRole[] = ["admin", "member", "viewer"];
+
+/**
+ * Выбор роли.
+ *
+ * Нативный список браузер рисует по-своему на каждой системе, и рядом с
+ * ровными полями формы он выглядит чужеродно. Оформление снимаем, стрелку
+ * рисуем сами — поведение при этом остаётся родным, включая клавиатуру.
+ */
+function RoleSelect({
+  value,
+  onChange,
+  label,
+  disabled,
+  className,
+}: {
+  value: WorkspaceRole;
+  onChange: (role: WorkspaceRole) => void;
+  label: string;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className="relative shrink-0">
+      <select
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.value as WorkspaceRole)}
+        aria-label={label}
+        className={cn(
+          "w-full appearance-none rounded-md border border-stone-200 bg-white pl-2.5 pr-7 text-[13px] text-stone-700 transition-colors hover:border-stone-300 focus-visible:border-stone-900 focus-visible:outline-none disabled:opacity-50",
+          className
+        )}
+      >
+        {ASSIGNABLE.map((item) => (
+          <option key={item} value={item}>
+            {ROLE_LABELS[item]}
+          </option>
+        ))}
+      </select>
+
+      <ChevronDown
+        aria-hidden
+        className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400"
+      />
+    </div>
+  );
+}
+
+/** Инициалы из имени: аватаров у участников нет, а различать их взглядом надо. */
+function initials(fullName: string): string {
+  return fullName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 /**
  * Участники пространства и незакрытые приглашения.
@@ -101,7 +158,14 @@ export function MembersPanel({
       {/* Состав */}
       <ul className="flex flex-col divide-y divide-stone-200 border-y border-stone-200">
         {members.map((member) => (
-          <li key={member.userId} className="flex items-center gap-4 py-3.5">
+          <li key={member.userId} className="flex items-center gap-3.5 py-3.5">
+            <span
+              aria-hidden
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white font-mono text-[11px] uppercase text-stone-500"
+            >
+              {initials(member.fullName)}
+            </span>
+
             <div className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-sm text-stone-900">
                 {member.fullName}
@@ -118,28 +182,24 @@ export function MembersPanel({
             </div>
 
             {canManage && member.role !== "owner" ? (
-              <select
+              <RoleSelect
                 value={member.role}
                 disabled={isPending}
-                onChange={(event) =>
-                  runAction(
-                    updateMemberRoleAction(
-                      member.userId,
-                      event.target.value as WorkspaceRole
-                    )
-                  )
+                onChange={(role) =>
+                  runAction(updateMemberRoleAction(member.userId, role))
                 }
-                className="h-8 shrink-0 rounded-md border border-stone-200 bg-white px-2 text-[13px] text-stone-700 transition-colors hover:border-stone-300 focus-visible:border-stone-900 focus-visible:outline-none disabled:opacity-50"
-                aria-label={`Роль участника ${member.fullName}`}
-              >
-                {ASSIGNABLE.map((value) => (
-                  <option key={value} value={value}>
-                    {ROLE_LABELS[value]}
-                  </option>
-                ))}
-              </select>
+                label={`Роль участника ${member.fullName}`}
+                className="h-8"
+              />
             ) : (
-              <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+              <span
+                className={cn(
+                  "shrink-0 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em]",
+                  member.role === "owner"
+                    ? "border-stone-300 text-stone-700"
+                    : "border-stone-200 text-stone-400"
+                )}
+              >
                 {ROLE_LABELS[member.role]}
               </span>
             )}
@@ -226,20 +286,12 @@ export function MembersPanel({
               />
             </div>
 
-            <select
+            <RoleSelect
               value={role}
-              onChange={(event) =>
-                setRole(event.target.value as WorkspaceRole)
-              }
-              className="h-10 shrink-0 rounded-md border border-stone-200 bg-white px-2 text-sm text-stone-700 focus-visible:border-stone-900 focus-visible:outline-none"
-              aria-label="Роль приглашаемого"
-            >
-              {ASSIGNABLE.map((value) => (
-                <option key={value} value={value}>
-                  {ROLE_LABELS[value]}
-                </option>
-              ))}
-            </select>
+              onChange={setRole}
+              label="Роль приглашаемого"
+              className="h-11"
+            />
 
             <Button type="submit" disabled={isPending} className="h-10 gap-2">
               {isPending ? (

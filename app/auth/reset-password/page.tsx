@@ -33,6 +33,7 @@ export default async function ResetPasswordPage() {
         "Ссылка из письма срабатывает один раз",
         "После сохранения вы сразу окажетесь в приложении",
       ]}
+      footnote="После смены пароля прежние сессии на других устройствах продолжают работать — при необходимости выйдите из них в настройках."
     >
       <ResetPasswordForm hasSession={hasSession} />
     </AuthShell>
