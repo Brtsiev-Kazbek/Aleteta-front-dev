@@ -6,4 +6,6 @@ build
 .env*.local
 .DS_Store
 next-env.d.ts
+# Кеш проверки типов: переписывается каждой сборкой, в истории от него шум.
+*.tsbuildinfo
 .claude
