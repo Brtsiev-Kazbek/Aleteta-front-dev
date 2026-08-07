@@ -92,6 +92,67 @@
 
 @layer utilities {
   /*
+   * Сетка медленно ползёт по диагонали. Сдвиг равен ровно одной ячейке,
+   * поэтому кадр смыкается сам с собой и шва не видно. Двадцать восемь
+   * секунд на клетку — движение на пороге заметности: фон оживает, но
+   * читать заголовок не мешает.
+   */
+  .animate-grid-pan {
+    animation: grid-pan 28s linear infinite;
+  }
+
+  /*
+   * Луч, проходящий по сетке слева направо. Он и есть та деталь, из-за
+   * которой шапка перестаёт выглядеть картинкой: глаз ловит движение,
+   * даже когда смотрит на текст.
+   */
+  .animate-sweep {
+    animation: sweep 11s ease-in-out infinite;
+  }
+
+  /* Второй слой свечения — навстречу первому, чтобы пятно не ходило по кругу. */
+  .aurora-drift-slow {
+    animation: aurora-reverse 34s ease-in-out infinite alternate;
+  }
+
+@keyframes grid-pan {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 56px 56px;
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-40%) skewX(-12deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(140%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes aurora-reverse {
+  from {
+    transform: translate3d(2%, 1%, 0) scale(1.06);
+    opacity: 0.75;
+  }
+  to {
+    transform: translate3d(-3%, -2%, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+  /*
    * Акцент на части заголовка. Градиент вместо сплошного цвета: на тёмном
    * фоне ровная заливка фирменным фиолетовым выглядит плоско, а переход
    * даёт объём, не превращая текст в украшение.
@@ -233,8 +294,16 @@
   @media (prefers-reduced-motion: reduce) {
     .animate-marquee,
     .animate-marquee-reverse,
-    .aurora-drift {
+    .aurora-drift,
+    .aurora-drift-slow,
+    .animate-grid-pan,
+    .animate-sweep {
       animation: none;
+    }
+
+    /* Луч без движения — просто лишняя засветка: убираем совсем. */
+    .animate-sweep {
+      opacity: 0;
     }
 
   }

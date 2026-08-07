@@ -46,7 +46,21 @@ export function Hero() {
     <section className="grain relative overflow-hidden bg-stone-950">
       {/* Сетка и мягкое свечение */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-grid-dark" />
+        <div className="animate-grid-pan absolute inset-0 bg-grid-dark" />
+
+        {/* Луч по сетке: движение ловится боковым зрением, читать не мешает. */}
+        <div className="absolute inset-y-0 left-0 w-[45%] overflow-hidden">
+          <div className="animate-sweep h-full w-1/3 bg-gradient-to-r from-transparent via-violet-500/[0.07] to-transparent blur-2xl" />
+        </div>
+
+        {/* Встречный слой свечения — пятно перестаёт ходить по одной дуге. */}
+        <div
+          className="aurora-drift-slow absolute inset-x-0 top-0 h-[40rem]"
+          style={{
+            backgroundImage:
+              "radial-gradient(32rem 20rem at 68% 4%, rgba(99,102,241,0.14), transparent 64%)",
+          }}
+        />
         <div
           className="aurora-drift absolute inset-x-0 top-0 h-[46rem]"
           style={{
