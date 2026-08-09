@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@embedpdf/pdfium": "npm:@embedpdf/pdfium@2.15.0"
+  }
+}

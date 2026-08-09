@@ -16,7 +16,8 @@
     "docs:api": "typedoc",
     "docs:build": "node scripts/build-docs.mjs",
     "prebuild": "node scripts/build-docs.mjs",
-    "predev": "node scripts/build-docs.mjs"
+    "predev": "node scripts/build-docs.mjs",
+    "check:vision": "node --experimental-strip-types scripts/check-vision.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.0",
@@ -44,6 +45,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@embedpdf/pdfium": "2.15.0",
     "@netlify/plugin-nextjs": "^5.15.13",
     "@types/node": "^20.14.2",
     "@types/react": "^18.3.3",

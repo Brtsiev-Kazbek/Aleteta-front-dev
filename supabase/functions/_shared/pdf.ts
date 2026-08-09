@@ -21,8 +21,13 @@
  * как в просмотрщике. Внутрь PDFium уходит его собственная, с нуля.
  */
 
+/*
+ * Имя без префикса `npm:` — намеренно. Версия прописана один раз в
+ * `ai-worker/deno.json`, и благодаря этому тот же файл запускается под Node:
+ * так его проверяет `npm run check:vision`, не поднимая Supabase.
+ */
 // deno-lint-ignore-file no-explicit-any
-import { init } from "npm:@embedpdf/pdfium@2.15.0";
+import { init } from "@embedpdf/pdfium";
 
 /**
  * Где лежит сам движок.
