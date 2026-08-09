@@ -14,7 +14,7 @@ import { createServerClient } from "@supabase/ssr";
  */
 
 /** Пути, доступные без входа. */
-const PUBLIC_PREFIXES = ["/", "/auth", "/api/auth"];
+const PUBLIC_PREFIXES = ["/", "/auth", "/api/auth", "/docs"];
 
 function isPublic(pathname: string): boolean {
   if (pathname === "/") return true;

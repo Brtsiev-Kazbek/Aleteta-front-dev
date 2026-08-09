@@ -11,9 +11,17 @@ const COLUMNS = [
     ],
   },
   {
+    title: "Разработчикам",
+    links: [
+      { href: "/docs", label: "Документация" },
+      { href: "/docs/development", label: "Как начать" },
+      { href: "/docs/data-model", label: "Модель данных" },
+    ],
+  },
+  {
     title: "Компания",
     links: [
-      { href: "/dashboard", label: "Войти" },
+      { href: "/auth/login", label: "Войти" },
       { href: "mailto:hello@aleteya.ru", label: "Написать нам" },
     ],
   },
@@ -30,7 +38,7 @@ export function LandingFooter() {
   return (
     <footer className="bg-stone-50">
       <div className="mx-auto max-w-6xl px-6 py-14">
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-5">
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center gap-2.5">
               <span className="flex h-7 w-7 items-center justify-center rounded bg-stone-950 text-[13px] font-medium text-white">
