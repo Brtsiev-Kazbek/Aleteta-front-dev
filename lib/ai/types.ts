@@ -1,0 +1,134 @@
+import type { AiTask, JobStatus } from "@/types/database";
+
+/**
+ * Задачи модели: что подаётся на вход и что ожидается на выходе.
+ *
+ * Файл общий для приложения и для исполнителя в Edge Function. Приложение по
+ * этим типам ставит задание, исполнитель — разбирает. Разойтись они не могут:
+ * тип один.
+ *
+ * ДОБАВЛЕНИЕ НОВОЙ ОПЕРАЦИИ начинается здесь. Порядок целиком описан в
+ * docs/AI-BACKEND.md, раздел «Как добавить новую операцию».
+ */
+
+export type { AiTask, JobStatus };
+
+/* ------------------------------------------------------------------ */
+/*  ИЗВЛЕЧЕНИЕ РЕКВИЗИТОВ                                              */
+/* ------------------------------------------------------------------ */
+
+export interface ExtractInput {
+  /** Документ, из которого читаем. Файл исполнитель возьмёт из хранилища сам. */
+  documentId: string;
+  /** Дело, в которое ляжет объект. */
+  caseId: string;
+  /**
+   * Тип объекта: его описание реквизитов уходит в промпт. Благодаря этому
+   * пользовательские типы работают без единой правки кода.
+   */
+  typeId: string;
+}
+
+export interface ExtractedField {
+  /** Ключ реквизита из `entity_types.fields`. */
+  key: string;
+  value: string;
+  /**
+   * Уверенность от 0 до 1. Ниже порога значение подставляется, но помечается
+   * как требующее подтверждения — человек видит, что именно проверить.
+   */
+  confidence: number;
+  /** Страница исходного файла: по ней интерфейс показывает, откуда взято. */
+  page?: number;
+}
+
+export interface ExtractOutput {
+  fields: ExtractedField[];
+  /** Что модель прочитать не смогла — показываем человеку прямо. */
+  missing: string[];
+}
+
+/* ------------------------------------------------------------------ */
+/*  РАЗБОР ДОГОВОРА                                                    */
+/* ------------------------------------------------------------------ */
+
+export interface ReviewInput {
+  documentId: string;
+  caseId: string;
+}
+
+export interface ReviewFinding {
+  level: "critical" | "warning" | "info";
+  title: string;
+  description: string;
+  recommendation?: string;
+  /** Номер пункта договора: по нему подсвечивается текст слева. */
+  clause?: string;
+  paragraphId?: string;
+}
+
+export interface ReviewOutput {
+  paragraphs: { id: string; clause?: string; text: string }[];
+  findings: ReviewFinding[];
+}
+
+/* ------------------------------------------------------------------ */
+/*  АССИСТЕНТ ПО ДЕЛУ                                                  */
+/* ------------------------------------------------------------------ */
+
+export interface AssistantInput {
+  caseId: string;
+  question: string;
+}
+
+export interface AssistantOutput {
+  answer: string;
+  /** Фрагменты, на которых основан ответ. Без них ответу нельзя верить. */
+  citations: { documentId: string; chunkId: string; quote: string }[];
+}
+
+/* ------------------------------------------------------------------ */
+/*  ВЕКТОРИЗАЦИЯ ФРАГМЕНТОВ                                            */
+/* ------------------------------------------------------------------ */
+
+export interface EmbedInput {
+  documentId: string;
+  caseId: string;
+}
+
+export interface EmbedOutput {
+  /** Сколько фрагментов проиндексировано. */
+  chunks: number;
+}
+
+/* ------------------------------------------------------------------ */
+/*  СООТВЕТСТВИЕ ЗАДАЧИ ЕЁ ВХОДУ И ВЫХОДУ                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Карта задач. Исполнитель по ней понимает, что разбирать, приложение — что
+ * присылать. Задача без записи здесь не поставится: TypeScript не даст.
+ */
+export interface TaskShapes {
+  extract: { input: ExtractInput; output: ExtractOutput };
+  review: { input: ReviewInput; output: ReviewOutput };
+  assistant: { input: AssistantInput; output: AssistantOutput };
+  embed: { input: EmbedInput; output: EmbedOutput };
+}
+
+/** Задачи, для которых описан вход и выход. Остальные значения `ai_task` — заготовки. */
+export type TypedTask = keyof TaskShapes;
+
+export type TaskInput<T extends TypedTask> = TaskShapes[T]["input"];
+export type TaskOutput<T extends TypedTask> = TaskShapes[T]["output"];
+
+/** Состояние задания для интерфейса: форма опрашивает его, пока идёт работа. */
+export interface JobState<T extends TypedTask = TypedTask> {
+  id: string;
+  task: T;
+  status: JobStatus;
+  /** 0–100. Обработчик обновляет по мере прохождения этапов. */
+  progress: number;
+  output: TaskOutput<T> | null;
+  error: string | null;
+}
