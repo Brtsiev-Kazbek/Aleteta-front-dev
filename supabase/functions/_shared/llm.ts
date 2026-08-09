@@ -13,6 +13,15 @@ const API_KEY = Deno.env.get("LLM_API_KEY") ?? "";
 /** Сколько ждём ответа. Дольше — почти всегда значит, что что-то зависло. */
 const TIMEOUT_MS = 120_000;
 
+/**
+ * Распознавание страницы ждёт меньше остальных операций.
+ *
+ * Исполнителю отведено полторы минуты на весь запуск, и он должен успеть не
+ * только дождаться ответа, но и записать страницу. Разбор договора думает
+ * минутами и укладывается в общий срок; страница картинкой — нет.
+ */
+export const PAGE_TIMEOUT_MS = 60_000;
+
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
   /**
@@ -44,14 +53,17 @@ export interface CompletionResult {
 export async function complete(
   model: string,
   messages: ChatMessage[],
-  options: { json?: boolean; temperature?: number } = {}
+  options: { json?: boolean; temperature?: number; timeoutMs?: number } = {}
 ): Promise<CompletionResult> {
   if (!API_KEY) {
     throw new Error("LLM_API_KEY не задан в секретах функции");
   }
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timer = setTimeout(
+    () => controller.abort(),
+    options.timeoutMs ?? TIMEOUT_MS
+  );
 
   try {
     const response = await fetch(`${BASE_URL}/chat/completions`, {

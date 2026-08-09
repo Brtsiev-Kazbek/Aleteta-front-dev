@@ -1,5 +1,6 @@
-import { complete } from "../../_shared/llm.ts";
-import type { HandlerResult, Job } from "../index.ts";
+import { complete, PAGE_TIMEOUT_MS } from "../../_shared/llm.ts";
+import { imageDataUrl, looksLikePdf, openPdf } from "../../_shared/pdf.ts";
+import type { HandlerResult, Job, Run } from "../index.ts";
 
 /**
  * Распознавание документа. Ровно одна операция на файл.
@@ -10,24 +11,44 @@ import type { HandlerResult, Job } from "../index.ts";
  * открывают многократно: сперва достают реквизиты, потом разбирают, потом
  * ищут в нём условие. Платить за это по разу — единственный разумный вариант.
  *
- * Порядок:
- *   1. тот же файл уже распознан в этом пространстве? — копируем текст;
- *   2. в файле есть текстовый слой? — берём его, модель не нужна;
- *   3. иначе постранично: картинка → vision-модель → строка в базе.
+ * Порядок — от самого дешёвого к самому дорогому:
+ *   1. тот же файл уже распознан в этом пространстве — копируем текст;
+ *   2. у страницы есть текстовый слой — читаем его, модель не нужна;
+ *   3. страница пустая — записываем пустоту, модель тоже не нужна;
+ *   4. и только скан уходит в vision-модель.
+ *
+ * На практике так выглядит экономия: договор из системы документооборота
+ * обходится в ноль, у сшитого дела платными оказываются приложения-сканы, а не
+ * весь том целиком.
  *
  * Каждая страница пишется сразу после распознавания. Обрыв на семидесятой
- * странице из восьмидесяти не обесценивает работу: повтор начнёт с
+ * странице из восьмидесяти не обесценивает работу: следующий запуск начнёт с
  * семьдесят первой.
  */
 
 interface OcrInput {
   documentId: string;
-  /** Продолжить с конкретной страницы. Пусто — сначала или с места обрыва. */
-  fromPage?: number;
 }
 
-/** Сколько страниц отправляем в модель за один вызов. */
-const PAGES_PER_CALL = 1;
+/**
+ * Сколько символов текстового слоя считаем настоящим текстом.
+ *
+ * У скана слоя нет вовсе или в нём остаётся мелочь: колонтитул, штамп
+ * сканера, номер страницы. Полтораста символов — примерно абзац, меньше
+ * которого на странице делового документа не бывает.
+ */
+const TEXT_LAYER_MIN_CHARS = 150;
+
+/**
+ * Ниже этой доли закрашенных точек страница считается пустой.
+ *
+ * Порог намеренно почти нулевой, потому что ошибки здесь неравноценны.
+ * Отправить пустой лист в модель — потерять стоимость одной страницы. Принять
+ * непустой за пустой — молча потерять его содержимое, и никто об этом не
+ * узнает. Для сравнения: строка текста на листе A4 — это около четверти
+ * процента краски, то есть почти в десять раз больше порога.
+ */
+const BLANK_INK = 0.0003;
 
 const OCR_PROMPT = `Перенеси в текст всё, что написано на странице документа.
 
@@ -40,9 +61,14 @@ const OCR_PROMPT = `Перенеси в текст всё, что написан
 
 Верни только текст страницы, без пояснений и без обрамления.`;
 
+type SupabaseClient = ReturnType<
+  typeof import("jsr:@supabase/supabase-js@2").createClient
+>;
+
 export async function runOcr(
   job: Job,
-  supabase: ReturnType<typeof import("jsr:@supabase/supabase-js@2").createClient>
+  supabase: SupabaseClient,
+  run: Run
 ): Promise<HandlerResult> {
   const input = job.input as unknown as OcrInput;
 
@@ -58,7 +84,7 @@ export async function runOcr(
      * самый частый случай в жизни: типовой договор загружают в каждое дело.
      */
     return {
-      output: { pages: reused, source: "reused", spent: false },
+      output: { pages: reused, billedPages: 0, source: "reused" },
       tokensIn: 0,
       tokensOut: 0,
       costUsd: 0,
@@ -82,83 +108,280 @@ export async function runOcr(
     .update({ ocr_status: "running" })
     .eq("id", input.documentId);
 
-  const { data: signed, error: signError } = await supabase.storage
-    .from(document.bucket ?? "case-documents")
-    .createSignedUrl(document.path, 3600);
+  try {
+    /*
+     * Файл забираем целиком, а не подписанной ссылкой: рисовать страницы будем
+     * здесь же, а движку нужны байты. Подписанная ссылка осталась бы нужна,
+     * если бы картинку разбирала чужая сторона.
+     */
+    const { data: blob, error: downloadError } = await supabase.storage
+      .from(document.bucket ?? "case-documents")
+      .download(document.path);
 
-  if (signError || !signed) {
-    throw new Error(`Не удалось получить файл: ${signError?.message}`);
-  }
+    if (downloadError || !blob) {
+      throw new Error(`Не удалось получить файл: ${downloadError?.message}`);
+    }
 
-  /*
-   * Число страниц и картинки страниц даёт рендер PDF. В Deno это внешняя
-   * библиотека; пока она не подключена, работаем с одностраничными
-   * изображениями — сканы выписок обычно именно такие.
-   *
-   * ЗАГЛУШКА: заменить на настоящий рендер при подключении библиотеки.
-   */
-  const totalPages = document.page_count ?? 1;
-  const startPage = Math.max(input.fromPage ?? 1, (document.pages_done ?? 0) + 1);
+    const bytes = new Uint8Array(await blob.arrayBuffer());
 
-  if (document.page_count === null) {
+    return looksLikePdf(bytes)
+      ? await recognizePdf(bytes, job, supabase, run, {
+          documentId: input.documentId,
+          pagesDone: document.pages_done ?? 0,
+        })
+      : await recognizeImage(
+          bytes,
+          job,
+          supabase,
+          document.mime_type,
+          input.documentId
+        );
+  } catch (caught) {
+    /*
+     * Метка на документе, а не только в задании: интерфейс показывает её
+     * рядом с файлом, и человек видит, что распознать не удалось, не заходя в
+     * журнал. Следующая попытка вернёт состояние в `running`.
+     */
     await supabase
       .from("documents")
-      .update({ page_count: totalPages })
+      .update({ ocr_status: "failed" })
       .eq("id", input.documentId);
+
+    throw caught;
   }
+}
 
-  /* --- 3. Постранично --------------------------------------------- */
+/* ------------------------------------------------------------------ */
+/*  PDF                                                                */
+/* ------------------------------------------------------------------ */
 
-  const model = job.model ?? Deno.env.get("LLM_MODEL_VISION") ?? "";
-  let tokensIn = 0;
-  let tokensOut = 0;
-  let cost = 0;
+async function recognizePdf(
+  bytes: Uint8Array,
+  job: Job,
+  supabase: SupabaseClient,
+  run: Run,
+  document: { documentId: string; pagesDone: number }
+): Promise<HandlerResult> {
+  const { documentId } = document;
 
-  for (let page = startPage; page <= totalPages; page += PAGES_PER_CALL) {
-    const result = await complete(
-      model,
-      [
-        { role: "system", content: OCR_PROMPT },
-        {
-          role: "user",
-          content: [
-            { type: "text", text: `Страница ${page} из ${totalPages}` },
-            { type: "image_url", image_url: { url: signed.signedUrl } },
-          ],
-        },
-      ],
-      { temperature: 0 }
-    );
+  const pdf = await openPdf(bytes, {
+    wasmUrl: Deno.env.get("PDFIUM_WASM_URL") ?? undefined,
+  });
 
-    // Страница ложится в базу сразу: обрыв не обнуляет уже сделанное.
-    await supabase.rpc("save_document_page", {
-      target_document: input.documentId,
-      page_number: page,
-      page_text: result.text,
-      used_model: model,
-      page_confidence: null,
-    });
+  try {
+    const total = pdf.pageCount;
 
-    tokensIn += result.tokensIn;
-    tokensOut += result.tokensOut;
-    cost += result.costUsd ?? 0;
-
-    // Прогресс честный: «страница 34 из 80», а не полоска по таймеру.
     await supabase
-      .from("ai_jobs")
-      .update({ progress: Math.round((page / totalPages) * 100) })
-      .eq("id", job.id);
+      .from("documents")
+      .update({ page_count: total })
+      .eq("id", documentId);
+
+    const model = job.model ?? Deno.env.get("LLM_MODEL_VISION") ?? "";
+
+    /*
+     * Откуда продолжать, спрашивать не нужно: страницы пишутся по одной и по
+     * порядку, поэтому сколько записано — оттуда и продолжаем. Это же чинит
+     * повтор после падения: заново платить за уже разобранное не придётся.
+     */
+    let page = document.pagesDone + 1;
+    let reported = -1;
+
+    /*
+     * Прогресс честный: «страница 34 из 80», а не полоска, ползущая по
+     * таймеру. Записываем только когда изменился процент — у документа в
+     * триста страниц, читаемых из текстового слоя, обновление на каждой
+     * удвоило бы число обращений к базе ради одной и той же цифры.
+     */
+    const reportProgress = async (done: number) => {
+      const percent = Math.round((done / total) * 100);
+      if (percent === reported) return;
+      reported = percent;
+      await supabase
+        .from("ai_jobs")
+        .update({ progress: percent })
+        .eq("id", job.id);
+    };
+
+    for (; page <= total; page += 1) {
+      // Проверка в начале круга: тогда `page` всегда указывает на первую
+      // несделанную страницу, и следующий запуск возьмёт ровно её.
+      if (Date.now() >= run.deadline) break;
+
+      /* --- текстовый слой: даром --------------------------------- */
+
+      const layer = pdf.text(page);
+
+      if (layer.length >= TEXT_LAYER_MIN_CHARS) {
+        // Ни рисования, ни модели — бюджет страниц эта страница не тратит.
+        await savePage(supabase, documentId, page, layer, null, "embedded");
+        await reportProgress(page);
+        continue;
+      }
+
+      /* --- дальше платно: сверяемся с бюджетом -------------------- */
+
+      if (run.pages <= 0) break;
+      run.pages -= 1;
+
+      const image = await pdf.render(page);
+
+      if (image.ink < BLANK_INK) {
+        // Чистый лист. Спрашивать у модели, что на нём написано, незачем.
+        await savePage(supabase, documentId, page, "", null, "blank");
+        await reportProgress(page);
+        continue;
+      }
+
+      const answer = await complete(
+        model,
+        [
+          { role: "system", content: OCR_PROMPT },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: `Страница ${page} из ${total}` },
+              { type: "image_url", image_url: { url: image.dataUrl } },
+            ],
+          },
+        ],
+        { temperature: 0, timeoutMs: PAGE_TIMEOUT_MS }
+      );
+
+      await savePage(supabase, documentId, page, answer.text, model, "vision");
+
+      /*
+       * Расход записываем сразу, а не в конце задания: деньги за эту страницу
+       * потрачены независимо от того, чем кончится следующая.
+       */
+      await supabase.rpc("record_job_spend", {
+        job_id: job.id,
+        tokens_in: answer.tokensIn,
+        tokens_out: answer.tokensOut,
+        cost: answer.costUsd,
+      });
+
+      await reportProgress(page);
+    }
+
+    const recognized = page - 1;
+    const done = page > total;
+
+    /*
+     * Сколько страниц в итоге ушло в модель, считаем по базе, а не по этому
+     * запуску: длинный документ проходит через несколько запусков, и каждый из
+     * них видит только свой кусок.
+     */
+    const { count: billed } = await supabase
+      .from("document_pages")
+      .select("*", { count: "exact", head: true })
+      .eq("document_id", documentId)
+      .eq("source", "vision");
+
+    const paid = billed ?? 0;
+    const source = paid === 0 ? "embedded" : paid === recognized ? "vision" : "mixed";
+
+    if (done) {
+      await supabase
+        .from("documents")
+        .update({ ocr_status: "done", text_source: source })
+        .eq("id", documentId);
+    }
+
+    return {
+      output: { pages: recognized, billedPages: paid, source },
+      unfinished: !done,
+      progress: Math.round((recognized / total) * 100),
+    };
+  } finally {
+    // Память движка не освобождается сама: следующий документ придёт в тот же
+    // процесс и лёг бы поверх этого.
+    pdf.close();
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  КАРТИНКА                                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Снимок или фотография — всегда одна страница.
+ *
+ * Ни текстового слоя, ни разбивки: файл уходит в модель как есть. Проверять
+ * пустоту здесь нечем и незачем — сфотографировать чистый лист специально
+ * никто не станет.
+ */
+async function recognizeImage(
+  bytes: Uint8Array,
+  job: Job,
+  supabase: SupabaseClient,
+  mimeType: string | null,
+  documentId: string
+): Promise<HandlerResult> {
+  if (mimeType && !mimeType.startsWith("image/")) {
+    throw new Error(
+      `Файл «${mimeType}» распознать пока нельзя: поддерживаются PDF и изображения`
+    );
   }
 
   await supabase
     .from("documents")
+    .update({ page_count: 1 })
+    .eq("id", documentId);
+
+  const model = job.model ?? Deno.env.get("LLM_MODEL_VISION") ?? "";
+
+  const answer = await complete(
+    model,
+    [
+      { role: "system", content: OCR_PROMPT },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "Страница 1 из 1" },
+          {
+            type: "image_url",
+            image_url: { url: imageDataUrl(bytes, mimeType ?? "image/jpeg") },
+          },
+        ],
+      },
+    ],
+    { temperature: 0, timeoutMs: PAGE_TIMEOUT_MS }
+  );
+
+  await savePage(supabase, documentId, 1, answer.text, model, "vision");
+
+  await supabase
+    .from("documents")
     .update({ ocr_status: "done", text_source: "vision" })
-    .eq("id", input.documentId);
+    .eq("id", documentId);
 
   return {
-    output: { pages: totalPages, source: "vision", spent: true },
-    tokensIn,
-    tokensOut,
-    costUsd: cost || null,
+    output: { pages: 1, billedPages: 1, source: "vision" },
+    tokensIn: answer.tokensIn,
+    tokensOut: answer.tokensOut,
+    costUsd: answer.costUsd,
   };
 }
+
+/* ------------------------------------------------------------------ */
+/*  МЕЛОЧИ                                                             */
+/* ------------------------------------------------------------------ */
+
+function savePage(
+  supabase: SupabaseClient,
+  documentId: string,
+  page: number,
+  text: string,
+  model: string | null,
+  source: "embedded" | "vision" | "blank"
+) {
+  return supabase.rpc("save_document_page", {
+    target_document: documentId,
+    page_number: page,
+    page_text: text,
+    used_model: model,
+    page_confidence: null,
+    page_source: source,
+  });
+}
+
