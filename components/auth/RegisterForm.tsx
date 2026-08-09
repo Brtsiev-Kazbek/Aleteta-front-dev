@@ -3,13 +3,12 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Loader2, MailCheck } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 
-import { resendConfirmationAction, signUpAction } from "@/app/actions/auth";
+import { signUpAction } from "@/app/actions/auth";
 import {
   FormError,
   FormHeading,
-  FormSuccess,
   PasswordField,
   TextField,
 } from "@/components/auth/fields";
@@ -56,8 +55,6 @@ export function RegisterForm({
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [error, setError] = useState<string | null>(null);
-  const [confirmationSent, setConfirmationSent] = useState(false);
-  const [resent, setResent] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function validate(): boolean {
@@ -100,70 +97,9 @@ export function RegisterForm({
         return;
       }
 
-      // Проект может требовать подтверждения адреса — тогда сессии ещё нет.
-      if (result.data?.needsConfirmation) {
-        setConfirmationSent(true);
-        return;
-      }
-
       router.replace(nextPath);
       router.refresh();
     });
-  }
-
-  if (confirmationSent) {
-    return (
-      <div className="flex flex-col">
-        <FormHeading eyebrow="Почти всё" title="Подтвердите почту" />
-
-        <div className="mt-6 flex items-start gap-3 border-t border-stone-200 pt-5">
-          <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-          <p className="text-sm leading-relaxed text-stone-600">
-            Отправили письмо на{" "}
-            <span className="text-stone-900">{email.trim()}</span>. Откройте
-            ссылку из него — и вернётесь сюда уже вошедшим. Письма нет? Проверьте
-            папку «Спам».
-          </p>
-        </div>
-
-        {resent && (
-          <div className="mt-5">
-            <FormSuccess>Письмо отправлено ещё раз.</FormSuccess>
-          </div>
-        )}
-
-        {error && (
-          <div className="mt-5">
-            <FormError>{error}</FormError>
-          </div>
-        )}
-
-        <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-          <Button
-            variant="outline"
-            disabled={isPending}
-            onClick={() =>
-              startTransition(async () => {
-                setError(null);
-                const result = await resendConfirmationAction(email);
-                if (result.ok) setResent(true);
-                else setError(result.error ?? "Не удалось отправить письмо.");
-              })
-            }
-          >
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Отправить письмо ещё раз
-          </Button>
-
-          <Link
-            href="/auth/login"
-            className="border-b border-stone-300 pb-0.5 text-sm text-stone-600 transition-colors hover:border-stone-900 hover:text-stone-900"
-          >
-            Перейти ко входу
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -171,7 +107,7 @@ export function RegisterForm({
       <FormHeading
         eyebrow="Регистрация"
         title="Создайте аккаунт"
-        description="Рабочее пространство создастся автоматически — дела, документы и типы объектов будут принадлежать ему."
+        description="Рабочее пространство создастся автоматически. Письма и подтверждения не потребуются — после заполнения формы вы сразу окажетесь внутри."
       />
 
       <div className="mt-8 flex flex-col gap-4">

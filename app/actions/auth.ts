@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { actionError, actionFail, actionOk, type ActionResult } from "@/lib/actions/result";
 import { describeAuthError } from "@/lib/auth/messages";
-import { getSiteUrl, safeNextPath } from "@/lib/auth/site-url";
+import { getSiteUrl } from "@/lib/auth/site-url";
 import {
   validateEmail,
   validateFullName,
@@ -29,7 +29,10 @@ export interface SignUpInput {
   jobTitle?: string;
   /** Название организации становится именем рабочего пространства. */
   workspaceName?: string;
-  /** Куда вернуть человека после подтверждения почты. */
+  /**
+   * Куда вести после регистрации. Письма и подтверждения нет — путь нужен
+   * только форме, которая сама переносит человека после ответа.
+   */
   next?: string;
 }
 
@@ -59,7 +62,6 @@ export async function signUpAction(
 
   try {
     const supabase = createClient();
-    const next = safeNextPath(input.next);
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -78,7 +80,11 @@ export async function signUpAction(
             ? { workspace_name: input.workspaceName.trim() }
             : {}),
         },
-        emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent(next)}`,
+        /*
+         * emailRedirectTo намеренно нет: подтверждение адреса выключено, и
+         * ссылке в письме неоткуда взяться. Регистрация заканчивается сразу
+         * сессией — человек попадает в приложение с последнего нажатия.
+         */
       },
     });
 
@@ -102,7 +108,14 @@ export async function signUpAction(
       return actionOk({ needsConfirmation: false, email });
     }
 
-    return actionOk({ needsConfirmation: true, email });
+    /*
+     * Сессии нет — значит в проекте всё ещё включено подтверждение почты.
+     * Это настройка Supabase, кодом её не обойти, поэтому говорим прямо, а не
+     * показываем экран «проверьте почту», которого быть не должно.
+     */
+    return actionFail(
+      "Регистрация не завершена: в проекте включено подтверждение почты. Выключите его в Supabase → Authentication → Sign In / Providers → Confirm email."
+    );
   } catch (caught) {
     return actionError(caught, "Не удалось зарегистрироваться.");
   }
