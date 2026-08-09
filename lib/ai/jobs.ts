@@ -24,7 +24,9 @@ import type {
 
 /** Какой класс модели нужен задаче. Влияет на цену и на отпечаток. */
 const TASK_TIER: Record<TypedTask, ModelTier> = {
-  extract: "vision",
+  ocr: "vision",
+  // Извлечение работает с распознанным текстом, картинки ему не нужны.
+  extract: "fast",
   review: "smart",
   assistant: "smart",
   embed: "embedding",

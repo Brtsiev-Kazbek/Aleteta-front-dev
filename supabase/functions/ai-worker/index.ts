@@ -18,6 +18,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 import { runExtract } from "./handlers/extract.ts";
+import { runOcr } from "./handlers/ocr.ts";
 import { isTransient } from "../_shared/llm.ts";
 
 /** Сколько заданий берём за один запуск. */
@@ -36,6 +37,7 @@ const HANDLERS: Record<
   string,
   (job: Job, supabase: SupabaseClient) => Promise<HandlerResult>
 > = {
+  ocr: runOcr,
   extract: runExtract,
 };
 

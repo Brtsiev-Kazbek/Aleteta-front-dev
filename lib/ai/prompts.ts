@@ -18,7 +18,8 @@ import type { TypedTask } from "@/lib/ai/types";
 
 /** Версия промпта. Меняется при каждой правке текста. */
 export const PROMPT_VERSIONS: Record<TypedTask, number> = {
-  extract: 1,
+  ocr: 1,
+  extract: 2,
   review: 1,
   assistant: 1,
   embed: 1,

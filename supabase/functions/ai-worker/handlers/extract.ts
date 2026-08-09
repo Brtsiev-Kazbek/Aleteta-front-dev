@@ -43,24 +43,33 @@ export async function runExtract(
 ): Promise<HandlerResult> {
   const input = job.input as unknown as ExtractInput;
 
-  /* --- 1. Файл --------------------------------------------------- */
+  /* --- 1. Распознанный текст ------------------------------------- */
 
+  /*
+   * Картинок здесь больше нет: их прочитала задача `ocr`, ровно один раз на
+   * файл. Если текста ещё нет — значит распознавание не прошло, и разбирать
+   * нечего; повторять его отсюда нельзя, иначе платить будем дважды.
+   */
   const { data: document } = await supabase
     .from("documents")
-    .select("bucket, path, title, mime_type")
+    .select("title, ocr_status, pages_done")
     .eq("id", input.documentId)
     .maybeSingle();
 
-  if (!document?.path) {
-    throw new Error("У документа нет файла — разбирать нечего");
+  if (!document) throw new Error("Документ не найден");
+
+  if (document.ocr_status !== "done") {
+    throw new Error(
+      `Документ ещё не распознан (${document.ocr_status}) — сначала задача ocr`
+    );
   }
 
-  const { data: signed, error: signError } = await supabase.storage
-    .from(document.bucket ?? "case-documents")
-    .createSignedUrl(document.path, 600);
+  const { data: text } = await supabase.rpc("document_text", {
+    target_document: input.documentId,
+  });
 
-  if (signError || !signed) {
-    throw new Error(`Не удалось получить файл: ${signError?.message}`);
+  if (!text || String(text).trim().length === 0) {
+    throw new Error("В распознанном документе пусто — реквизиты брать неоткуда");
   }
 
   /* --- 2. Описание реквизитов ------------------------------------ */
@@ -106,16 +115,17 @@ ${fieldList}
 
   /* --- 3. Модель -------------------------------------------------- */
 
+  /*
+   * Класс модели — обычный текстовый, а не vision: на входе строка. Это же
+   * позволяет брать модель подешевле там, где документ короткий.
+   */
   const result = await complete(
-    job.model ?? Deno.env.get("LLM_MODEL_VISION") ?? "",
+    job.model ?? Deno.env.get("LLM_MODEL_FAST") ?? "",
     [
       { role: "system", content: prompt },
       {
         role: "user",
-        content: [
-          { type: "text", text: `Документ: ${document.title}` },
-          { type: "image_url", image_url: { url: signed.signedUrl } },
-        ],
+        content: `Документ «${document.title}», распознанный текст:\n\n${text}`,
       },
     ],
     { json: true }

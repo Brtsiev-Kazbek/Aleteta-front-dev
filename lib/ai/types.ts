@@ -14,6 +14,24 @@ import type { AiTask, JobStatus } from "@/types/database";
 export type { AiTask, JobStatus };
 
 /* ------------------------------------------------------------------ */
+/*  РАСПОЗНАВАНИЕ                                                      */
+/* ------------------------------------------------------------------ */
+
+export interface OcrInput {
+  documentId: string;
+  /** Продолжить с конкретной страницы: повтор после обрыва. */
+  fromPage?: number;
+}
+
+export interface OcrOutput {
+  pages: number;
+  /** vision — читала модель; reused — взято у файла с тем же содержимым. */
+  source: "vision" | "embedded" | "reused";
+  /** Были ли потрачены деньги. Для повторной загрузки того же файла — нет. */
+  spent: boolean;
+}
+
+/* ------------------------------------------------------------------ */
 /*  ИЗВЛЕЧЕНИЕ РЕКВИЗИТОВ                                              */
 /* ------------------------------------------------------------------ */
 
@@ -110,6 +128,7 @@ export interface EmbedOutput {
  * присылать. Задача без записи здесь не поставится: TypeScript не даст.
  */
 export interface TaskShapes {
+  ocr: { input: OcrInput; output: OcrOutput };
   extract: { input: ExtractInput; output: ExtractOutput };
   review: { input: ReviewInput; output: ReviewOutput };
   assistant: { input: AssistantInput; output: AssistantOutput };

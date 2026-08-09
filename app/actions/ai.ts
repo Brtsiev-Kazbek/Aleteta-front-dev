@@ -8,7 +8,12 @@ import {
 } from "@/lib/actions/result";
 import { enqueueJob, readJob, recordCorrection } from "@/lib/ai/jobs";
 import { isLlmConfigured } from "@/lib/ai/config";
-import type { ExtractInput, JobState, TypedTask } from "@/lib/ai/types";
+import type {
+  ExtractInput,
+  JobState,
+  OcrInput,
+  TypedTask,
+} from "@/lib/ai/types";
 
 /**
  * Действия для форм, работающих с моделью.
@@ -24,7 +29,30 @@ export async function isAiAvailableAction(): Promise<boolean> {
   return isLlmConfigured();
 }
 
-/** Разбор файла: реквизиты в карточку объекта. */
+/**
+ * Распознавание документа — ровно одна операция на файл.
+ *
+ * Ставится сразу после загрузки. Всё остальное — извлечение реквизитов,
+ * разбор по пунктам, ассистент — читает уже её результат, а не картинки:
+ * страница картинкой стоит примерно как тысяча токенов текста, а один и тот
+ * же договор открывают многократно.
+ */
+export async function recognizeDocumentAction(
+  input: OcrInput
+): Promise<ActionResult<{ jobId: string; fromCache: boolean }>> {
+  if (!input.documentId) return actionFail("Не указан документ.");
+
+  try {
+    const result = await enqueueJob("ocr", input, {
+      documentId: input.documentId,
+    });
+    return actionOk(result);
+  } catch (caught) {
+    return actionError(caught, "Не удалось поставить распознавание в очередь.");
+  }
+}
+
+/** Разбор файла: реквизиты в карточку объекта. Требует распознанного текста. */
 export async function extractFromDocumentAction(
   input: ExtractInput
 ): Promise<ActionResult<{ jobId: string; fromCache: boolean }>> {
