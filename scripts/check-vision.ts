@@ -192,7 +192,11 @@ function perMillion(pricing: Record<string, unknown> | undefined, key: string): 
   return (value * 1_000_000).toFixed(2);
 }
 
-async function listModels(router: Router, limit: number): Promise<void> {
+async function listModels(
+  router: Router,
+  limit: number,
+  needle: string
+): Promise<void> {
   const response = await request(`${router.baseUrl}/models`, {
     method: "GET",
     headers: { authorization: `Bearer ${router.apiKey}` },
@@ -203,15 +207,32 @@ async function listModels(router: Router, limit: number): Promise<void> {
   if (!models.length) fail("Каталог пуст — маршрутизатор вернул список без моделей");
 
   /*
-   * Vision-модель узнаётся по заявленным входным модальностям, а не по имени:
-   * названия у поставщиков произвольные, и угадывать по ним — верный способ
-   * пропустить половину подходящих.
+   * Модель для распознавания узнаётся по заявленным модальностям, а не по
+   * имени: названия у поставщиков произвольные.
+   *
+   * Условий два, и второе не менее важно. Мало принимать картинку — надо ещё
+   * отвечать текстом, иначе в список попадают генераторы видео и изображений:
+   * `veo`, `kling`, `flux` тоже берут картинку на вход, но отдают ролик.
    */
-  const vision = models.filter((model) =>
-    (model.architecture?.input_modalities ?? []).some((kind) => /image/i.test(kind))
+  const vision = models.filter((model) => {
+    const input = model.architecture?.input_modalities ?? [];
+    const output = model.architecture?.output_modalities ?? [];
+    return (
+      input.some((kind) => /image/i.test(kind)) &&
+      output.some((kind) => /text/i.test(kind))
+    );
+  });
+
+  /*
+   * Каталог у маршрутизатора на сотни моделей, и целиком его читать
+   * бессмысленно. `--grep gemini` показывает одно семейство — по такому куску
+   * уже можно выбирать.
+   */
+  const matching = (vision.length ? vision : models).filter(
+    (model) => !needle || model.id.toLowerCase().includes(needle.toLowerCase())
   );
 
-  const shown = (vision.length ? vision : models)
+  const shown = matching
     .slice()
     .sort((a, b) => {
       const left = Number(a.pricing?.prompt ?? Infinity);
@@ -221,8 +242,16 @@ async function listModels(router: Router, limit: number): Promise<void> {
     .slice(0, limit);
 
   console.log(
-    `Моделей в каталоге: ${models.length}, из них читают картинки: ${vision.length}\n`
+    `Моделей в каталоге: ${models.length}, ` +
+      `из них читают картинки и отвечают текстом: ${vision.length}` +
+      (needle ? `, подходит под «${needle}»: ${matching.length}` : "") +
+      "\n"
   );
+
+  if (!matching.length) {
+    console.log(`Ничего не нашлось по «${needle}» — уберите --grep.`);
+    return;
+  }
 
   if (!vision.length) {
     console.log(
@@ -250,7 +279,10 @@ async function listModels(router: Router, limit: number): Promise<void> {
   }
 
   if (shown.length < (vision.length || models.length)) {
-    console.log(`\n…показаны первые ${shown.length}. Больше — с ключом --top 50`);
+    console.log(
+      `\n…показано ${shown.length} из ${matching.length}. ` +
+        "Больше — с --top 100, уже — с --grep gemini"
+    );
   }
 }
 
@@ -414,7 +446,7 @@ async function main(): Promise<void> {
   }
 
   if (flags.has("list")) {
-    await listModels(router, Number(flags.get("top") ?? 30));
+    await listModels(router, Number(flags.get("top") ?? 30), flags.get("grep") ?? "");
     return;
   }
 
