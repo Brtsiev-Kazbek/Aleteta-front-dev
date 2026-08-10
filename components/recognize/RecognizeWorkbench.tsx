@@ -765,6 +765,10 @@ function TextPane({
   /** Номер совпадения, к которому перешли стрелками. −1 — ни к какому. */
   const [active, setActive] = useState(-1);
   const scrollRef = useRef<HTMLDivElement>(null);
+  /** Обработанный переход из поиска: повторно на него не смотрим. */
+  const handledTarget = useRef<typeof target>(null);
+  /** Номер, который сброс по смене запроса должен взять вместо нуля. */
+  const pendingActive = useRef<number | null>(null);
 
   /* Задание нужно ради одного поля — текста ошибки, если оно упало. */
   const job = useAppStore((state) =>
@@ -785,11 +789,32 @@ function TextPane({
   const documentId = document?.id ?? null;
   const pagesDone = document?.pagesDone ?? 0;
 
+  /**
+   * Чей текст сейчас в `pages`.
+   *
+   * Без этого страницы предыдущего файла продолжают считаться текущими всё
+   * время, пока едут новые, — а это несколько сотен миллисекунд, в которые
+   * успевает отработать переход из поиска. Он тогда ищет совпадение в чужом
+   * тексте, помечает переход обработанным и больше к нему не возвращается.
+   * Снаружи это выглядит именно так, как выглядело: оригинал открылся на
+   * нужной странице, а текст остался на месте.
+   */
+  const loadedFor = useRef<string | null>(null);
+
   /* Перечитываем по числу готовых страниц: за самим ходом дела следит стор. */
   useEffect(() => {
     if (!documentId) {
+      loadedFor.current = null;
       setPages([]);
       return;
+    }
+
+    // Сменился файл — старый текст больше не наш, даже на время загрузки.
+    if (loadedFor.current !== documentId) {
+      loadedFor.current = documentId;
+      handledTarget.current = null;
+      setPages([]);
+      setActive(-1);
     }
 
     let cancelled = false;
@@ -858,8 +883,6 @@ function TextPane({
    * Признак перехода — сам объект `target`: он создаётся заново на каждый
    * щелчок по находке. Запоминаем обработанный и больше на него не смотрим.
    */
-  const handledTarget = useRef<typeof target>(null);
-  const pendingActive = useRef<number | null>(null);
 
   /**
    * Прокрутка внутри окна чтения.
@@ -947,8 +970,24 @@ function TextPane({
 
     handledTarget.current = target;
 
-    const entry = marks.offsets.find((item) => item.page === target.page);
-    const position = entry?.offset ?? 0;
+    /*
+     * Смещение считаем по запросу самой находки, а не по тому, что сейчас
+     * набрано в поле. Запрос из поиска только что передан в поле, но состояние
+     * обновится лишь к следующему проходу — `marks` здесь ещё про старый
+     * запрос, и взятое из них смещение указывало бы не туда.
+     */
+    const targetTerms = target.query.trim().split(/\s+/).filter(Boolean);
+
+    let running = 0;
+    let position = 0;
+
+    for (const page of filled) {
+      if (page.page === target.page) {
+        position = running;
+        break;
+      }
+      running += countMatches(page.text, targetTerms);
+    }
 
     /*
      * Смена запроса сбрасывает позицию на первое совпадение — это правильно,
@@ -968,7 +1007,7 @@ function TextPane({
      * и выглядело как «прокручивается только PDF».
      */
     reveal(position, target.page);
-  }, [target, filled.length, marks.offsets, onOpenPage, reveal]);
+  }, [target, filled, onOpenPage, reveal]);
 
   /* Новый запрос — с первого совпадения. Кроме перехода из общего поиска. */
   useEffect(() => {
