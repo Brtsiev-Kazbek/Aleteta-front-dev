@@ -37,7 +37,7 @@ const BATCH = 3;
  * запуск продолжает с той же страницы.
  */
 const PAGE_BUDGET = Number(Deno.env.get("OCR_PAGES_PER_RUN") ?? 4);
-const RUN_MS = Number(Deno.env.get("WORKER_RUN_MS") ?? 60_000);
+const RUN_MS = Number(Deno.env.get("WORKER_RUN_MS") ?? 45_000);
 
 /** Имя процесса в `locked_by`: по нему видно, чей запуск завис. */
 const WORKER = `edge-${crypto.randomUUID().slice(0, 8)}`;
@@ -75,7 +75,7 @@ export interface HandlerResult {
   progress?: number;
   tokensIn?: number;
   tokensOut?: number;
-  costUsd?: number | null;
+  cost?: number | null;
 }
 
 export interface Job {
@@ -163,7 +163,7 @@ Deno.serve(async () => {
         result: result.output,
         tokens_in: result.tokensIn ?? null,
         tokens_out: result.tokensOut ?? null,
-        cost: result.costUsd ?? null,
+        cost: result.cost ?? null,
       });
     } catch (caught) {
       const reason = caught instanceof Error ? caught.message : String(caught);

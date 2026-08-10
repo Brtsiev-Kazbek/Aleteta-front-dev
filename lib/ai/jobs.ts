@@ -127,7 +127,7 @@ export async function enqueueJob<T extends TypedTask>(
       correction: null,
       tokens_in: null,
       tokens_out: null,
-      cost_usd: null,
+      cost: null,
     })
     .select("id")
     .single();

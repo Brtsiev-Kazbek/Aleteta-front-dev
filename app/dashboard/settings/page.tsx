@@ -1,4 +1,11 @@
-import { Building2, LayoutGrid, ShieldCheck, UserRound, Users } from "lucide-react";
+import {
+  Building2,
+  Coins,
+  LayoutGrid,
+  ShieldCheck,
+  UserRound,
+  Users,
+} from "lucide-react";
 
 import { Sidebar } from "@/components/layout/Sidebar";
 import { PanelHeading } from "@/components/layout/PanelHeading";
@@ -7,9 +14,11 @@ import { OrganizationForm } from "@/components/settings/OrganizationForm";
 import { ProfileForm } from "@/components/settings/ProfileForm";
 import { SecurityPanel } from "@/components/settings/SecurityPanel";
 import { SettingsSection } from "@/components/settings/SettingsSection";
+import { UsagePanel } from "@/components/settings/UsagePanel";
 import { StoreBootstrap } from "@/components/layout/StoreBootstrap";
 import { WorkspaceSwitcher } from "@/components/settings/WorkspaceSwitcher";
 import { loadSettings } from "@/lib/data/workspace";
+import { loadUsage } from "@/lib/data/usage";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 export const metadata = {
@@ -27,6 +36,7 @@ const SECTION_LINKS = [
   { href: "#organization", label: "Организация" },
   { href: "#members", label: "Участники" },
   { href: "#workspaces", label: "Пространства" },
+  { href: "#usage", label: "Расход" },
   { href: "#access", label: "Доступ" },
 ];
 
@@ -43,7 +53,12 @@ export default async function SettingsPage() {
     return <NotConfigured />;
   }
 
-  const settings = await loadSettings();
+  /*
+   * Отчёт о расходе читаем вместе с настройками: он нужен на первой же
+   * отрисовке, а отдельным запросом из браузера страница мигала бы пустой
+   * таблицей.
+   */
+  const [settings, usage] = await Promise.all([loadSettings(), loadUsage(30)]);
   const canManage = settings.myRole === "owner" || settings.myRole === "admin";
 
   return (
@@ -158,6 +173,15 @@ export default async function SettingsPage() {
                   workspaces={settings.workspaces}
                   currentId={settings.workspace.id}
                 />
+              </SettingsSection>
+
+              <SettingsSection
+                id="usage"
+                icon={Coins}
+                title="Расход на модель"
+                description="Сколько запросов и токенов ушло по участникам и делам."
+              >
+                <UsagePanel initial={usage} />
               </SettingsSection>
 
               <SettingsSection

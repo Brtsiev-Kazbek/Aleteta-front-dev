@@ -21,11 +21,12 @@ const TIMEOUT_MS = 120_000;
 /**
  * Распознавание страницы ждёт меньше остальных операций.
  *
- * Исполнителю отведено полторы минуты на весь запуск, и он должен успеть не
- * только дождаться ответа, но и записать страницу. Разбор договора думает
- * минутами и укладывается в общий срок; страница картинкой — нет.
+ * Замеры на настоящем скане: страница договора у qwen3-vl-32b читается около
+ * пятидесяти пяти секунд. Полутора минут хватает с запасом, а вместе с
+ * границей запуска в сорок пять секунд худший случай складывается в сто
+ * тридцать пять — под потолком Edge Function в сто пятьдесят.
  */
-export const PAGE_TIMEOUT_MS = 60_000;
+export const PAGE_TIMEOUT_MS = 90_000;
 
 export interface ChatMessage {
   role: "system" | "user" | "assistant";
@@ -44,13 +45,8 @@ export interface CompletionResult {
   text: string;
   tokensIn: number;
   tokensOut: number;
-  /**
-   * Стоимость запроса в валюте маршрутизатора — у RouterAI это рубли, а не
-   * доллары, как можно решить по имени поля в базе. Имя осталось от первого
-   * поставщика; менять его в схеме отдельно от остального смысла нет, но
-   * помнить об этом надо.
-   */
-  costUsd: number | null;
+  /** Стоимость запроса в валюте маршрутизатора. У RouterAI — рубли. */
+  cost: number | null;
 }
 
 /**
@@ -131,7 +127,7 @@ export async function complete(
     return {
       text,
       ...readTokens(usage),
-      costUsd: await readCost(usage, generationId),
+      cost: await readCost(usage, generationId),
     };
   } finally {
     clearTimeout(timer);

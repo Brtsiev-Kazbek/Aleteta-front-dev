@@ -181,6 +181,6 @@ ${fieldList}
     output: { fields: answer.fields ?? [], missing: answer.missing ?? [] },
     tokensIn: result.tokensIn,
     tokensOut: result.tokensOut,
-    costUsd: result.costUsd,
+    cost: result.cost,
   };
 }

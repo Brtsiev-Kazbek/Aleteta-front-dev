@@ -89,7 +89,7 @@ export type Database = {
           attempts: number
           case_id: string | null
           correction: Json | null
-          cost_usd: number | null
+          cost: number | null
           created_at: string
           created_by: string | null
           document_id: string | null
@@ -117,7 +117,7 @@ export type Database = {
           attempts?: number
           case_id?: string | null
           correction?: Json | null
-          cost_usd?: number | null
+          cost?: number | null
           created_at?: string
           created_by?: string | null
           document_id?: string | null
@@ -145,7 +145,7 @@ export type Database = {
           attempts?: number
           case_id?: string | null
           correction?: Json | null
-          cost_usd?: number | null
+          cost?: number | null
           created_at?: string
           created_by?: string | null
           document_id?: string | null
@@ -1259,13 +1259,39 @@ export type Database = {
     }
     Functions: {
       accept_pending_invites: { Args: never; Returns: number }
+      ai_usage_by_case: {
+        Args: { from_date?: string; to_date?: string }
+        Returns: {
+          case_id: string
+          cost: number
+          documents: number
+          failed: number
+          requests: number
+          title: string
+          tokens_in: number
+          tokens_out: number
+        }[]
+      }
+      ai_usage_by_member: {
+        Args: { from_date?: string; to_date?: string }
+        Returns: {
+          cost: number
+          email: string
+          failed: number
+          full_name: string
+          member_id: string
+          requests: number
+          tokens_in: number
+          tokens_out: number
+        }[]
+      }
       claim_job: {
         Args: { worker: string }
         Returns: {
           attempts: number
           case_id: string | null
           correction: Json | null
-          cost_usd: number | null
+          cost: number | null
           created_at: string
           created_by: string | null
           document_id: string | null

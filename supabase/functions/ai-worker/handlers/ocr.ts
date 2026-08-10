@@ -87,7 +87,7 @@ export async function runOcr(
       output: { pages: reused, billedPages: 0, source: "reused" },
       tokensIn: 0,
       tokensOut: 0,
-      costUsd: 0,
+      cost: 0,
     };
   }
 
@@ -257,7 +257,7 @@ async function recognizePdf(
         job_id: job.id,
         tokens_in: answer.tokensIn,
         tokens_out: answer.tokensOut,
-        cost: answer.costUsd,
+        cost: answer.cost,
       });
 
       await reportProgress(page);
@@ -359,7 +359,7 @@ async function recognizeImage(
     output: { pages: 1, billedPages: 1, source: "vision" },
     tokensIn: answer.tokensIn,
     tokensOut: answer.tokensOut,
-    costUsd: answer.costUsd,
+    cost: answer.cost,
   };
 }
 
