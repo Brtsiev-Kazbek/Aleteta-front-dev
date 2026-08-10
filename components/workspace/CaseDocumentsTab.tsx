@@ -8,6 +8,7 @@ import {
   FileText,
   MoreHorizontal,
   ScanLine,
+  ScanText,
   ShieldCheck,
   Sparkles,
   Trash2,
@@ -53,6 +54,9 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const deleteDocument = useAppStore((state) => state.deleteDocument);
   const startExtraction = useAppStore((state) => state.startExtraction);
   const recognizeDocument = useAppStore((state) => state.recognizeDocument);
+  const isRecognitionAvailable = useAppStore(
+    (state) => state.isRecognitionAvailable
+  );
 
   /* Какой документ показываем распознанным текстом. */
   const [textDocumentId, setTextDocumentId] = useState<string | null>(null);
@@ -315,10 +319,28 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={() => setTextDocumentId(document.id)}
-                      disabled={!document.ocrStatus}
                     >
                       <FileSearch className="h-4 w-4 text-stone-400" />
                       Распознанный текст
+                    </DropdownMenuItem>
+                    {/*
+                      Запуск руками нужен там, где само не сработало: файл
+                      загрузили до того, как исполнителя развернули, или
+                      предыдущая попытка упала. Пока распознавание идёт, пункт
+                      закрыт — второе задание на тот же файл ничего не ускорит.
+                    */}
+                    <DropdownMenuItem
+                      onSelect={() => void recognizeDocument(document.id)}
+                      disabled={
+                        !isRecognitionAvailable ||
+                        document.ocrStatus === "pending" ||
+                        document.ocrStatus === "running"
+                      }
+                    >
+                      <ScanText className="h-4 w-4 text-stone-400" />
+                      {document.ocrStatus
+                        ? "Распознать заново"
+                        : "Распознать текст"}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={() => void handleDownload(document.id)}

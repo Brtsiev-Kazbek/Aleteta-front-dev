@@ -9,6 +9,7 @@ import type {
   FreeformStage,
   GeneratedDocument,
   GenerationStatus,
+  RecognizedPage,
   TemplateMatch,
 } from "@/types";
 
@@ -185,6 +186,8 @@ export interface RecognitionSlice {
   recognizeDocument: (documentId: string) => Promise<void>;
   /** Распознанный текст документа — для просмотра человеком. */
   readDocumentText: (documentId: string) => Promise<string | null>;
+  /** То же постранично: видно границы страниц и происхождение каждой. */
+  readDocumentPages: (documentId: string) => Promise<RecognizedPage[]>;
   /** Настроена ли работа с моделью: без неё кнопки прячутся. */
   isRecognitionAvailable: boolean;
   /**

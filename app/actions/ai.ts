@@ -10,6 +10,7 @@ import { enqueueJob, readJob, recordCorrection } from "@/lib/ai/jobs";
 import { isLlmConfigured } from "@/lib/ai/config";
 import { requireSession } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
+import type { RecognizedPage } from "@/types";
 import type { JobStatus, OcrStatus } from "@/types/rows";
 import type {
   ExtractInput,
@@ -185,6 +186,48 @@ export async function getDocumentTextAction(
     return actionOk(data ?? "");
   } catch (caught) {
     return actionError(caught, "Не удалось прочитать распознанный текст.");
+  }
+}
+
+/**
+ * Распознанный текст постранично.
+ *
+ * `getDocumentTextAction` склеивает всё в одну простыню — это нужно тому, кто
+ * будет текст читать. А тому, кто его проверяет, нужно обратное: увидеть
+ * границы страниц и происхождение каждой. Страница, прочитанная моделью, и
+ * страница, взятая из текстового слоя, — разного доверия: во второй ошибиться
+ * попросту нечему, а первую стоит сверить с оригиналом.
+ *
+ * Отсюда же видно и дыры. Волна из десяти страниц может принести девять: одна
+ * не получилась и ушла на второй заход. Пока она не вернулась, в списке видно,
+ * какой именно страницы не хватает.
+ */
+export async function getDocumentPagesAction(
+  documentId: string
+): Promise<ActionResult<RecognizedPage[]>> {
+  try {
+    await requireSession();
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from("document_pages")
+      .select("page, text, source, model, confidence")
+      .eq("document_id", documentId)
+      .order("page", { ascending: true });
+
+    if (error) return actionFail(error.message);
+
+    return actionOk(
+      (data ?? []).map((row) => ({
+        page: row.page,
+        text: row.text,
+        source: row.source,
+        model: row.model,
+        confidence: row.confidence,
+      }))
+    );
+  } catch (caught) {
+    return actionError(caught, "Не удалось прочитать страницы документа.");
   }
 }
 

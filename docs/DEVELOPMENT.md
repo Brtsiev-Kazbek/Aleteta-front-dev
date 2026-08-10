@@ -304,26 +304,81 @@ curl https://routerai.ru/api/v1/keys --request POST \
 первом обращении и живёт в памяти процесса. Если внешние адреса закрыты,
 положите `pdfium.wasm` в своё хранилище и укажите путь через `PDFIUM_WASM_URL`.
 
-**Расписание.** Без него очередь разберётся только от толчка приложения, а
-задание, вернувшееся в очередь после перерыва, повиснет. В SQL-редакторе
-Supabase один раз:
+**Расписание.** Ставится миграцией `20260810120000_worker_schedule.sql`, руками
+делать ничего не надо — кроме одного. Тик расписания вызывает Edge Function, а
+для этого нужен служебный ключ; в теле функции он лежал бы открытым текстом — в
+дампе базы, в выдаче `pg_get_functiondef`, в истории репозитория. Поэтому ключ
+читается из `vault`, и положить его туда надо один раз, в SQL-редакторе:
 
 ```sql
-create extension if not exists pg_cron;
-create extension if not exists pg_net;
-
-select cron.schedule(
-  'ai-worker',
-  '* * * * *',
-  $$ select net.http_post(
-       url := 'https://<проект>.supabase.co/functions/v1/ai-worker',
-       headers := '{"Authorization": "Bearer <служебный ключ>"}'::jsonb
-     ) $$
-);
+select vault.create_secret('<служебный ключ>', 'service_role_key');
 ```
 
-Проверить, что расписание живо: `select * from cron.job;`, а последние запуски
-— `select * from cron.job_run_details order by start_time desc limit 10;`.
+Пока ключа нет, тик проходит вхолостую: зависшие задания возвращает в очередь,
+исполнителя не будит и в журнал не ругается.
+
+Проверить, что расписание живо: `select * from cron.job;`, последние запуски —
+`select * from cron.job_run_details order by start_time desc limit 10;`, а
+попытки достучаться до функции — `select * from net._http_response order by
+created desc limit 10;`.
+
+### Запустить распознавание с нуля
+
+По порядку, каждый шаг проверяем прежде, чем идти дальше.
+
+**1. Ключ модели.** Заводится у маршрутизатора с потолком расхода (см. ниже) и
+проверяется, не отходя от кассы:
+
+```bash
+npm run check:vision -- --whoami
+npm run check:vision -- скан.pdf --model qwen/qwen3-vl-32b-instruct --page 3
+```
+
+Второй командой распознаётся одна настоящая страница тем же путём, каким пойдёт
+исполнитель. Картинка сохраняется рядом с PDF — видно, что именно ушло в модель.
+
+**2. Выложить исполнителя.** С машины, где есть Supabase CLI:
+
+```bash
+supabase login
+supabase link --project-ref <ref проекта>
+supabase functions deploy ai-worker
+```
+
+**3. Секреты исполнителя.** Функция живёт в чужом окружении и переменных
+Netlify не видит:
+
+```bash
+supabase secrets set \
+  LLM_API_KEY=<ключ> \
+  LLM_BASE_URL=https://routerai.ru/api/v1 \
+  LLM_MODEL_VISION=qwen/qwen3-vl-32b-instruct \
+  LLM_MODE=live
+```
+
+`LLM_MODE=live` обязателен: по умолчанию стоит `replay`, и тогда ответы берутся
+из журнала по отпечатку входа, а к модели обращений нет вовсе.
+
+**4. Толчок из приложения.** В переменные Netlify (и в `.env.local`, если
+проверяете локально) — `SUPABASE_SERVICE_ROLE_KEY`. Без него приложение положит
+задание в очередь, но разбудить исполнителя не сможет, и работа начнётся только
+со следующим тиком расписания.
+
+**5. Ключ расписания в хранилище** — команда из абзаца выше.
+
+**Проверка.** Загрузите скан в дело. Строка файла должна за несколько секунд
+перейти из «В очереди» в «Страница 1 из N». Если висит «В очереди» дольше
+минуты — смотрите по порядку:
+
+```sql
+select id, task, status, attempts, error from app.ai_jobs
+ order by created_at desc limit 5;
+select * from net._http_response order by created desc limit 5;
+```
+
+Задание в `queued` и пустая таблица ответов — до функции не достучались (шаги
+2, 4, 5). Задание в `failed` — читайте `error`: там будет либо отказ
+маршрутизатора, либо нехватка секрета (шаг 3).
 
 ---
 

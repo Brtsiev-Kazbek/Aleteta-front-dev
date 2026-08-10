@@ -1,4 +1,5 @@
 import {
+  getDocumentPagesAction,
   getDocumentTextAction,
   getRecognitionAction,
   isAiAvailableAction,
@@ -123,6 +124,19 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
     recognizeDocument: async (documentId) => {
       if (!isRemote(get)) return;
 
+      /*
+       * Состояние переводим в «в очереди» сразу, не дожидаясь ответа сервера.
+       * Распознавание запускают руками, когда предыдущая попытка не удалась, —
+       * и если строка после нажатия не меняется, человек нажимает ещё раз.
+       */
+      set((current) => ({
+        documents: current.documents.map((document) =>
+          document.id === documentId
+            ? { ...document, ocrStatus: "pending", pagesDone: 0 }
+            : document
+        ),
+      }));
+
       const enqueued = await sync(
         recognizeDocumentAction({ documentId }),
         { fallback: "Не удалось поставить распознавание в очередь." }
@@ -178,6 +192,18 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
       }
 
       return result.data ?? "";
+    },
+
+    readDocumentPages: async (documentId) => {
+      if (!isRemote(get)) return [];
+
+      const result = await getDocumentPagesAction(documentId);
+      if (!result.ok) {
+        set({ syncError: result.error });
+        return [];
+      }
+
+      return result.data ?? [];
     },
   };
 };

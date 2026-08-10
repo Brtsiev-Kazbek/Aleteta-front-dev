@@ -284,6 +284,24 @@ export interface Document {
   textSource?: string | null;
 }
 
+/**
+ * Одна распознанная страница.
+ *
+ * Нужна там, где текст не читают, а проверяют. Происхождение здесь важнее
+ * самого текста: страница из текстового слоя перенесена посимвольно и
+ * ошибиться в ней нечему, а страницу, прочитанную моделью, стоит сверить с
+ * оригиналом — особенно в номерах и датах.
+ */
+export interface RecognizedPage {
+  page: number;
+  text: string;
+  /** vision — читала модель, embedded — текстовый слой, blank — пустой лист. */
+  source: string | null;
+  model: string | null;
+  /** 0–1, если поставщик её вернул. Обычно не возвращает. */
+  confidence: number | null;
+}
+
 export const DOCUMENT_STATUS_META: Record<
   DocumentStatus,
   { label: string; className: string }
