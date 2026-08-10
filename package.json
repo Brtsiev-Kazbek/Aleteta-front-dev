@@ -13,6 +13,7 @@
     "db:diff": "supabase db diff --linked",
     "db:seed": "supabase db push --include-seed",
     "db:types": "supabase gen types typescript --linked --schema public > types/database.ts",
+    "setup:ocr": "cmd /c scripts\\setup-ocr.bat",
     "worker:deploy": "supabase functions deploy ai-worker",
     "worker:secrets": "supabase secrets set --env-file supabase/functions/.env",
     "worker:logs": "supabase functions logs ai-worker",
