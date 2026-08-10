@@ -71,16 +71,24 @@ export async function enqueueJob<T extends TypedTask>(
   input: TaskInput<T>,
   context: { caseId?: string; documentId?: string } = {}
 ): Promise<EnqueueResult> {
-  if (!isLlmConfigured()) {
+  /*
+   * Проверяем ту модель, которая нужна этой задаче, а не все сразу.
+   * Распознаванию нужна `vision`, извлечению — `smart`; человек, заполнивший
+   * одну из них, вправе пользоваться тем, что заполнил.
+   */
+  const tier = TASK_TIER[task];
+
+  if (!isLlmConfigured(tier)) {
     throw new Error(
-      "Модель не настроена: заполните LLM_BASE_URL и имена моделей в переменных окружения."
+      `Не задана модель для этой операции. Заполните LLM_BASE_URL и ` +
+        `LLM_MODEL_${tier.toUpperCase()} в переменных окружения приложения.`
     );
   }
 
   const session = await requireSession();
   const supabase = createClient();
 
-  const model = getModel(TASK_TIER[task]);
+  const model = getModel(tier);
   const hash = fingerprint(task, input, model);
 
   /*

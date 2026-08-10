@@ -49,9 +49,16 @@ export function getModel(tier: ModelTier): string {
   }
 }
 
-/** Настроена ли работа с моделью. Без этого задания ставить бессмысленно. */
-export function isLlmConfigured(): boolean {
-  return Boolean(process.env.LLM_BASE_URL && getModel("fast"));
+/**
+ * Настроена ли работа с моделью. Без этого задания ставить бессмысленно.
+ *
+ * Класс задачи спрашивается отдельно, потому что модели задают по одной.
+ * Распознаванию нужна `vision` и только она: человек, заполнивший её и
+ * ничего больше, вправе ожидать, что распознавание работает — а раньше он
+ * упирался в проверку `fast`, к его задаче отношения не имеющую.
+ */
+export function isLlmConfigured(tier: ModelTier = "fast"): boolean {
+  return Boolean(process.env.LLM_BASE_URL && getModel(tier));
 }
 
 /**

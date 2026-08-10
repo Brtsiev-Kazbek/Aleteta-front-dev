@@ -33,20 +33,64 @@ import type { Document } from "@/types";
 
 const BUCKET = "case-documents";
 
-/** Имя файла для пути в бакете: латиница, цифры, дефис. */
+/**
+ * Кириллица латиницей.
+ *
+ * Хранилище не принимает ключи с буквами вне латиницы: «скан.pdf» отвергается
+ * с «Invalid key», а вместе с ним и вся загрузка. Просто выбросить такие буквы
+ * нельзя — от «скан договора» не осталось бы ничего, и в бакете лежали бы
+ * файлы с именами вида `-.pdf`, неразличимые между собой.
+ *
+ * Таблица нарочно простая, без ГОСТов и стандартов транслитерации: имя в
+ * хранилище человек читает разве что при разборе неполадок, а настоящее
+ * название файла хранится в базе целиком и в интерфейсе показывается оно.
+ */
+const CYRILLIC: Record<string, string> = {
+  а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ё: "e", ж: "zh", з: "z",
+  и: "i", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r",
+  с: "s", т: "t", у: "u", ф: "f", х: "h", ц: "c", ч: "ch", ш: "sh", щ: "sch",
+  ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya",
+};
+
+function transliterate(value: string): string {
+  let result = "";
+
+  for (const char of value.toLowerCase()) {
+    result += CYRILLIC[char] ?? char;
+  }
+
+  return result;
+}
+
+/**
+ * Имя файла для пути в бакете: латиница, цифры, дефис — и ничего больше.
+ *
+ * Ограничение не наше, а хранилища: всё, что вне латиницы, оно отвергает.
+ * Раньше здесь стояло `\p{L}`, которое считает буквой и «с», и «к», — отсюда и
+ * бралась ошибка на первом же русском названии.
+ */
 function slugifyFileName(name: string): string {
   const dot = name.lastIndexOf(".");
   const base = dot > 0 ? name.slice(0, dot) : name;
   const extension = dot > 0 ? name.slice(dot + 1).toLowerCase() : "";
 
   const safeBase =
-    base
+    transliterate(base)
+      /*
+       * Разложение по NFKD отделяет диакритику от буквы: «é» превращается в
+       * «e» и отдельный значок. Значок выбрасываем сразу — иначе он попал бы
+       * под общее правило и стал бы дефисом посреди слова: «re-sume».
+       */
       .normalize("NFKD")
-      .replace(/[^\p{L}\p{N}]+/gu, "-")
+      .replace(/\p{M}+/gu, "")
+      .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 60) || "file";
 
-  const safeExtension = extension.replace(/[^a-z0-9]/g, "").slice(0, 8);
+  const safeExtension = transliterate(extension)
+    .replace(/[^a-z0-9]/g, "")
+    .slice(0, 8);
+
   return safeExtension ? `${safeBase}.${safeExtension}` : safeBase;
 }
 

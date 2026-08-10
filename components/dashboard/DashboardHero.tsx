@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import { ScanText } from "lucide-react";
 
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { plural } from "@/lib/utils";
@@ -93,6 +95,31 @@ export function DashboardHero() {
           Ровно то, что показано на главной странице. Всё ниже запускается на
           демонстрационных данных — ничего не отправляется наружу.
         </motion.p>
+
+        {/*
+          Распознавание вынесено отдельной кнопкой, а не спрятано в список из
+          девяти инструментов ниже. Причина простая: это единственное, что
+          работает не на демонстрационных данных, а по-настоящему, — и это
+          первое, чего от продукта хотят. Искать его в меню человек не должен.
+        */}
+        <motion.div
+          initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.42 }}
+          className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3"
+        >
+          <Link
+            href="/dashboard/recognize"
+            className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 text-[13px] font-medium text-stone-900 transition-colors hover:bg-stone-200"
+          >
+            <ScanText className="h-4 w-4" />
+            Распознать документ
+          </Link>
+
+          <span className="text-[12.5px] text-stone-500">
+            Скан или PDF — текст появится на странице и останется в поиске
+          </span>
+        </motion.div>
 
         {/* Текущее состояние рабочей области */}
         <motion.ul

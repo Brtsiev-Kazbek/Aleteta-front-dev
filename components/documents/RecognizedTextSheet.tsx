@@ -1,9 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Check, Copy, Loader2, ScanText } from "lucide-react";
+import Link from "next/link";
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  Check,
+  Copy,
+  Download,
+  FileSearch,
+  Loader2,
+  ScanText,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
   Sheet,
   SheetContent,
@@ -27,9 +38,10 @@ import type { RecognizedPage } from "@/types";
  * видно лишние пробелы, склеенные строки, подменённые цифры — и сразу понятно,
  * какую страницу оригинала открывать для сверки.
  *
- * Отсюда же распознавание и запускается. Причин ровно две, и обе настоящие:
- * первая попытка не удалась, или файл загрузили тогда, когда исполнитель ещё не
- * был развёрнут. В обоих случаях человеку нужна кнопка, а не объяснение.
+ * Шторка устроена в три яруса: заголовок, панель действий и текст, занимающий
+ * всё оставшееся место. Пустые состояния выровнены по центру этого места, а не
+ * прижаты к его верхнему краю: строчка текста под шапкой большой пустой рамки
+ * выглядит недоделанной вёрсткой, а не ответом.
  */
 export function RecognizedTextSheet({
   documentId,
@@ -57,7 +69,8 @@ export function RecognizedTextSheet({
   const [isCopied, setCopied] = useState(false);
 
   const status = document?.ocrStatus;
-  const pagesDone = document?.pagesDone ?? 0;
+  const done = document?.pagesDone ?? 0;
+  const total = document?.pageCount ?? null;
   const isRunning = status === "pending" || status === "running";
 
   /*
@@ -72,25 +85,30 @@ export function RecognizedTextSheet({
     }
 
     let cancelled = false;
-
-    void (async () => {
-      const result = await readDocumentPages(documentId);
-      if (!cancelled) {
-        setPages(result);
-        setLoading(false);
-      }
-    })();
-
     setLoading(true);
+
+    void readDocumentPages(documentId).then((result) => {
+      if (cancelled) return;
+      setPages(result);
+      setLoading(false);
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [documentId, pagesDone, readDocumentPages]);
+  }, [documentId, done, readDocumentPages]);
+
+  const filled = useMemo(
+    () => (pages ?? []).filter((page) => page.text.trim().length > 0),
+    [pages]
+  );
 
   const fullText = useMemo(
-    () => (pages ?? []).map((page) => page.text).join("\n\n"),
-    [pages]
+    () =>
+      filled
+        .map((page) => `— Страница ${page.page} —\n\n${page.text}`)
+        .join("\n\n"),
+    [filled]
   );
 
   async function handleCopy() {
@@ -99,7 +117,17 @@ export function RecognizedTextSheet({
     window.setTimeout(() => setCopied(false), 2000);
   }
 
-  const filled = (pages ?? []).filter((page) => page.text.trim().length > 0);
+  function handleDownload() {
+    const blob = new Blob([fullText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = window.document.createElement("a");
+
+    link.href = url;
+    link.download = `${title.replace(/\.[^.]+$/, "") || "текст"}.txt`;
+    link.click();
+
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <Sheet
@@ -108,90 +136,137 @@ export function RecognizedTextSheet({
         if (!open) onClose();
       }}
     >
-      <SheetContent side="right" className="flex w-full flex-col sm:max-w-2xl">
-        <SheetHeader>
-          <SheetTitle>Распознанный текст</SheetTitle>
-          <SheetDescription>
-            {title}. Это тот текст, из которого будут браться реквизиты и
-            формулировки — проверьте номера и даты.
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-3xl"
+      >
+        {/* Ярус 1: что это за файл */}
+        {/* Место справа оставлено крестику: он висит поверх, в правом верхнем углу. */}
+        <SheetHeader className="border-b border-stone-200 px-6 py-5 pr-14">
+          <SheetTitle className="text-[15px]">{title || "Документ"}</SheetTitle>
+          <SheetDescription className="text-[12.5px] leading-relaxed">
+            Текст дословно, как его прочитала модель. Из него потом берутся
+            реквизиты и формулировки — проверьте номера и даты.
           </SheetDescription>
         </SheetHeader>
 
-        {/* Строка состояния и действия */}
-        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-stone-200 pb-4">
-          <StatusLine
-            status={status}
-            pagesDone={pagesDone}
-            pageCount={document?.pageCount ?? null}
-            recognized={filled.length}
-          />
+        {/* Ярус 2: состояние и действия */}
+        <div className="shrink-0 border-b border-stone-200 bg-stone-50/70 px-6 py-3">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <StatusLine
+              status={status}
+              done={done}
+              total={total}
+              recognized={filled.length}
+            />
 
-          <div className="ml-auto flex items-center gap-2">
-            {fullText.length > 0 && (
+            <div className="ml-auto flex items-center gap-1">
+              {fullText.length > 0 && (
+                <>
+                  <IconButton title="Скопировать текст" onClick={() => void handleCopy()}>
+                    {isCopied ? (
+                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5" />
+                    )}
+                  </IconButton>
+                  <IconButton title="Скачать текстом" onClick={handleDownload}>
+                    <Download className="h-3.5 w-3.5" />
+                  </IconButton>
+                </>
+              )}
+
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="gap-1.5"
-                onClick={() => void handleCopy()}
+                className="ml-1 gap-1.5"
+                disabled={!documentId || isRunning || !isAvailable}
+                onClick={() => {
+                  if (documentId) void recognizeDocument(documentId);
+                }}
               >
-                {isCopied ? (
-                  <Check className="h-3.5 w-3.5 text-emerald-600" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5" />
-                )}
-                {isCopied ? "Скопировано" : "Скопировать"}
+                <ScanText className="h-3.5 w-3.5" />
+                {status ? "Распознать заново" : "Распознать"}
               </Button>
-            )}
-
-            <Button
-              size="sm"
-              className="gap-1.5"
-              disabled={!documentId || isRunning || !isAvailable}
-              onClick={() => {
-                if (documentId) void recognizeDocument(documentId);
-              }}
-            >
-              <ScanText className="h-3.5 w-3.5" />
-              {status ? "Распознать заново" : "Распознать"}
-            </Button>
+            </div>
           </div>
+
+          {isRunning && (
+            <Progress
+              value={total ? (done / total) * 100 : 8}
+              className="mt-3"
+              indicatorClassName="bg-violet-500"
+            />
+          )}
         </div>
 
-        {/* Почему кнопка не нажимается */}
+        {/* Предупреждения — только когда есть о чём предупредить */}
         {!isAvailable && (
-          <p className="mt-3 text-[12.5px] leading-relaxed text-stone-500">
-            Распознавание выключено: не задан ключ модели. Пока он не появится в
-            секретах исполнителя, кнопка ничего не даст.
-          </p>
+          <div className="shrink-0 border-b border-amber-200 bg-amber-50/60 px-6 py-3 text-[12.5px] leading-relaxed text-amber-900">
+            Распознавание не настроено: нет модели, читающей картинки. Задайте
+            приложению <code className="font-mono">LLM_BASE_URL</code> и{" "}
+            <code className="font-mono">LLM_MODEL_VISION</code>, а ключ — в
+            секретах исполнителя.
+          </div>
         )}
 
-        {/* Чем именно кончилась неудача */}
         {status === "failed" && job?.error && (
-          <p className="mt-3 flex items-start gap-2 rounded border border-red-200 bg-red-50/60 p-3 text-[12.5px] leading-relaxed text-red-700">
+          <div className="flex shrink-0 items-start gap-2 border-b border-red-200 bg-red-50/60 px-6 py-3 text-[12.5px] leading-relaxed text-red-700">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             {job.error}
-          </p>
+          </div>
         )}
 
-        <div className="scrollable-area mt-4 flex-1 overflow-y-auto rounded-lg border border-stone-200 bg-stone-50/60 p-5">
+        {/* Ярус 3: сам текст */}
+        <div className="scrollable-area min-h-0 flex-1 overflow-y-auto px-6 py-6">
           {isLoading && pages === null ? (
-            <p className="flex items-center gap-2 text-[13px] text-stone-500">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Читаю…
-            </p>
+            <Empty icon={Loader2} spinning title="Читаю" />
           ) : filled.length > 0 ? (
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-7">
               {filled.map((page) => (
                 <PageBlock key={page.page} page={page} />
               ))}
+
+              {isRunning && (
+                <Meta>
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Дочитываю остальное
+                </Meta>
+              )}
             </div>
+          ) : isRunning ? (
+            <Empty
+              icon={Loader2}
+              spinning
+              title={
+                total
+                  ? `Читаю страницу ${Math.min(done + 1, total)} из ${total}`
+                  : "Открываю файл"
+              }
+              hint="Текст появится здесь сам, по мере готовности страниц. Шторку можно закрыть — работа идёт на сервере."
+            />
           ) : (
-            <p className="text-[13px] leading-relaxed text-stone-500">
-              {isRunning
-                ? "Текста пока нет — страницы дочитываются. Он появится здесь по мере готовности."
-                : "Текста нет. Либо распознавание ещё не запускали, либо все страницы оказались пустыми."}
-            </p>
+            <Empty
+              icon={FileSearch}
+              title="Текста пока нет"
+              hint={
+                status
+                  ? "Страницы оказались пустыми — либо распознавание ещё не дошло до этого файла."
+                  : "Этот файл ещё не распознавали. Нажмите «Распознать» наверху."
+              }
+            />
           )}
+        </div>
+
+        {/* Ярус 4: куда идти дальше */}
+        <div className="shrink-0 border-t border-stone-200 px-6 py-3">
+          <Link
+            href="/dashboard/recognize"
+            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500 transition-colors hover:text-stone-900"
+          >
+            Все расшифровки и поиск по ним
+            <ArrowUpRight className="h-3 w-3" />
+          </Link>
         </div>
       </SheetContent>
     </Sheet>
@@ -247,54 +322,82 @@ function describeSource(source: string | null): string {
 
 function StatusLine({
   status,
-  pagesDone,
-  pageCount,
+  done,
+  total,
   recognized,
 }: {
   status: string | undefined;
-  pagesDone: number;
-  pageCount: number | null;
+  done: number;
+  total: number | null;
   recognized: number;
 }) {
   if (status === "pending") {
     return (
-      <Line>
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />В очереди
-      </Line>
+      <Meta>
+        <Loader2 className="h-3 w-3 animate-spin" />В очереди
+      </Meta>
     );
   }
 
   if (status === "running") {
     return (
-      <Line>
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        {pageCount
-          ? `Страница ${Math.min(pagesDone + 1, pageCount)} из ${pageCount}`
-          : "Читаю"}
-      </Line>
+      <Meta>
+        <Loader2 className="h-3 w-3 animate-spin" />
+        {total ? `Страница ${Math.min(done + 1, total)} из ${total}` : "Читаю"}
+      </Meta>
     );
   }
 
   if (status === "failed") {
     return (
-      <Line className="text-red-600">
-        <AlertTriangle className="h-3.5 w-3.5" />
+      <Meta className="text-red-600">
+        <AlertTriangle className="h-3 w-3" />
         Распознать не удалось
-      </Line>
+      </Meta>
     );
   }
 
-  if (!status) return <Line>Не распознавался</Line>;
+  if (!status) return <Meta>Не распознавался</Meta>;
 
   return (
-    <Line>
-      <Check className="h-3.5 w-3.5 text-emerald-600" />
+    <Meta>
+      <Check className="h-3 w-3 text-emerald-600" />
       {recognized} {plural(recognized, "страница", "страницы", "страниц")}
-    </Line>
+    </Meta>
   );
 }
 
-function Line({
+/* ------------------------------------------------------------------ */
+/*  МЕЛОЧИ                                                             */
+/* ------------------------------------------------------------------ */
+
+function Empty({
+  icon: Icon,
+  spinning,
+  title,
+  hint,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  spinning?: boolean;
+  title: string;
+  hint?: string;
+}) {
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
+      <Icon
+        className={cn("h-5 w-5 text-stone-300", spinning && "animate-spin")}
+      />
+      <p className="text-[13px] text-stone-900">{title}</p>
+      {hint && (
+        <p className="max-w-sm text-[12.5px] leading-relaxed text-stone-500">
+          {hint}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function Meta({
   children,
   className,
 }: {
@@ -310,5 +413,27 @@ function Line({
     >
       {children}
     </span>
+  );
+}
+
+function IconButton({
+  children,
+  title,
+  onClick,
+}: {
+  children: React.ReactNode;
+  title: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      className="rounded p-1.5 text-stone-400 transition-colors hover:bg-stone-200/70 hover:text-stone-900"
+    >
+      {children}
+      <span className="sr-only">{title}</span>
+    </button>
   );
 }
