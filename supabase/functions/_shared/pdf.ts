@@ -29,6 +29,8 @@
 // deno-lint-ignore-file no-explicit-any
 import { init } from "@embedpdf/pdfium";
 
+import { encodeJpegGray } from "./jpeg.ts";
+
 /**
  * Где лежит сам движок.
  *
@@ -48,6 +50,27 @@ const DEFAULT_WASM_URL =
  * Мелкий шрифт договора на такой стороне читается уверенно.
  */
 const DEFAULT_MAX_SIDE = 1400;
+
+/**
+ * Качество JPEG по умолчанию.
+ *
+ * Восемьдесят пять. Замер на странице договора: средняя ошибка по всей
+ * странице 0.11 уровня яркости из 255, на самих буквах 4.1, границу
+ * «тёмное/светлое» переходят 0.018 % точек. Семьдесят пять весит в полтора
+ * раза меньше, но ошибка на буквах там уже 6.4 — экономия не стоит цифры,
+ * прочитанной неверно.
+ */
+const DEFAULT_QUALITY = 85;
+
+/**
+ * Вес PNG, после которого страница уходит в JPEG.
+ *
+ * Обычная страница укладывается в 20–60 КБ, и трогать её незачем. За триста
+ * килобайт переваливает только скан с бумажным шумом — там без потерь выходит
+ * до 715 КБ на страницу, а десяток таких в работе разом это уже семь мегабайт
+ * в памяти исполнителя и столько же по сети.
+ */
+const DEFAULT_MAX_BYTES = 300_000;
 
 /* Флаги отрисовки PDFium. */
 const FPDF_ANNOT = 0x01; // рисовать аннотации: штампы и подписи живут в них
@@ -132,6 +155,36 @@ export interface RenderOptions {
    * Цвет включают, когда он и правда важен: карта, схема, выделение маркером.
    */
   grayscale?: boolean;
+  /**
+   * Чем кодировать картинку.
+   *
+   * По умолчанию `"auto"`: сначала PNG — он без потерь, а на обычной странице
+   * ещё и легче JPEG (замер: 21 КБ против 40 КБ). Точность здесь достаётся
+   * даром, и отдавать её не за что.
+   *
+   * Отступаем от PNG только там, где он становится неподъёмным. Настоящий скан
+   * несёт бумажный шум — набор случайных точек, а случайное без потерь не
+   * жмётся: та же страница вырастает до 570–715 КБ. Если PNG перевалил за
+   * `maxBytes`, страница уходит в JPEG.
+   *
+   * `"png"` и `"jpeg"` задают формат жёстко, без оглядки на вес. JPEG умеет
+   * только оттенки серого, поэтому для цветной страницы всегда PNG.
+   */
+  format?: "auto" | "jpeg" | "png";
+  /**
+   * Порог, после которого PNG уступает место JPEG. Ноль отключает отступление
+   * и оставляет PNG любого веса.
+   */
+  maxBytes?: number;
+  /**
+   * Качество JPEG, 1–100.
+   *
+   * Восемьдесят пять — замеренная граница, где потеря перестаёт касаться букв:
+   * на тексте средняя ошибка 4 уровня яркости из 255, а порог «тёмное/светлое»
+   * переходят 0.018 % точек страницы. Ниже семидесяти начинают плыть тонкие
+   * линии.
+   */
+  quality?: number;
 }
 
 export interface PdfDocument {
@@ -231,6 +284,10 @@ export async function openPdf(
     render(page, options = {}) {
       const maxSide = options.maxSide ?? DEFAULT_MAX_SIDE;
       const grayscale = options.grayscale ?? true;
+      // Цветную страницу нашим кодировщиком не закодировать — только PNG.
+      const format = grayscale ? options.format ?? "auto" : "png";
+      const quality = options.quality ?? DEFAULT_QUALITY;
+      const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
 
       const raster = withPage(page, (handle) => {
         /*
@@ -280,12 +337,45 @@ export async function openPdf(
         }
       });
 
-      return encodePng(raster.rgba, raster.width, raster.height, grayscale).then((png) => ({
-        dataUrl: `data:image/png;base64,${base64(png)}`,
-        width: raster.width,
-        height: raster.height,
-        ink: inkRatio(raster.rgba),
-      }));
+      const ink = inkRatio(raster.rgba);
+
+      const asJpeg = () => {
+        const jpeg = encodeJpegGray(
+          toGray(raster.rgba, raster.width, raster.height),
+          raster.width,
+          raster.height,
+          quality
+        );
+
+        return {
+          dataUrl: `data:image/jpeg;base64,${base64(jpeg)}`,
+          width: raster.width,
+          height: raster.height,
+          ink,
+        };
+      };
+
+      if (format === "jpeg") return Promise.resolve(asJpeg());
+
+      return encodePng(raster.rgba, raster.width, raster.height, grayscale).then(
+        (png) => {
+          /*
+           * PNG получился тяжелее порога — значит, страница шумная и без потерь
+           * не сжимается. Кодируем заново в JPEG: лишние семьдесят миллисекунд
+           * процессора против шестикратной разницы в весе.
+           */
+          if (format === "auto" && maxBytes > 0 && png.length > maxBytes) {
+            return asJpeg();
+          }
+
+          return {
+            dataUrl: `data:image/png;base64,${base64(png)}`,
+            width: raster.width,
+            height: raster.height,
+            ink,
+          };
+        }
+      );
     },
 
     close() {
@@ -320,6 +410,19 @@ function normalizeText(raw: string): string {
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+/**
+ * Один байт яркости на точку.
+ *
+ * Движок уже нарисовал в сером, поэтому все три канала равны и достаточно
+ * взять любой. Отдельный проход нужен потому, что кодировщик JPEG работает с
+ * плотным массивом яркости, а не с четырьмя байтами на точку.
+ */
+function toGray(rgba: Uint8Array, width: number, height: number): Uint8Array {
+  const gray = new Uint8Array(width * height);
+  for (let i = 0; i < gray.length; i += 1) gray[i] = rgba[i * 4]!;
+  return gray;
 }
 
 /**

@@ -2,8 +2,8 @@
  * Проверка vision-модели на настоящей странице документа.
  *
  * Скрипт проходит ровно тот путь, которым потом пойдёт распознавание в
- * Edge Function: берёт PDF, рисует страницу тем же движком, кодирует в PNG тем
- * же кодировщиком и отправляет тем же запросом. Поэтому если он отработал —
+ * Edge Function: берёт PDF, рисует страницу тем же движком, кодирует картинку
+ * тем же кодировщиком и отправляет тем же запросом. Поэтому если он отработал —
  * отработает и конвейер, а если нет, видно, где именно сломалось: на рендере,
  * на формате картинки или на самой модели.
  *
@@ -12,13 +12,19 @@
  *   npm run check:vision -- --list                     что есть в каталоге
  *   npm run check:vision -- скан.pdf --model <имя>     распознать страницу
  *
+ * Полезные ключи: `--page N` — какая страница, `--side 1400` — наибольшая
+ * сторона в точках, `--color` — не переводить в серое, `--format png|jpeg`
+ * и `--quality 85` — чем кодировать. Без `--format` формат выбирается сам:
+ * PNG, а на шумном скане JPEG. Картинка сохраняется рядом с PDF — можно
+ * открыть и посмотреть, что именно ушло в модель.
+ *
  * Ключ берётся из переменной LLM_API_KEY или из .env.local. В аргументах его
  * передавать не надо: командная строка попадает в историю оболочки.
  *
  * Нужен Node 22.6 или новее — скрипт на TypeScript исполняется напрямую.
  */
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 
 import { openPdf, looksLikePdf } from "../supabase/functions/_shared/pdf.ts";
 
@@ -394,7 +400,9 @@ async function recognize(
   modelName: string,
   page: number,
   side: number,
-  color: boolean
+  color: boolean,
+  format: "auto" | "png" | "jpeg",
+  quality: number
 ): Promise<void> {
   const bytes = new Uint8Array(readFileSync(path));
 
@@ -421,13 +429,26 @@ async function recognize(
       );
     }
 
-    const image = await pdf.render(page, { maxSide: side, grayscale: !color });
+    const image = await pdf.render(page, {
+      maxSide: side,
+      grayscale: !color,
+      format,
+      quality,
+    });
     const kilobytes = Math.round((image.dataUrl.length * 3) / 4 / 1024);
+    // Формат берём из самой картинки: при `auto` его выбрал рендер, а не мы.
+    const kind = image.dataUrl.slice(11, image.dataUrl.indexOf(";"));
     console.log(
       `Картинка: ${image.width}×${image.height}, ${color ? "цвет" : "серая"}, ` +
+        `${kind.toUpperCase()}${kind === "jpeg" ? ` q${quality}` : ""}, ` +
         `${kilobytes} КБ, краски ${(image.ink * 100).toFixed(2)}%, ` +
         `рендер ${Date.now() - startedRender} мс`
     );
+
+    // Сохраняем ровно то, что уходит в модель: можно открыть и посмотреть глазами.
+    const saved = `${path.replace(/\.pdf$/i, "")}-стр${page}.${kind === "jpeg" ? "jpg" : "png"}`;
+    writeFileSync(saved, Buffer.from(image.dataUrl.split(",")[1] ?? "", "base64"));
+    console.log(`Сохранил картинку: ${saved}`);
 
     // Тело запроса больше картинки на треть: base64 — это четыре байта на три.
     console.log(
@@ -577,13 +598,20 @@ async function main(): Promise<void> {
   if (!model) fail("Укажите модель: --model <имя> или LLM_MODEL_VISION в .env.local");
   if (!existsSync(file)) fail(`Файл не найден: ${file}`);
 
+  const format = flags.get("format") ?? "auto";
+  if (format !== "auto" && format !== "png" && format !== "jpeg") {
+    fail(`Формат бывает png, jpeg или auto — не «${format}»`);
+  }
+
   await recognize(
     router,
     file,
     model,
     Number(flags.get("page") ?? 1),
     Number(flags.get("side") ?? 1400),
-    flags.has("color")
+    flags.has("color"),
+    format as "auto" | "png" | "jpeg",
+    Number(flags.get("quality") ?? 85)
   );
 }
 
