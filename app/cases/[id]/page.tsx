@@ -214,7 +214,7 @@ export default function CaseWorkspacePage() {
       <AIAssistantSheet caseId={caseId} contextFile={caseItem.contextFile} />
       <GenerationSheet caseId={caseId} />
       {/* Разбор файла запущен внутри дела — реквизиты идут в это же дело */}
-      <ExtractionSheet caseId={caseId} />
+      <ExtractionSheet />
     </div>
   );
 }

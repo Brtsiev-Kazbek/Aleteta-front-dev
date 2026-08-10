@@ -33,7 +33,7 @@ const ACTIVITY_ICONS: Record<ActivityKind, LucideIcon> = {
 export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
   const allEntities = useAppStore((state) => state.entities);
   const allDocuments = useAppStore((state) => state.documents);
-  const customSchemas = useAppStore((state) => state.customSchemas);
+  const entitySchemas = useAppStore((state) => state.entitySchemas);
   const setActiveTab = useAppStore((state) => state.setActiveTab);
   const toggleAssistant = useAppStore((state) => state.toggleAssistant);
 
@@ -53,10 +53,10 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
   const checked = useMemo(
     () =>
       entities.map((entity) => {
-        const schema = findSchema(customSchemas, entity.type);
+        const schema = findSchema(entitySchemas, entity.type);
         return { entity, schema, validation: validateEntity(entity, schema) };
       }),
-    [entities, customSchemas]
+    [entities, entitySchemas]
   );
 
   const stats = useMemo(() => {

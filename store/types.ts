@@ -2,6 +2,7 @@ import type {
   BatchReviewResult,
   Case,
   ChatMessage,
+  DemoExtractionState,
   Document,
   Entity,
   EntitySchema,
@@ -76,7 +77,7 @@ export interface StoreSnapshot {
   cases?: Case[];
   entities?: Entity[];
   documents?: Document[];
-  customSchemas?: EntitySchema[];
+  entitySchemas?: EntitySchema[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -127,8 +128,13 @@ export interface CasesSlice {
 
 export interface EntitiesSlice {
   entities: Entity[];
-  /** Типы сущностей, созданные пользователем. */
-  customSchemas: EntitySchema[];
+  /**
+   * Все типы объектов: и встроенные, и созданные пользователем. С базой
+   * приходят из неё вместе с настоящими идентификаторами, без базы
+   * подставляются встроенные из кода. Отличить одни от других можно по
+   * `isCustom` — там, где разница действительно важна.
+   */
+  entitySchemas: EntitySchema[];
   editingCell: EditingCell | null;
 
   updateEntityField: (entityId: string, field: string, value: string) => void;
@@ -299,15 +305,35 @@ export interface GenerationSlice {
 /*  РАЗБОР ДОКУМЕНТОВ                                                  */
 /* ------------------------------------------------------------------ */
 
+/** С чего начинается разбор: файл в базе, дело и выбранный тип карточки. */
+export interface ExtractionRequest {
+  documentId: string;
+  caseId: string;
+  typeId: string;
+  title: string;
+  sizeBytes: number;
+}
+
 export interface ReviewSlice {
   /* Разбор загруженного файла с переносом реквизитов. */
   extraction: ExtractionState | null;
   isExtractionOpen: boolean;
-  /** Разбирает файл и предлагает перенести реквизиты в карточку объекта. */
-  startExtraction: (file: UploadedFile) => void;
+  /**
+   * Ставит задание `extract` и следит за ним. Карточку объекта создаёт
+   * исполнитель — подтверждать перенос не требуется, требуется проверить.
+   */
+  startExtraction: (request: ExtractionRequest) => Promise<void>;
   setExtractionOpen: (open: boolean) => void;
-  /** Переносит распознанные реквизиты в новую сущность дела. */
-  applyExtraction: (caseId: string) => void;
+  /** Повтор после неудачи — тем же файлом и тем же типом. */
+  retryExtraction: () => Promise<void>;
+
+  /* То же самое «как будто» — для витрины на рабочем столе. */
+  demoExtraction: DemoExtractionState | null;
+  isDemoExtractionOpen: boolean;
+  startDemoExtraction: (file: UploadedFile) => void;
+  setDemoExtractionOpen: (open: boolean) => void;
+  /** Переносит показанные реквизиты в новую сущность дела. */
+  applyDemoExtraction: (caseId: string) => void;
 
   /* Разбор договора прямо из дела. */
   reviewDocumentId: string | null;

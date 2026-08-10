@@ -38,9 +38,10 @@ import { RecognizedTextSheet } from "@/components/documents/RecognizedTextSheet"
 import { ReviewSplitView } from "@/components/documents/ReviewSplitView";
 import { MetaLabel } from "@/components/layout/PanelHeading";
 import { BatchReviewSheet } from "@/components/workspace/BatchReviewSheet";
+import { ExtractionStartDialog } from "@/components/workspace/ExtractionStartDialog";
 import { cn, formatDate, plural } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
-import { DOCUMENT_STATUS_META } from "@/types";
+import { DOCUMENT_STATUS_META, type Document } from "@/types";
 
 export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const allDocuments = useAppStore((state) => state.documents);
@@ -52,7 +53,6 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const toggleAssistant = useAppStore((state) => state.toggleAssistant);
   const addDocuments = useAppStore((state) => state.addDocuments);
   const deleteDocument = useAppStore((state) => state.deleteDocument);
-  const startExtraction = useAppStore((state) => state.startExtraction);
   const recognizeDocument = useAppStore((state) => state.recognizeDocument);
   const isRecognitionAvailable = useAppStore(
     (state) => state.isRecognitionAvailable
@@ -60,6 +60,9 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
 
   /* Какой документ показываем распознанным текстом. */
   const [textDocumentId, setTextDocumentId] = useState<string | null>(null);
+
+  /* Какой документ разбираем на реквизиты: сначала спрашиваем тип карточки. */
+  const [extractTarget, setExtractTarget] = useState<Document | null>(null);
 
   const selectedIds = useAppStore((state) => state.selectedDocumentIds);
   const toggleSelection = useAppStore((state) => state.toggleDocumentSelection);
@@ -87,8 +90,16 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
     documents.length > 0 && selectedIds.length === documents.length;
 
   /**
-   * Загруженный файл не просто ложится в список: сразу запускается разбор,
-   * который вынимает реквизиты в карточку объекта.
+   * Загруженный файл ложится в список и уходит на распознавание.
+   *
+   * Разбор на реквизиты отсюда больше не запускается, и это сознательно.
+   * Во-первых, ему нужен тип карточки, а угадывать его по имени файла — верный
+   * способ получить карточку не того типа и потраченный вызов модели.
+   * Во-вторых, запускался он раньше на файле, который в базу ещё даже не успел
+   * попасть: идентификатора у него не было, и разбирать было нечего.
+   *
+   * Теперь так: файл загрузился, распознался, дальше человек нажимает «Извлечь
+   * реквизиты» и выбирает, во что переносить.
    */
   function handleFiles(list: FileList | null) {
     if (!list || list.length === 0) return;
@@ -101,9 +112,6 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
 
     // Содержимое передаём дальше: загрузку в хранилище делает стор.
     void addDocuments(caseId, files);
-
-    const first = files[0];
-    if (first) startExtraction(first);
   }
 
   /**
@@ -162,7 +170,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
 
         {isDragging && (
           <MetaLabel className="text-stone-900">
-            Отпустите — файл добавится и будет разобран
+            Отпустите — файл добавится и уйдёт на распознавание
           </MetaLabel>
         )}
 
@@ -207,7 +215,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                 onClick={() => inputRef.current?.click()}
               >
                 <Upload className="h-3.5 w-3.5" />
-                Загрузить и разобрать
+                Загрузить файлы
               </Button>
             </>
           )}
@@ -233,8 +241,9 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
           <FileText className="h-5 w-5 text-stone-300" />
           <p className="mt-1 text-sm text-stone-900">Документов пока нет</p>
           <p className="max-w-sm text-[13px] leading-relaxed text-stone-500">
-            Перетащите файл сюда — реквизиты из него попадут в карточку
-            объекта. Либо соберите пакет во вкладке «Объекты и генерация».
+            Перетащите файл сюда — он распознается сам. Дальше из него можно
+            извлечь реквизиты в карточку объекта: пункт «Извлечь реквизиты» в
+            меню файла.
           </p>
         </div>
       ) : (
@@ -306,16 +315,21 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                       <ShieldCheck className="h-4 w-4 text-stone-400" />
                       Разобрать по пунктам
                     </DropdownMenuItem>
+                    {/*
+                      Разбор читает распознанный текст, а не картинки: страница
+                      картинкой стоит примерно как тысяча токенов текста, и один
+                      и тот же файл разбирают не по разу. Пока текста нет,
+                      разбирать нечего — исполнитель всё равно откажет, и отказ
+                      честнее показать до вызова, а не после.
+                    */}
                     <DropdownMenuItem
-                      onSelect={() =>
-                        startExtraction({
-                          name: document.title,
-                          sizeBytes: 1_048_576,
-                        })
-                      }
+                      onSelect={() => setExtractTarget(document)}
+                      disabled={document.ocrStatus !== "done"}
                     >
                       <ScanLine className="h-4 w-4 text-stone-400" />
-                      Извлечь реквизиты
+                      {document.ocrStatus === "done"
+                        ? "Извлечь реквизиты"
+                        : "Извлечь реквизиты — нужен текст"}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={() => setTextDocumentId(document.id)}
@@ -389,6 +403,13 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Во что переносить реквизиты — спрашиваем до запуска */}
+      <ExtractionStartDialog
+        document={extractTarget}
+        caseId={caseId}
+        onClose={() => setExtractTarget(null)}
+      />
 
       {/* Результаты пакетной проверки */}
       <BatchReviewSheet />

@@ -21,7 +21,11 @@ export function DashboardHero() {
   const cases = useAppStore((state) => state.cases);
   const entities = useAppStore((state) => state.entities);
   const documents = useAppStore((state) => state.documents);
-  const customSchemas = useAppStore((state) => state.customSchemas);
+  const entitySchemas = useAppStore((state) => state.entitySchemas);
+
+  // Считаем только свои: встроенные типы есть у всех и ничего не говорят о
+  // том, как человек настроил работу под себя.
+  const ownTypes = entitySchemas.filter((schema) => schema.isCustom).length;
 
   const stats = [
     {
@@ -37,8 +41,8 @@ export function DashboardHero() {
       label: plural(documents.length, "документ", "документа", "документов"),
     },
     {
-      value: customSchemas.length,
-      label: plural(customSchemas.length, "свой тип", "своих типа", "своих типов"),
+      value: ownTypes,
+      label: plural(ownTypes, "свой тип", "своих типа", "своих типов"),
     },
   ];
 

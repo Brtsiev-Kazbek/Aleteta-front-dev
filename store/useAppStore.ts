@@ -62,7 +62,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       cases: snapshot.cases ?? state.cases,
       entities: snapshot.entities ?? state.entities,
       documents: snapshot.documents ?? state.documents,
-      customSchemas: snapshot.customSchemas ?? state.customSchemas,
+      entitySchemas: snapshot.entitySchemas ?? state.entitySchemas,
       isBackedByDatabase: true,
     }));
 

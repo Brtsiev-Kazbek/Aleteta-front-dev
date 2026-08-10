@@ -73,6 +73,7 @@ export function toEntity(row: EntityRow): Entity {
     type: row.type_id,
     data: readEntityData(row.data),
     validationErrors: row.validation_errors,
+    uncertainFields: row.uncertain_fields ?? [],
   };
 }
 
@@ -86,6 +87,7 @@ export function toDocument(row: DocumentRow): Document {
     // Ссылку собирает клиент из bucket/path — в базе полного адреса нет.
     url: row.path ?? "#",
     createdAt: row.created_at,
+    sizeBytes: row.size_bytes,
 
     // Состояние распознавания показывается прямо в строке файла.
     ocrStatus: row.ocr_status,

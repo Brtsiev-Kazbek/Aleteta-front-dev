@@ -69,6 +69,7 @@ export const MOCK_ENTITIES: Entity[] = [
       landUse: "Для индивидуального жилищного строительства",
     },
     validationErrors: [],
+    uncertainFields: [],
   },
   {
     id: "entity-2",
@@ -82,6 +83,7 @@ export const MOCK_ENTITIES: Entity[] = [
       landUse: "",
     },
     validationErrors: [],
+    uncertainFields: [],
   },
   {
     id: "entity-3",
@@ -95,6 +97,7 @@ export const MOCK_ENTITIES: Entity[] = [
       director: "Иванов И. И.",
     },
     validationErrors: [],
+    uncertainFields: [],
   },
   {
     id: "entity-4",
@@ -107,6 +110,7 @@ export const MOCK_ENTITIES: Entity[] = [
       registrationAddress: "г. Москва, ул. Тверская, д. 4",
     },
     validationErrors: [],
+    uncertainFields: [],
   },
 ];
 

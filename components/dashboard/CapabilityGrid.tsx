@@ -25,7 +25,7 @@ import { FileDropzone } from "@/components/documents/FileDropzone";
 import { ReviewSplitView } from "@/components/documents/ReviewSplitView";
 import { CasePickerDialog } from "@/components/dashboard/CasePickerDialog";
 import { MetaLabel } from "@/components/layout/PanelHeading";
-import { ExtractionSheet } from "@/components/workspace/ExtractionSheet";
+import { DemoExtractionSheet } from "@/components/dashboard/DemoExtractionSheet";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -169,7 +169,7 @@ export function CapabilityGrid() {
   const setBulkSheetOpen = useAppStore((state) => state.setBulkSheetOpen);
   const selectDocuments = useAppStore((state) => state.selectDocuments);
   const startBatchReview = useAppStore((state) => state.startBatchReview);
-  const startExtraction = useAppStore((state) => state.startExtraction);
+  const startDemoExtraction = useAppStore((state) => state.startDemoExtraction);
 
   const [isGeneratorOpen, setGeneratorOpen] = useState(false);
   const [isExtractPickerOpen, setExtractPickerOpen] = useState(false);
@@ -377,7 +377,7 @@ export function CapabilityGrid() {
             demoLabel="Или разберите демонстрационную выписку"
             onPick={(file) => {
               setExtractPickerOpen(false);
-              startExtraction(file);
+              startDemoExtraction(file);
             }}
           />
         </DialogContent>
@@ -429,8 +429,8 @@ export function CapabilityGrid() {
         сразу виден результат создания, поэтому здесь он не дублируется.
       */}
 
-      {/* Разбор запущен с рабочего стола — дело выбирается в шторке */}
-      <ExtractionSheet />
+      {/* Показ разбора: настоящий запускается из дела, где есть загруженный файл */}
+      <DemoExtractionSheet />
     </>
   );
 }

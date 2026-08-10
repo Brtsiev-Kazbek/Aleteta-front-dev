@@ -14,10 +14,17 @@ import { useAppStore } from "@/store/useAppStore";
  * созданный здесь или в любом деле, появляется в списке типов везде.
  */
 export function CustomTypesPanel() {
-  const customSchemas = useAppStore((state) => state.customSchemas);
+  const allSchemas = useAppStore((state) => state.entitySchemas);
   const entities = useAppStore((state) => state.entities);
   const setCustomSchemaOpen = useAppStore((state) => state.setCustomSchemaOpen);
   const deleteCustomSchema = useAppStore((state) => state.deleteCustomSchema);
+
+  /*
+   * Раздел про свои типы, поэтому встроенные отсеиваем здесь, а не в сторе: в
+   * сторе живут все типы, какие есть, и это правильно — объекту нужна его
+   * схема независимо от того, кто её завёл.
+   */
+  const ownSchemas = allSchemas.filter((schema) => schema.isCustom);
 
   return (
     <section>
@@ -40,7 +47,7 @@ export function CustomTypesPanel() {
         </div>
       </div>
 
-      {customSchemas.length === 0 ? (
+      {ownSchemas.length === 0 ? (
         <p className="py-6 text-[13px] leading-relaxed text-stone-500">
           Пока ни одного своего типа. Опишите то, с чем работаете именно вы —
           транспорт, оборудование, объекты аренды, студенческие работы: набор
@@ -50,7 +57,7 @@ export function CustomTypesPanel() {
       ) : (
         <ul className="flex flex-col divide-y divide-stone-200">
           <AnimatePresence initial={false}>
-            {customSchemas.map((schema) => {
+            {ownSchemas.map((schema) => {
               const usage = entities.filter(
                 (entity) => entity.type === schema.id
               ).length;

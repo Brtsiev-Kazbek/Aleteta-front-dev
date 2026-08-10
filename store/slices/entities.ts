@@ -9,7 +9,11 @@ import {
 import { MOCK_ENTITIES } from "@/data/mock-data";
 import { plural } from "@/lib/utils";
 import { findSchema, withValidation } from "@/lib/validation";
-import type { EntityFieldSchema, EntitySchema } from "@/types";
+import {
+  BUILTIN_SCHEMAS,
+  type EntityFieldSchema,
+  type EntitySchema,
+} from "@/types";
 
 import { createSync, isRemote, nextId, replaceEntityId } from "../sync";
 import type { EntitiesSlice, SliceCreator } from "../types";
@@ -30,12 +34,18 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
 
   return {
     entities: SEEDED_ENTITIES,
-    customSchemas: [],
+    /*
+     * Начальное значение — встроенные типы из кода: это режим без базы, в
+     * котором стенд открывается на свежем клоне. Как только приходит снимок
+     * рабочей области, список заменяется целиком тем, что лежит в базе, — там
+     * те же типы, но с настоящими идентификаторами.
+     */
+    entitySchemas: BUILTIN_SCHEMAS,
     editingCell: null,
     isCustomSchemaOpen: false,
 
     updateEntityField: (entityId, field, value) => {
-      const custom = get().customSchemas;
+      const schemas = get().entitySchemas;
       const previous = get().entities.find((entity) => entity.id === entityId);
 
       set({
@@ -43,7 +53,7 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
           entity.id === entityId
             ? withValidation(
                 { ...entity, data: { ...entity.data, [field]: value } },
-                findSchema(custom, entity.type)
+                findSchema(schemas, entity.type)
               )
             : entity
         ),
@@ -69,7 +79,7 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
     },
 
     addEntity: (caseId, typeId) => {
-      const schema = findSchema(get().customSchemas, typeId);
+      const schema = findSchema(get().entitySchemas, typeId);
       const entity = withValidation(
         {
           id: nextId("entity"),
@@ -77,6 +87,7 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
           type: schema.id,
           data: {},
           validationErrors: [],
+          uncertainFields: [],
         },
         schema
       );
@@ -135,7 +146,7 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
       const source = get().entities.find((entity) => entity.id === entityId);
       if (!source) return;
 
-      const schema = findSchema(get().customSchemas, source.type);
+      const schema = findSchema(get().entitySchemas, source.type);
       // Имя берём из первого поля схемы: у своих типов ключа `name` нет.
       const nameKey = schema.fields[0]?.key;
       const data = { ...source.data };
@@ -218,13 +229,14 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
               type: schema.id,
               data: {},
               validationErrors: [],
+              uncertainFields: [],
             },
             schema
           )
         : null;
 
       set({
-        customSchemas: [...get().customSchemas, schema],
+        entitySchemas: [...get().entitySchemas, schema],
         entities: entity ? [...get().entities, entity] : get().entities,
         isCustomSchemaOpen: false,
         editingCell:
@@ -252,7 +264,7 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
            */
           onSuccess: (saved) =>
             set({
-              customSchemas: get().customSchemas.map((item) =>
+              entitySchemas: get().entitySchemas.map((item) =>
                 item.id === schema.id ? saved : item
               ),
               entities: get().entities.map((item) =>
@@ -261,7 +273,7 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
             }),
           onFailure: () =>
             set({
-              customSchemas: get().customSchemas.filter(
+              entitySchemas: get().entitySchemas.filter(
                 (item) => item.id !== schema.id
               ),
               entities: get().entities.filter(
@@ -287,13 +299,21 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
     setCustomSchemaOpen: (open) => set({ isCustomSchemaOpen: open }),
 
     deleteCustomSchema: (schemaId) => {
-      const schema = get().customSchemas.find((item) => item.id === schemaId);
+      const schema = get().entitySchemas.find((item) => item.id === schemaId);
+
+      /*
+       * Встроенный тип удалить нельзя: он часть продукта и общий для всех
+       * пространств. Проверка нужна с тех пор, как список стал включать и
+       * встроенные типы, — до этого в нём лежали только свои.
+       */
+      if (!schema || !schema.isCustom) return;
+
       const orphaned = get().entities.filter(
         (entity) => entity.type === schemaId
       );
 
       set({
-        customSchemas: get().customSchemas.filter(
+        entitySchemas: get().entitySchemas.filter(
           (item) => item.id !== schemaId
         ),
         // Объекты осиротевшего типа держать негде — убираем вместе с типом.
@@ -305,7 +325,7 @@ export const createEntitiesSlice: SliceCreator<EntitiesSlice> = (set, get) => {
       void sync(archiveEntitySchemaAction(schemaId), {
         onFailure: () =>
           set({
-            customSchemas: [...get().customSchemas, schema],
+            entitySchemas: [...get().entitySchemas, schema],
             entities: [...get().entities, ...orphaned],
           }),
         fallback: "Не удалось удалить тип.",

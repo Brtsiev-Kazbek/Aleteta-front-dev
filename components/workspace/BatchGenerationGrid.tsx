@@ -49,12 +49,7 @@ import {
   type EntityValidation,
 } from "@/lib/validation";
 import { useAppStore } from "@/store/useAppStore";
-import {
-  BUILTIN_SCHEMAS,
-  type Entity,
-  type EntityFieldSchema,
-  type EntitySchema,
-} from "@/types";
+import type { Entity, EntityFieldSchema, EntitySchema } from "@/types";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -78,7 +73,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
   // Выбираем стабильную ссылку и фильтруем локально: селектор, возвращающий
   // новый массив, заставлял бы грид перерисовываться на любое изменение стора.
   const allEntities = useAppStore((state) => state.entities);
-  const customSchemas = useAppStore((state) => state.customSchemas);
+  const entitySchemas = useAppStore((state) => state.entitySchemas);
   const addEntity = useAppStore((state) => state.addEntity);
   const setEditingCell = useAppStore((state) => state.setEditingCell);
   const startGeneration = useAppStore((state) => state.startGeneration);
@@ -89,10 +84,13 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
     [allEntities, caseId]
   );
 
-  const availableSchemas = useMemo(
-    () => [...BUILTIN_SCHEMAS, ...customSchemas],
-    [customSchemas]
-  );
+  /*
+   * Склейки со встроенными типами из кода здесь больше нет: список из стора
+   * уже содержит все типы, какие есть, — с базой они приходят из неё, без базы
+   * подставляются те же встроенные. Склейка давала бы каждый встроенный тип
+   * дважды и с разными идентификаторами.
+   */
+  const availableSchemas = entitySchemas;
 
   /** Валидация по каждой сущности с учётом её собственной схемы. */
   const validations = useMemo(() => {
@@ -100,11 +98,11 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
     for (const entity of entities) {
       map[entity.id] = validateEntity(
         entity,
-        findSchema(customSchemas, entity.type)
+        findSchema(entitySchemas, entity.type)
       );
     }
     return map;
-  }, [entities, customSchemas]);
+  }, [entities, entitySchemas]);
 
   /**
    * Сущности разных типов имеют разные реквизиты, поэтому одна общая таблица
@@ -122,10 +120,10 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
       // typeId, а не schema.id: неизвестные типы откатываются к одной и той же
       // запасной схеме, и ключи React стали бы одинаковыми.
       typeId,
-      schema: findSchema(customSchemas, typeId),
+      schema: findSchema(entitySchemas, typeId),
       entities: items,
     }));
-  }, [entities, customSchemas]);
+  }, [entities, entitySchemas]);
 
   const stats = useMemo(() => {
     const valid = entities.filter(
@@ -145,7 +143,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
   }, [entities, validations]);
 
   function jumpToFirstError() {
-    const target = findFirstInvalidCell(entities, customSchemas);
+    const target = findFirstInvalidCell(entities, entitySchemas);
     if (target) setEditingCell(target);
   }
 
@@ -659,6 +657,40 @@ function EntityCell({
           Добавить
         </span>
       </button>
+    );
+  }
+
+  /*
+   * Значение подставила модель и сама в нём не уверена.
+   *
+   * Не ошибка — ошибка красная и выше по коду, она главнее. Здесь другое:
+   * значение, скорее всего, верное, но проверить его должен человек. Янтарный
+   * — ровно та громкость, которая нужна: заметно при взгляде на таблицу и не
+   * мешает работать. Пометка снимается сама, как только значение поправили.
+   */
+  if (entity.uncertainFields.includes(field.key)) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={() =>
+              setEditingCell({ entityId: entity.id, field: field.key })
+            }
+            className="flex h-11 w-full items-center gap-1.5 border border-amber-200 bg-amber-50/70 px-3 text-left transition-colors hover:bg-amber-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-400"
+          >
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+            <span className="truncate text-sm text-stone-900">{value}</span>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-xs">
+          <span className="flex items-center gap-1.5">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+            Значение взято из файла, но модель в нём не уверена — сверьте с
+            оригиналом. Пометка снимется, как только вы поправите значение.
+          </span>
+        </TooltipContent>
+      </Tooltip>
     );
   }
 

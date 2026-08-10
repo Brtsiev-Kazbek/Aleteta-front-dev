@@ -22,6 +22,38 @@ import type { Entity, EntitySchema } from "@/types";
  * ту самую, ради которой продукт и существует.
  */
 
+/**
+ * Один объект по идентификатору.
+ *
+ * Нужен там, где карточку создало не приложение, а исполнитель: разобрав файл,
+ * он кладёт реквизиты в новый объект и возвращает только его идентификатор.
+ * Перечитывать ради этого всё дело незачем — как незачем и собирать карточку в
+ * браузере из ответа модели: показывать надо то, что действительно легло в
+ * базу, вместе с пересчитанными там ошибками и пометками неуверенности.
+ *
+ * Чужой объект просто не найдётся: читаем под правами вошедшего.
+ */
+export async function getEntityAction(
+  entityId: string
+): Promise<ActionResult<Entity | null>> {
+  try {
+    await requireSession();
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from("entities")
+      .select("*")
+      .eq("id", entityId)
+      .maybeSingle();
+
+    if (error) return actionFail(error.message);
+
+    return actionOk(data ? toEntity(data) : null);
+  } catch (caught) {
+    return actionError(caught, "Не удалось прочитать объект.");
+  }
+}
+
 export async function addEntityAction(
   caseId: string,
   typeId: string

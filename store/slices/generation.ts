@@ -74,10 +74,10 @@ export const createGenerationSlice: SliceCreator<GenerationSlice> = (
         const created: Document[] = [];
         const createdAt = new Date().toISOString();
 
-        const custom = get().customSchemas;
+        const schemas = get().entitySchemas;
 
         for (const entity of valid) {
-          const schema = findSchema(custom, entity.type);
+          const schema = findSchema(schemas, entity.type);
           // Имя берём из первого поля схемы: у своих типов ключа `name` нет.
           const firstKey = schema.fields[0]?.key ?? "name";
           const entityName = entity.data[firstKey]?.trim() || "Без наименования";

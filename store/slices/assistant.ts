@@ -139,7 +139,7 @@ export const createAssistantSlice: SliceCreator<AssistantSlice> = (set, get) => 
           if (entity.validationErrors.length === 0) return entity;
 
           // Подставляем значения только в поля, которые есть в схеме этого типа.
-          const schema = findSchema(get().customSchemas, entity.type);
+          const schema = findSchema(get().entitySchemas, entity.type);
           const patch: Record<string, string> = {};
           for (const field of schema.fields) {
             const suggestion = AI_SUGGESTED_VALUES[field.key];
