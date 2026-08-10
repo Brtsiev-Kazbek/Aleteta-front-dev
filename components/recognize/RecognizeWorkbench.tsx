@@ -77,10 +77,22 @@ export function RecognizeWorkbench() {
   const [target, setTarget] = useState<{ page: number; query: string } | null>(
     null
   );
+  /*
+   * Оригинал живёт здесь, а не внутри панели текста, потому что от него зависит
+   * вся раскладка: когда он открыт, места нужно втрое больше, и список файлов
+   * уходит, чтобы освободить его. Раскладку нельзя решать изнутри одной из
+   * колонок.
+   */
+  const [showOriginal, setShowOriginal] = useState(true);
+  const [openPage, setOpenPage] = useState(1);
   const [isDragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const selected = recognized.find((item) => item.id === selectedId) ?? null;
+
+  /* Оригинал показываем только у PDF: у картинки страниц нет и листать нечего. */
+  const isPdf = /\.pdf$/i.test(selected?.title ?? "");
+  const withOriginal = showOriginal && isPdf && selected !== null;
 
   /* Сам собой выделяется первый: экран без выбранного файла выглядит пустым. */
   useEffect(() => {
@@ -159,25 +171,76 @@ export function RecognizeWorkbench() {
         }
       />
 
-      {recognized.length > 0 && (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
-          <FileList
-            documents={recognized}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onRetry={recognizeDocument}
-            onDelete={deleteDocument}
-          />
+      {recognized.length > 0 &&
+        (withOriginal ? (
+          /*
+           * Режим сверки. Список файлов уходит наверх полосой, а текст и
+           * оригинал встают рядом — иначе на обычном ноутбуке им не хватает
+           * ширины, колонки складываются, и «рядом» превращается в «одно под
+           * другим». Ради чего тогда всё это.
+           */
+          <div className="flex min-w-0 flex-col gap-4">
+            <FileStrip
+              documents={recognized}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+            />
 
-          <TextPane
-            document={selected}
-            readPages={readDocumentPages}
-            onRetry={recognizeDocument}
-            canRetry={isAvailable}
-            target={target}
-          />
-        </div>
-      )}
+            <div className="grid min-w-0 gap-4 md:grid-cols-2 md:items-stretch">
+              <div className="h-[78vh] min-w-0">
+                <TextPane
+                  document={selected}
+                  readPages={readDocumentPages}
+                  onRetry={recognizeDocument}
+                  canRetry={isAvailable}
+                  target={target}
+                  openPage={openPage}
+                  onOpenPage={setOpenPage}
+                  showOriginal={showOriginal}
+                  onToggleOriginal={() => setShowOriginal((value) => !value)}
+                  canShowOriginal={isPdf}
+                />
+              </div>
+
+              {selected && (
+                <div className="h-[78vh] min-w-0">
+                  <OriginalPane
+                    documentId={selected.id}
+                    title={selected.title}
+                    page={openPage}
+                    pageCount={selected.pageCount ?? null}
+                    onPageChange={setOpenPage}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
+            <FileList
+              documents={recognized}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onRetry={recognizeDocument}
+              onDelete={deleteDocument}
+            />
+
+            <div className="h-[75vh] min-w-0">
+              <TextPane
+                document={selected}
+                readPages={readDocumentPages}
+                onRetry={recognizeDocument}
+                canRetry={isAvailable}
+                target={target}
+                openPage={openPage}
+                onOpenPage={setOpenPage}
+                showOriginal={showOriginal}
+                onToggleOriginal={() => setShowOriginal((value) => !value)}
+                canShowOriginal={isPdf}
+              />
+            </div>
+          </div>
+        ))}
     </div>
   );
 }
@@ -569,6 +632,55 @@ function FileList({
   );
 }
 
+/**
+ * Полоса файлов для режима сверки.
+ *
+ * Тот же выбор, что и в списке, но по горизонтали: когда рядом стоит оригинал,
+ * ширина дороже всего, а список файлов при сверке нужен реже прочего — к нему
+ * обращаются, чтобы перейти к следующему документу, и всё.
+ */
+function FileStrip({
+  documents,
+  selectedId,
+  onSelect,
+}: {
+  documents: Document[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div className="scrollable-area -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+      {documents.map((document) => {
+        const isSelected = document.id === selectedId;
+
+        return (
+          <button
+            key={document.id}
+            type="button"
+            onClick={() => onSelect(document.id)}
+            className={cn(
+              "flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 transition-colors",
+              isSelected
+                ? "border-stone-900 bg-white"
+                : "border-stone-200 bg-white/60 hover:border-stone-400"
+            )}
+          >
+            <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
+
+            <span className="max-w-[14rem] truncate text-[12.5px] text-stone-900">
+              {document.title}
+            </span>
+
+            <span className="shrink-0">
+              <StatusText document={document} />
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function StatusText({ document }: { document: Document }) {
   const done = document.pagesDone ?? 0;
   const total = document.pageCount;
@@ -616,6 +728,11 @@ function TextPane({
   onRetry,
   canRetry,
   target,
+  openPage,
+  onOpenPage,
+  showOriginal,
+  onToggleOriginal,
+  canShowOriginal,
 }: {
   document: Document | null;
   readPages: (documentId: string) => Promise<RecognizedPage[]>;
@@ -623,6 +740,12 @@ function TextPane({
   canRetry: boolean;
   /** Переход из поиска: какую страницу показать и что в ней подсветить. */
   target: { page: number; query: string } | null;
+  /** Какая страница открыта в оригинале — им распоряжается рабочий стол. */
+  openPage: number;
+  onOpenPage: (page: number) => void;
+  showOriginal: boolean;
+  onToggleOriginal: () => void;
+  canShowOriginal: boolean;
 }) {
   const [pages, setPages] = useState<RecognizedPage[]>([]);
   const [isLoading, setLoading] = useState(false);
@@ -630,8 +753,6 @@ function TextPane({
   const [query, setQuery] = useState("");
   /** Номер совпадения, к которому перешли стрелками. −1 — ни к какому. */
   const [active, setActive] = useState(-1);
-  const [showOriginal, setShowOriginal] = useState(true);
-  const [openPage, setOpenPage] = useState(1);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   /* Задание нужно ради одного поля — текста ошибки, если оно упало. */
@@ -721,8 +842,8 @@ function TextPane({
   }, [active, marks.offsets]);
 
   useEffect(() => {
-    if (activePage) setOpenPage(activePage);
-  }, [activePage]);
+    if (activePage) onOpenPage(activePage);
+  }, [activePage, onOpenPage]);
 
   /* Прокрутка к текущему совпадению. */
   useEffect(() => {
@@ -740,8 +861,8 @@ function TextPane({
   useEffect(() => {
     if (!target) return;
     setQuery(target.query);
-    setOpenPage(target.page);
-  }, [target]);
+    onOpenPage(target.page);
+  }, [target, onOpenPage]);
 
   /*
    * Переход из поиска ведёт не к первому совпадению в файле, а к тому, что на
@@ -796,12 +917,14 @@ function TextPane({
   const isRunning =
     document.ocrStatus === "pending" || document.ocrStatus === "running";
   const hasText = filled.length > 0;
-  /* Оригинал есть смысл показывать только у PDF: у картинки страниц нет. */
-  const isPdf = /\.pdf$/i.test(document.title);
-  const withOriginal = showOriginal && isPdf && hasText;
 
   return (
-    <div className="flex min-w-0 flex-col gap-4">
+    /*
+     * Высоту задаёт тот, кто эту панель ставит: в режиме сверки она должна
+     * совпасть с высотой оригинала, иначе колонки разъезжаются и «рядом»
+     * перестаёт быть рядом.
+     */
+    <div className="flex h-full min-w-0 flex-col gap-3">
       {/* Шапка: имя файла, поиск по нему, действия */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-stone-200 bg-white px-4 py-2.5">
         <h2 className="min-w-0 flex-1 truncate text-[14px] font-medium tracking-[-0.01em] text-stone-900">
@@ -850,10 +973,10 @@ function TextPane({
           </div>
         )}
 
-        {isPdf && hasText && (
+        {canShowOriginal && (
           <IconButton
             title={showOriginal ? "Скрыть оригинал" : "Показать оригинал"}
-            onClick={() => setShowOriginal((value) => !value)}
+            onClick={onToggleOriginal}
           >
             {showOriginal ? (
               <PanelRightClose className="h-3.5 w-3.5" />
@@ -888,18 +1011,12 @@ function TextPane({
         )}
       </div>
 
-      <div
-        className={cn(
-          "grid min-w-0 gap-4",
-          withOriginal && "xl:grid-cols-2"
-        )}
-      >
-        {/* Расшифровка */}
-        <div className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
-          <div
-            ref={scrollRef}
-            className="scrollable-area h-[70vh] min-w-0 overflow-y-auto"
-          >
+      {/* Расшифровка */}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
+        <div
+          ref={scrollRef}
+          className="scrollable-area min-h-0 min-w-0 flex-1 overflow-y-auto"
+        >
             {document.ocrStatus === "failed" ? (
               /*
                * Причину показываем дословно, как её записал исполнитель. Общее
@@ -958,7 +1075,7 @@ function TextPane({
                     >
                       <button
                         type="button"
-                        onClick={() => setOpenPage(page.page)}
+                        onClick={() => onOpenPage(page.page)}
                         className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500 transition-colors hover:text-stone-900"
                         title="Показать эту страницу в оригинале"
                       >
@@ -977,9 +1094,9 @@ function TextPane({
                         {describeSource(page.source)}
                       </span>
 
-                      {openPage === page.page && withOriginal && (
+                      {openPage === page.page && showOriginal && canShowOriginal && (
                         <span className="ml-auto font-mono text-[9px] uppercase tracking-[0.1em] text-amber-700">
-                          показана справа
+                          открыта в оригинале
                         </span>
                       )}
                     </header>
@@ -1008,19 +1125,7 @@ function TextPane({
                 )}
               </div>
             )}
-          </div>
         </div>
-
-        {/* Оригинал */}
-        {withOriginal && (
-          <div className="hidden h-[70vh] min-w-0 xl:block">
-            <OriginalPane
-              documentId={document.id}
-              title={document.title}
-              page={openPage}
-            />
-          </div>
-        )}
       </div>
     </div>
   );
