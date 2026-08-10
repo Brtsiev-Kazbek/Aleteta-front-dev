@@ -40,11 +40,18 @@ import { init } from "@embedpdf/pdfium";
 const DEFAULT_WASM_URL =
   "https://cdn.jsdelivr.net/npm/@embedpdf/pdfium@2.15.0/dist/pdfium.wasm";
 
-/** Наибольшая сторона картинки страницы. Примерно 150 точек на дюйм для A4. */
-const DEFAULT_MAX_SIDE = 1800;
+/**
+ * Наибольшая сторона картинки страницы. Примерно 120 точек на дюйм для A4.
+ *
+ * Больше не нужно: vision-модели всё равно ужимают вход под свою сетку, и
+ * лишние точки превращаются не в качество, а в мегабайты в теле запроса.
+ * Мелкий шрифт договора на такой стороне читается уверенно.
+ */
+const DEFAULT_MAX_SIDE = 1400;
 
 /* Флаги отрисовки PDFium. */
 const FPDF_ANNOT = 0x01; // рисовать аннотации: штампы и подписи живут в них
+const FPDF_GRAYSCALE = 0x08; // рисовать в оттенках серого
 const FPDF_REVERSE_BYTE_ORDER = 0x10; // отдать RGBA вместо BGRA
 const BITMAP_BGRA = 4;
 
@@ -112,12 +119,27 @@ export interface PdfPageImage {
   ink: number;
 }
 
+export interface RenderOptions {
+  /** Наибольшая сторона в точках. */
+  maxSide?: number;
+  /**
+   * Оттенки серого вместо цвета. По умолчанию да, и вот почему.
+   *
+   * Скан — это чёрный текст на белой бумаге; цвет несёт в нём почти нулевую
+   * долю смысла, а места занимает втрое больше. Синяя печать в сером виде
+   * читается ничуть не хуже — модель распознаёт её очертания, а не оттенок.
+   *
+   * Цвет включают, когда он и правда важен: карта, схема, выделение маркером.
+   */
+  grayscale?: boolean;
+}
+
 export interface PdfDocument {
   pageCount: number;
   /** Текстовый слой страницы. Пустая строка — слоя нет, это скан. */
   text(page: number): string;
   /** Страница картинкой. */
-  render(page: number, maxSide?: number): Promise<PdfPageImage>;
+  render(page: number, options?: RenderOptions): Promise<PdfPageImage>;
   close(): void;
 }
 
@@ -206,7 +228,10 @@ export async function openPdf(
       });
     },
 
-    render(page, maxSide = DEFAULT_MAX_SIDE) {
+    render(page, options = {}) {
+      const maxSide = options.maxSide ?? DEFAULT_MAX_SIDE;
+      const grayscale = options.grayscale ?? true;
+
       const raster = withPage(page, (handle) => {
         /*
          * Размер страницы PDF задан в пунктах — семьдесят вторых долях дюйма.
@@ -241,7 +266,9 @@ export async function openPdf(
             width,
             height,
             0,
-            FPDF_ANNOT | FPDF_REVERSE_BYTE_ORDER
+            FPDF_ANNOT |
+              FPDF_REVERSE_BYTE_ORDER |
+              (grayscale ? FPDF_GRAYSCALE : 0)
           );
 
           // Копия обязательна: после free эта область памяти будет чужой.
@@ -253,7 +280,7 @@ export async function openPdf(
         }
       });
 
-      return encodePng(raster.rgba, raster.width, raster.height).then((png) => ({
+      return encodePng(raster.rgba, raster.width, raster.height, grayscale).then((png) => ({
         dataUrl: `data:image/png;base64,${base64(png)}`,
         width: raster.width,
         height: raster.height,
@@ -338,7 +365,8 @@ const PNG_SIGNATURE = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 async function encodePng(
   rgba: Uint8Array,
   width: number,
-  height: number
+  height: number,
+  grayscale: boolean
 ): Promise<Uint8Array> {
   /*
    * Прозрачность отбрасываем: страница уже нарисована на белом, альфа-канал
@@ -348,7 +376,8 @@ async function encodePng(
    * выше»: у документа соседние строки почти одинаковы, и после вычитания
    * получаются нули, которые сжимаются в ничто.
    */
-  const rowLength = width * 3;
+  const channels = grayscale ? 1 : 3;
+  const rowLength = width * channels;
   const raw = new Uint8Array((rowLength + 1) * height);
   const previous = new Uint8Array(rowLength);
   const current = new Uint8Array(rowLength);
@@ -356,10 +385,16 @@ async function encodePng(
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
       const from = (y * width + x) * 4;
-      const to = x * 3;
-      current[to] = rgba[from];
-      current[to + 1] = rgba[from + 1];
-      current[to + 2] = rgba[from + 2];
+      const to = x * channels;
+
+      if (grayscale) {
+        // Движок уже нарисовал в сером, все три канала равны — берём любой.
+        current[to] = rgba[from];
+      } else {
+        current[to] = rgba[from];
+        current[to + 1] = rgba[from + 1];
+        current[to + 2] = rgba[from + 2];
+      }
     }
 
     const rowStart = y * (rowLength + 1);
@@ -378,7 +413,7 @@ async function encodePng(
   view.setUint32(0, width);
   view.setUint32(4, height);
   header[8] = 8; // восемь бит на канал
-  header[9] = 2; // цвет: три канала без прозрачности
+  header[9] = grayscale ? 0 : 2; // один канал яркости или три цветовых
   header[10] = 0; // сжатие: другого в PNG не бывает
   header[11] = 0; // набор фильтров: тоже единственный
   header[12] = 0; // без чересстрочности

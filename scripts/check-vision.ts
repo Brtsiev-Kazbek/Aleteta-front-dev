@@ -64,7 +64,7 @@ function parseArgs(argv: string[]) {
 
     const name = argument.slice(2);
 
-    if (name === "list" || name === "whoami") {
+    if (name === "list" || name === "whoami" || name === "color") {
       flags.set(name, "yes");
       continue;
     }
@@ -131,12 +131,30 @@ interface Router {
   apiKey: string;
 }
 
-/** Запрос с понятной ошибкой вместо стека undici. */
-async function request(url: string, init: RequestInit): Promise<Response> {
+/**
+ * Запрос с понятной ошибкой вместо стека undici — и со сроком.
+ *
+ * Без срока скрипт просто висит, и отличить «модель думает» от «запрос ушёл в
+ * никуда» нельзя ничем, кроме терпения.
+ */
+async function request(
+  url: string,
+  init: RequestInit,
+  timeoutMs = 120_000
+): Promise<Response> {
   try {
-    return await fetch(url, init);
+    return await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
   } catch (caught) {
     const reason = caught instanceof Error ? (caught.cause ?? caught.message) : caught;
+
+    if (caught instanceof Error && /timeout|abort/i.test(caught.name + caught.message)) {
+      fail(
+        `Модель не ответила за ${timeoutMs / 1000} с.\n` +
+          "Обычно это либо очень большая картинка, либо перегруженный поставщик.\n" +
+          "Попробуйте меньшую сторону: --side 1000"
+      );
+    }
+
     fail(`Не удалось обратиться к ${url}\n${String(reason)}`);
   }
 }
@@ -374,7 +392,9 @@ async function recognize(
   router: Router,
   path: string,
   modelName: string,
-  page: number
+  page: number,
+  side: number,
+  color: boolean
 ): Promise<void> {
   const bytes = new Uint8Array(readFileSync(path));
 
@@ -401,11 +421,17 @@ async function recognize(
       );
     }
 
-    const image = await pdf.render(page);
+    const image = await pdf.render(page, { maxSide: side, grayscale: !color });
     const kilobytes = Math.round((image.dataUrl.length * 3) / 4 / 1024);
     console.log(
-      `Картинка: ${image.width}×${image.height}, ${kilobytes} КБ, краски ` +
-        `${(image.ink * 100).toFixed(2)}%, рендер ${Date.now() - startedRender} мс\n`
+      `Картинка: ${image.width}×${image.height}, ${color ? "цвет" : "серая"}, ` +
+        `${kilobytes} КБ, краски ${(image.ink * 100).toFixed(2)}%, ` +
+        `рендер ${Date.now() - startedRender} мс`
+    );
+
+    // Тело запроса больше картинки на треть: base64 — это четыре байта на три.
+    console.log(
+      `Отправляю ${Math.round((image.dataUrl.length / 1024))} КБ в ${modelName}…\n`
     );
 
     const startedModel = Date.now();
@@ -551,7 +577,14 @@ async function main(): Promise<void> {
   if (!model) fail("Укажите модель: --model <имя> или LLM_MODEL_VISION в .env.local");
   if (!existsSync(file)) fail(`Файл не найден: ${file}`);
 
-  await recognize(router, file, model, Number(flags.get("page") ?? 1));
+  await recognize(
+    router,
+    file,
+    model,
+    Number(flags.get("page") ?? 1),
+    Number(flags.get("side") ?? 1400),
+    flags.has("color")
+  );
 }
 
 try {
