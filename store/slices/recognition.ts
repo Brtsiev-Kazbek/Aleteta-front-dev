@@ -143,7 +143,23 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
         { fallback: "Не удалось поставить распознавание в очередь." }
       );
 
-      if (!enqueued) return;
+      /*
+       * Задание не создалось — чаще всего потому, что модель не настроена.
+       * Оставить документ в «в очереди» было бы враньём: очереди никакой нет,
+       * ждать нечего, а интерфейс при этом закрывает кнопку повтора. Поэтому
+       * честно помечаем неудачей — тогда видно и ошибку, и как попробовать
+       * снова.
+       */
+      if (!enqueued) {
+        set((current) => ({
+          documents: current.documents.map((document) =>
+            document.id === documentId
+              ? { ...document, ocrStatus: "failed" }
+              : document
+          ),
+        }));
+        return;
+      }
 
       set((current) => ({
         recognitionJobs: {
@@ -174,12 +190,37 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
     resumeRecognition: async () => {
       if (!isRemote(get)) return;
 
-      set({ isRecognitionAvailable: await isAiAvailableAction() });
+      const available = await isAiAvailableAction();
+      set({ isRecognitionAvailable: available });
 
       for (const document of get().documents) {
-        if (document.ocrStatus === "pending" || document.ocrStatus === "running") {
-          watch(document.id);
+        if (document.ocrStatus !== "pending" && document.ocrStatus !== "running") {
+          continue;
         }
+
+        /*
+         * «В очереди» без задания — файл, который загрузился, но поставить его
+         * не вышло: в тот момент не была настроена модель или отказала сеть.
+         * Очереди у него никакой нет, и сам он из этого состояния не выйдет.
+         *
+         * Ставим заново — молча, потому что для человека это не событие: он
+         * файл загрузил, он вправе ожидать, что тот читается. Если и сейчас не
+         * выйдет, документ пометится неудачей и покажет причину.
+         */
+        const state = await getRecognitionAction(document.id);
+
+        if (
+          available &&
+          state.ok &&
+          state.data &&
+          state.data.ocrStatus === "pending" &&
+          state.data.job === null
+        ) {
+          void get().recognizeDocument(document.id);
+          continue;
+        }
+
+        watch(document.id);
       }
     },
 

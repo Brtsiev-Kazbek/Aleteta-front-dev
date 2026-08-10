@@ -111,6 +111,27 @@ export async function enqueueJob<T extends TypedTask>(
     return { jobId: cached.id, fromCache: true };
   }
 
+  /*
+   * Такое же задание уже в работе. Заводить второе незачем и вредно: два
+   * исполнителя прочитают один файл дважды, и это прямые деньги. Возвращаем то,
+   * что уже есть, — для интерфейса разницы нет, а нажать «распознать» дважды
+   * человек может запросто.
+   */
+  const { data: running } = await supabase
+    .from("ai_jobs")
+    .select("id")
+    .eq("workspace_id", session.workspaceId)
+    .eq("task", task)
+    .eq("model", model)
+    .eq("input_hash", hash)
+    .in("status", ["queued", "running"])
+    .limit(1)
+    .maybeSingle();
+
+  if (running) {
+    return { jobId: running.id, fromCache: false };
+  }
+
   const { data, error } = await supabase
     .from("ai_jobs")
     .insert({

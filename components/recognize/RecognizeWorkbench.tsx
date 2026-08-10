@@ -405,6 +405,8 @@ function FileList({
         const done = document.pagesDone ?? 0;
         const isRunning =
           document.ocrStatus === "pending" || document.ocrStatus === "running";
+        // Повтор прячем только на «читаю»: из «в очереди» файл может не выйти.
+        const isBusy = document.ocrStatus === "running";
 
         return (
           <li key={document.id}>
@@ -437,7 +439,7 @@ function FileList({
                 <StatusText document={document} />
 
                 <div className="ml-auto flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-                  {!isRunning && (
+                  {!isBusy && (
                     <IconButton
                       title="Распознать заново"
                       onClick={() => onRetry(document.id)}
@@ -649,7 +651,7 @@ function TextPane({
           </>
         )}
 
-        {!isRunning && canRetry && (
+        {document.ocrStatus !== "running" && canRetry && (
           <IconButton
             title="Распознать заново"
             onClick={() => onRetry(document.id)}

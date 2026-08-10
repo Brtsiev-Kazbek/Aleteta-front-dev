@@ -27,6 +27,12 @@ const PAGES = [
     summary: "Что за проект, какой документ читать и в каком порядке",
   },
   {
+    slug: "start-ocr",
+    file: "START-OCR.md",
+    title: "Запустить распознавание",
+    summary: "Пять шагов от ключа модели до текста на экране, с проверками",
+  },
+  {
     slug: "development",
     file: "DEVELOPMENT.md",
     title: "Руководство разработчика",

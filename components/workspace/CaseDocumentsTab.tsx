@@ -333,7 +333,6 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                       onSelect={() => void recognizeDocument(document.id)}
                       disabled={
                         !isRecognitionAvailable ||
-                        document.ocrStatus === "pending" ||
                         document.ocrStatus === "running"
                       }
                     >

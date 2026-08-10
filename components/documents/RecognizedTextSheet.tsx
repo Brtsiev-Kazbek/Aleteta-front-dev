@@ -72,6 +72,13 @@ export function RecognizedTextSheet({
   const done = document?.pagesDone ?? 0;
   const total = document?.pageCount ?? null;
   const isRunning = status === "pending" || status === "running";
+  /*
+   * Повтор закрыт только на «читаю». «В очереди» — состояние, в котором файл
+   * может застрять навсегда: если задание не создалось, ждать нечего, а
+   * закрытая кнопка не оставляет человеку выхода. Повторное нажатие безопасно:
+   * задание с тем же отпечатком не заводится дважды.
+   */
+  const isBusy = status === "running";
 
   /*
    * Перечитываем не по таймеру, а по числу готовых страниц. За ходом дела и так
@@ -180,7 +187,7 @@ export function RecognizedTextSheet({
                 variant="outline"
                 size="sm"
                 className="ml-1 gap-1.5"
-                disabled={!documentId || isRunning || !isAvailable}
+                disabled={!documentId || isBusy || !isAvailable}
                 onClick={() => {
                   if (documentId) void recognizeDocument(documentId);
                 }}
