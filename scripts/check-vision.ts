@@ -8,6 +8,7 @@
  * на формате картинки или на самой модели.
  *
  * Запуск:
+ *   npm run check:vision -- --whoami                   рабочий ли ключ
  *   npm run check:vision -- --list                     что есть в каталоге
  *   npm run check:vision -- скан.pdf --model <имя>     распознать страницу
  *
@@ -63,7 +64,7 @@ function parseArgs(argv: string[]) {
 
     const name = argument.slice(2);
 
-    if (name === "list") {
+    if (name === "list" || name === "whoami") {
       flags.set(name, "yes");
       continue;
     }
@@ -75,19 +76,35 @@ function parseArgs(argv: string[]) {
   return { flags, positional };
 }
 
-/** Простое чтение .env: тянуть ради этого зависимость незачем. */
+/**
+ * Простое чтение .env: тянуть ради этого зависимость незачем.
+ *
+ * С одной оговоркой про кодировку. `echo 'КЛЮЧ=...' >> .env.local` в
+ * PowerShell пишет файл в UTF-16 с меткой порядка байтов, а не в UTF-8, как
+ * все ожидают. Прочитанный как UTF-8, такой файл превращается в кашу из
+ * нулевых байтов, и ключ либо не находится вовсе, либо уходит на сервер
+ * испорченным — а сервер отвечает «401», и полдня уходит на поиск того, чего
+ * нет.
+ */
 function loadEnvFile(name: string): void {
   if (!existsSync(name)) return;
 
-  for (const line of readFileSync(name, "utf8").split("\n")) {
+  const bytes = readFileSync(name);
+  let text: string;
+
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) text = bytes.toString("utf16le");
+  else if (bytes[0] === 0xfe && bytes[1] === 0xff) text = bytes.swap16().toString("utf16le");
+  else text = bytes.toString("utf8");
+
+  for (const line of text.replace(/^﻿/, "").split("\n")) {
     const match = /^\s*([A-Z0-9_]+)\s*=\s*(.*)$/.exec(line);
     if (!match) continue;
 
     const key = match[1] ?? "";
-    const raw = match[2] ?? "";
+    const value = match[2] ?? "";
     if (!key || process.env[key]) continue;
 
-    process.env[key] = raw.trim().replace(/^["']|["']$/g, "");
+    process.env[key] = value.trim().replace(/^["']|["']$/g, "");
   }
 }
 
@@ -149,6 +166,69 @@ async function readJson(response: Response, what: string): Promise<any> {
   } catch {
     fail(`${what}: ответ не разбирается как JSON\n${body.slice(0, 300)}`);
   }
+}
+
+/* ------------------------------------------------------------------ */
+/*  КЛЮЧ                                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Отпечаток ключа: длина и края.
+ *
+ * Показываем его при отказе в доступе, не раскрывая сам ключ. По длине сразу
+ * видно самое частое — что в файл попал не только ключ, но и кавычка,
+ * пробел, комментарий или метка кодировки.
+ */
+function keyFingerprint(key: string): string {
+  const strange = /[^\x21-\x7e]/.test(key) ? ", есть посторонние символы" : "";
+  return `${key.slice(0, 6)}…${key.slice(-4)}, длина ${key.length}${strange}`;
+}
+
+/**
+ * Проверка, что ключ вообще рабочий.
+ *
+ * Каталог моделей у RouterAI открыт без ключа, поэтому удачный `--list`
+ * ничего про ключ не доказывает. А вот сведения о самом ключе и баланс — за
+ * авторизацией, и по ним видно, в чём дело: ключ не тот, отключён или деньги
+ * кончились.
+ */
+async function whoami(router: Router): Promise<void> {
+  console.log(`Ключ: ${keyFingerprint(router.apiKey)}\n`);
+
+  const key = await request(`${router.baseUrl}/key`, {
+    method: "GET",
+    headers: { authorization: `Bearer ${router.apiKey}` },
+  });
+
+  if (key.status === 401) {
+    fail(
+      "Маршрутизатор не принимает этот ключ.\n\n" +
+        "Что проверить:\n" +
+        "  1. ключ не отозван и не отключён в личном кабинете;\n" +
+        "  2. в .env.local лежит именно он, без кавычек и лишних пробелов;\n" +
+        "  3. это ключ API, а не мастер-ключ — мастер управляет ключами,\n" +
+        "     но моделями пользоваться не может."
+    );
+  }
+
+  const data = await readJson(key, "Сведения о ключе");
+  const info = data.data ?? data;
+
+  console.log(`Имя ключа: ${info.name ?? "—"}`);
+  console.log(`Отключён: ${info.disabled ? "да" : "нет"}`);
+  console.log(`Потрачено: ${info.usage ?? "—"}, лимит: ${info.limit || "без лимита"}`);
+
+  const credits = await request(`${router.baseUrl}/credits`, {
+    method: "GET",
+    headers: { authorization: `Bearer ${router.apiKey}` },
+  });
+
+  if (credits.ok) {
+    const balance = await readJson(credits, "Баланс");
+    console.log(`Баланс: ${balance.credits ?? "—"}`);
+  }
+
+  console.log("\nКлюч рабочий.");
 }
 
 /* ------------------------------------------------------------------ */
@@ -355,6 +435,15 @@ async function recognize(
       const body = await response.text();
       console.error(`\nМодель ответила ${response.status}:\n${body.slice(0, 800)}`);
 
+      if (response.status === 401) {
+        fail(
+          `Ключ отвергнут (${keyFingerprint(router.apiKey)}).\n` +
+            "Каталог моделей отдаётся без ключа, поэтому удачный --list ничего\n" +
+            "про него не говорил. Проверьте отдельно:\n\n" +
+            "  npm run check:vision -- --whoami"
+        );
+      }
+
       if (/image|url|base64|data:|modal/i.test(body)) {
         console.error(
           "\nПохоже, эта модель не принимает картинку строкой data: — либо она\n" +
@@ -443,6 +532,11 @@ async function main(): Promise<void> {
       "Нет ключа. Положите его в .env.local строкой LLM_API_KEY=... или задайте\n" +
         "переменной окружения перед запуском."
     );
+  }
+
+  if (flags.has("whoami")) {
+    await whoami(router);
+    return;
   }
 
   if (flags.has("list")) {
