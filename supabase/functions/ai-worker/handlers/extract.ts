@@ -64,6 +64,23 @@ export async function runExtract(
 ): Promise<HandlerResult> {
   const input = job.input as unknown as ExtractInput;
 
+  /*
+   * Начинать, только если на ответ заведомо хватит времени.
+   *
+   * Тот же приём, что в распознавании (`MIN_WAVE_MS` в ocr.ts), и по той же
+   * причине: начать запрос и оборваться посередине — худший из исходов. За
+   * прерванный запрос поставщик деньги возьмёт, ответа мы не получим, а задание
+   * останется помеченным как выполняющееся до тех пор, пока `release_stale_jobs`
+   * не решит, что исполнитель умер. Человек всё это время смотрит на бегунок,
+   * за которым уже никого нет.
+   *
+   * Возврат в очередь — не ошибка и не успех: следующий запуск начнёт заново, и
+   * начнёт с полным бюджетом.
+   */
+  if (run.hardStop - Date.now() < MIN_WAIT_MS + WRITE_RESERVE_MS) {
+    return { output: null, unfinished: true, progress: 0 };
+  }
+
   /* --- 1. Распознанный текст ------------------------------------- */
 
   /*
@@ -125,7 +142,7 @@ export async function runExtract(
     throw new Error("В распознанном документе пусто — реквизиты брать неоткуда");
   }
 
-  const text = parts.join("\n\n");
+  const excerpt = parts.join("\n\n");
 
   /* --- 2. Описание реквизитов ------------------------------------ */
 
@@ -162,7 +179,7 @@ export async function runExtract(
       { role: "system", content: prompt },
       {
         role: "user",
-        content: `Документ «${document.title}», распознанный текст:\n\n${text}`,
+        content: `Документ «${document.title}», распознанный текст:\n\n${excerpt}`,
       },
     ],
     {
