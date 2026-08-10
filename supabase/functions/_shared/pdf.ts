@@ -67,7 +67,24 @@ function loadEngine(wasmUrl: string): Promise<any> {
       );
     }
 
-    const pdfium = await init({ wasmBinary: await response.arrayBuffer() });
+    /*
+     * `thisProgram` задаём явно, и это не украшательство.
+     *
+     * Движок собран Emscripten, а тот при запуске складывает внутрь wasm
+     * подобие переменных окружения, и в переменную `_` кладёт путь к
+     * запущенному файлу — по умолчанию `process.argv[1]`. Записывает он их
+     * побайтово, с проверкой «символ помещается в байт». Пользователь с
+     * кириллицей в имени папки — `C:\Users\Администратор\...` — роняет эту
+     * проверку, и движок падает с `Aborted(Assertion failed)` ещё до того, как
+     * увидит хоть один PDF.
+     *
+     * Разбирать такую ошибку по стеку внутри wasm — занятие на полдня, а
+     * лечится она одной строкой: даём заведомо латинское имя.
+     */
+    const pdfium = await init({
+      wasmBinary: await response.arrayBuffer(),
+      thisProgram: "pdfium",
+    });
     // Обязательный шаг: без него любой вызов PDFium возвращает ошибку.
     pdfium.PDFiumExt_Init();
     return pdfium;
