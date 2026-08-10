@@ -47,7 +47,7 @@ import { useAppStore } from "@/store/useAppStore";
  * значения там подсвечены — и это честнее, чем список в шторке, который
  * закроется и забудется.
  */
-export function ExtractionSheet() {
+export function ExtractionSheet({ caseId }: { caseId: string }) {
   const isOpen = useAppStore((state) => state.isExtractionOpen);
   const setOpen = useAppStore((state) => state.setExtractionOpen);
   const extraction = useAppStore((state) => state.extraction);
@@ -64,9 +64,17 @@ export function ExtractionSheet() {
   const uncertainCount =
     extraction?.fields.filter((field) => field.uncertain).length ?? 0;
 
+  /*
+   * Разбор принадлежит своему делу. Состояние живёт в сторе и переход на другое
+   * дело его не гасит — задание-то идёт. Но показывать здесь чужой разбор
+   * нельзя: «Открыть карточку» увело бы на матрицу этого дела, где созданной
+   * карточки нет.
+   */
+  const isMine = extraction?.caseId === caseId;
+
   // Без разбираемого файла шторке нечего показывать — не открываем её пустой.
   return (
-    <Sheet open={isOpen && extraction !== null} onOpenChange={setOpen}>
+    <Sheet open={isOpen && isMine} onOpenChange={setOpen}>
       <SheetContent
         side="right"
         className="flex w-full flex-col gap-0 p-0 sm:max-w-md"
@@ -89,7 +97,7 @@ export function ExtractionSheet() {
           </SheetDescription>
         </SheetHeader>
 
-        {extraction && (
+        {extraction && isMine && (
           <>
             {/* Исходный файл */}
             <div className="flex shrink-0 items-center gap-2.5 border-b border-stone-200 px-5 py-3.5">

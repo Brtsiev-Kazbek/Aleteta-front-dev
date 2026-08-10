@@ -169,8 +169,13 @@ export const createReviewSlice: SliceCreator<ReviewSlice> = (set, get) => {
       entities: state.entities.some((item) => item.id === entity.id)
         ? state.entities.map((item) => (item.id === entity.id ? entity : item))
         : [...state.entities, entity],
-      // Реквизиты уже в матрице — показываем её сразу.
-      activeTab: "entities",
+      /*
+       * Вкладку переключаем, только пока шторка открыта. Разбор идёт секунды, и
+       * за это время человек мог закрыть её и уйти читать документы — тогда
+       * страница, сама собой уехавшая на другую вкладку, выглядит как сбой, а
+       * не как заботливость. Карточка всё равно на месте.
+       */
+      activeTab: state.isExtractionOpen ? "entities" : state.activeTab,
     }));
   }
 
@@ -339,6 +344,7 @@ export const createReviewSlice: SliceCreator<ReviewSlice> = (set, get) => {
   return {
     extraction: null,
     isExtractionOpen: false,
+    isExtractionAvailable: false,
     demoExtraction: null,
     isDemoExtractionOpen: false,
     reviewDocumentId: null,

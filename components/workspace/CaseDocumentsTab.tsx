@@ -57,6 +57,9 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const isRecognitionAvailable = useAppStore(
     (state) => state.isRecognitionAvailable
   );
+  const isExtractionAvailable = useAppStore(
+    (state) => state.isExtractionAvailable
+  );
 
   /* Какой документ показываем распознанным текстом. */
   const [textDocumentId, setTextDocumentId] = useState<string | null>(null);
@@ -316,20 +319,26 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                       Разобрать по пунктам
                     </DropdownMenuItem>
                     {/*
-                      Разбор читает распознанный текст, а не картинки: страница
-                      картинкой стоит примерно как тысяча токенов текста, и один
-                      и тот же файл разбирают не по разу. Пока текста нет,
-                      разбирать нечего — исполнитель всё равно откажет, и отказ
-                      честнее показать до вызова, а не после.
+                      Два условия, и оба честнее показать до нажатия, а не
+                      после. Разбор читает распознанный текст, а не картинки:
+                      пока текста нет, разбирать нечего. И ему нужна своя
+                      модель — `LLM_MODEL_FAST`; распознаванию она не нужна, и
+                      настроена бывает не всегда. В обоих случаях исполнитель
+                      всё равно откажет, но отказ, пришедший после ожидания,
+                      читается как поломка.
                     */}
                     <DropdownMenuItem
                       onSelect={() => setExtractTarget(document)}
-                      disabled={document.ocrStatus !== "done"}
+                      disabled={
+                        document.ocrStatus !== "done" || !isExtractionAvailable
+                      }
                     >
                       <ScanLine className="h-4 w-4 text-stone-400" />
-                      {document.ocrStatus === "done"
-                        ? "Извлечь реквизиты"
-                        : "Извлечь реквизиты — нужен текст"}
+                      {document.ocrStatus !== "done"
+                        ? "Извлечь реквизиты — нужен текст"
+                        : isExtractionAvailable
+                          ? "Извлечь реквизиты"
+                          : "Извлечь реквизиты — не задана модель"}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={() => setTextDocumentId(document.id)}

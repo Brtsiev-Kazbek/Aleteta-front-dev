@@ -32,13 +32,28 @@ const log = createLogger("ai");
  */
 
 /**
- * Настроено ли распознавание — интерфейс закрывает кнопки, если нет.
+ * Что из работы с моделью настроено, а что нет.
  *
- * Спрашиваем именно про модель, читающую картинки: на ней держится
- * распознавание, и только она для него обязательна.
+ * По операции, а не одним флагом: модели задаются по одной, и человек,
+ * заполнивший `LLM_MODEL_VISION` и ничего больше, вправе пользоваться
+ * распознаванием. Общая проверка закрывала бы ему и то, что работает.
+ *
+ * Интерфейс по этим двум флагам гасит пункты меню. Без них человек узнаёт об
+ * отсутствующей переменной, только нажав кнопку и подождав, — а отказ, который
+ * можно было показать заранее, показанный после, читается как поломка.
  */
-export async function isAiAvailableAction(): Promise<boolean> {
-  return isLlmConfigured("vision");
+export async function getAiCapabilitiesAction(): Promise<AiCapabilities> {
+  return {
+    // Распознавание держится на модели, читающей картинки.
+    recognition: isLlmConfigured("vision"),
+    // Извлечение работает с распознанным текстом — картинки ему не нужны.
+    extraction: isLlmConfigured("fast"),
+  };
+}
+
+export interface AiCapabilities {
+  recognition: boolean;
+  extraction: boolean;
 }
 
 /**
@@ -80,10 +95,40 @@ export async function extractFromDocumentAction(
   }
 
   try {
+    await requireSession();
+
+    /*
+     * Тип проверяем здесь, а файл и дело — в `enqueueJob`: там они нужны всем
+     * задачам, а тип только этой. Проверка та же по сути — читаем под правами
+     * вошедшего, и чужой тип просто не находится.
+     *
+     * Без неё исполнитель, работающий служебной ролью, собрал бы промпт из
+     * описания чужого типа. Вставку карточки триггер всё равно отбил бы, но
+     * задание к тому моменту уже сходило бы в модель — за деньги и впустую.
+     */
+    const supabase = createClient();
+    const { data: type, error } = await supabase
+      .from("entity_types")
+      .select("id")
+      .eq("id", input.typeId)
+      .maybeSingle();
+
+    if (error) return actionFail(error.message);
+    if (!type) return actionFail("Тип объекта не найден или недоступен.");
+
     const result = await enqueueJob("extract", input, {
       caseId: input.caseId,
       documentId: input.documentId,
     });
+
+    log.info("extract", {
+      документ: shortId(input.documentId),
+      дело: shortId(input.caseId),
+      тип: shortId(input.typeId),
+      задание: shortId(result.jobId),
+      изЖурнала: result.fromCache,
+    });
+
     return actionOk(result);
   } catch (caught) {
     return actionError(caught, "Не удалось поставить разбор в очередь.");

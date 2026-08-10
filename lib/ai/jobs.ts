@@ -64,6 +64,49 @@ export interface EnqueueResult {
 }
 
 /**
+ * Свой ли это файл и своё ли дело.
+ *
+ * Проверка обязательная, и вот почему. Задание выполняет исполнитель служебной
+ * ролью — политики он обходит по устройству, иначе не смог бы писать страницы и
+ * карточки. Значит, всё, что попадает к нему во вход, он примет на веру: прочтёт
+ * тот документ, чей номер назвали, и положит карточку в то дело, чей номер
+ * назвали.
+ *
+ * Номера при этом приходят из браузера. Политика `ai_jobs_insert` сверяет
+ * только `workspace_id`, а его проставляет сервер из сессии — то есть она
+ * говорит «этот человек вправе ставить задания», но ничего не говорит о том,
+ * над чем именно. Подменив в запросе номер документа, можно было бы вытащить
+ * реквизиты из чужого файла в своё дело; подменив номер дела — положить свои
+ * данные в чужое пространство.
+ *
+ * Проверяем чтением под правами вошедшего: чужая строка ему просто не видна,
+ * и `maybeSingle` вернёт пусто. Это дешевле и надёжнее, чем сверять
+ * `workspace_id` руками, — правила видимости уже описаны политиками, и второй
+ * их экземпляр в коде разошёлся бы с первым.
+ */
+async function assertOwn(
+  supabase: ReturnType<typeof createClient>,
+  table: "documents" | "cases",
+  id: string | undefined,
+  missing: string
+): Promise<void> {
+  if (!id) return;
+
+  const { data, error } = await supabase
+    .from(table)
+    .select("id")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw new Error(`Не удалось проверить доступ: ${error.message}`);
+
+  if (!data) {
+    log.error("enqueue.foreign", { таблица: table, строка: shortId(id) });
+    throw new Error(missing);
+  }
+}
+
+/**
  * Ставит задание в очередь.
  *
  * Возвращает управление сразу: считать будет исполнитель. Форма получает
@@ -96,6 +139,23 @@ export async function enqueueJob<T extends TypedTask>(
 
   const session = await requireSession();
   const supabase = createClient();
+
+  /*
+   * До вставки, а не после: задание, попавшее в очередь, исполнитель заберёт
+   * через секунды, и отменить его будет уже нечем.
+   */
+  await assertOwn(
+    supabase,
+    "documents",
+    context.documentId,
+    "Файл не найден или недоступен."
+  );
+  await assertOwn(
+    supabase,
+    "cases",
+    context.caseId,
+    "Дело не найдено или недоступно."
+  );
 
   const model = getModel(tier);
   const hash = fingerprint(task, input, model);

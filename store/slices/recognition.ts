@@ -1,8 +1,8 @@
 import {
+  getAiCapabilitiesAction,
   getDocumentPagesAction,
   getDocumentTextAction,
   getRecognitionAction,
-  isAiAvailableAction,
   recognizeDocumentAction,
   searchDocumentTextAction,
   type RecognitionState,
@@ -380,8 +380,18 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
     resumeRecognition: async () => {
       if (!isRemote(get)) return;
 
-      const available = await isAiAvailableAction();
-      set({ isRecognitionAvailable: available });
+      /*
+       * Заодно спрашиваем и про извлечение реквизитов: обе проверки — это одно
+       * чтение переменных окружения, и делать ради второй ещё один круг до
+       * сервера было бы расточительством. Поле живёт в слое разбора, но `set`
+       * у стора общий.
+       */
+      const capabilities = await getAiCapabilitiesAction();
+      const available = capabilities.recognition;
+      set({
+        isRecognitionAvailable: capabilities.recognition,
+        isExtractionAvailable: capabilities.extraction,
+      });
 
       const unfinished = get().documents.filter(
         (document) =>
@@ -390,7 +400,8 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
       );
 
       log.info("resume", {
-        распознаваниеНастроено: available,
+        распознаваниеНастроено: capabilities.recognition,
+        извлечениеНастроено: capabilities.extraction,
         незавершённых: unfinished.length,
         всегоФайлов: get().documents.length,
       });

@@ -319,6 +319,12 @@ export interface ReviewSlice {
   extraction: ExtractionState | null;
   isExtractionOpen: boolean;
   /**
+   * Задана ли модель для извлечения (`LLM_MODEL_FAST`). Отдельно от
+   * распознавания: модели задаются по одной, и настроенная половина должна
+   * работать.
+   */
+  isExtractionAvailable: boolean;
+  /**
    * Ставит задание `extract` и следит за ним. Карточку объекта создаёт
    * исполнитель — подтверждать перенос не требуется, требуется проверить.
    */
