@@ -205,6 +205,13 @@ export interface RecognitionSlice {
     query: string,
     documentId?: string | null
   ) => Promise<SearchHit[]>;
+  /**
+   * Перечитывает состояние одного документа.
+   *
+   * Нужно там, где документ уже дочитан или упал: наблюдателя за ним нет, а
+   * текст ошибки живёт в задании, и без отдельного запроса его не показать.
+   */
+  refreshRecognition: (documentId: string) => Promise<void>;
   /** Настроена ли работа с моделью: без неё кнопки прячутся. */
   isRecognitionAvailable: boolean;
   /**

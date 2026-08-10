@@ -533,6 +533,22 @@ function TextPane({
   const [query, setQuery] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  /* Задание нужно ради одного поля — текста ошибки, если оно упало. */
+  const job = useAppStore((state) =>
+    document ? state.recognitionJobs[document.id] : undefined
+  );
+  const refreshRecognition = useAppStore((state) => state.refreshRecognition);
+
+  /*
+   * У упавшего документа наблюдателя нет — он остановился вместе с работой.
+   * Значит, после перезагрузки страницы текста ошибки в сторе не окажется, и
+   * человек увидит «не удалось» без объяснения. Спрашиваем один раз.
+   */
+  useEffect(() => {
+    if (!document || document.ocrStatus !== "failed" || job) return;
+    void refreshRecognition(document.id);
+  }, [document, job, refreshRecognition]);
+
   const documentId = document?.id ?? null;
   const pagesDone = document?.pagesDone ?? 0;
 
@@ -667,11 +683,33 @@ function TextPane({
         className="scrollable-area max-h-[70vh] min-w-0 overflow-y-auto px-5 py-5"
       >
         {document.ocrStatus === "failed" ? (
-          <p className="flex items-start gap-2 rounded border border-red-200 bg-red-50/60 p-3 text-[12.5px] leading-relaxed text-red-700">
-            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            Распознать не удалось. Нажмите «распознать заново» — если не поможет,
-            загляните в журнал заданий.
-          </p>
+          /*
+           * Причину показываем дословно, как её записал исполнитель. Общее
+           * «не удалось» отправляет человека искать наугад, а здесь причина
+           * всегда конкретна: не принят ключ, файла нет в хранилище, модель
+           * ответила отказом. Прочитать её больше негде — исполнитель работает
+           * на другой машине.
+           */
+          <div className="flex flex-col gap-2 rounded border border-red-200 bg-red-50/60 p-3.5">
+            <p className="flex items-start gap-2 text-[12.5px] font-medium leading-relaxed text-red-800">
+              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              Распознать не удалось
+            </p>
+
+            {job?.error ? (
+              <p className="pl-5 font-mono text-[12px] leading-relaxed text-red-700">
+                {job.error}
+              </p>
+            ) : (
+              <p className="pl-5 text-[12.5px] leading-relaxed text-red-700">
+                Причина не записана. Загляните в журнал заданий.
+              </p>
+            )}
+
+            <p className="pl-5 text-[12px] leading-relaxed text-stone-500">
+              Исправив причину, нажмите «распознать заново».
+            </p>
+          </div>
         ) : isLoading && filled.length === 0 ? (
           <Meta>
             <Loader2 className="h-3 w-3 animate-spin" />

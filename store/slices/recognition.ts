@@ -432,6 +432,13 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
       }
     },
 
+    refreshRecognition: async (documentId) => {
+      if (!isRemote(get) || !isPersisted(documentId)) return;
+
+      const state = await getRecognitionAction(documentId);
+      if (state.ok && state.data) apply(documentId, state.data);
+    },
+
     readDocumentText: async (documentId) => {
       if (!isRemote(get) || !isPersisted(documentId)) return null;
 
