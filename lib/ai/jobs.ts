@@ -6,6 +6,7 @@ import { requireSession } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
 import { getModel, isLlmConfigured, type ModelTier } from "@/lib/ai/config";
 import { promptVersion } from "@/lib/ai/prompts";
+import { createLogger, shortId } from "@/lib/logger";
 import type {
   JobState,
   TaskInput,
@@ -21,6 +22,8 @@ import type {
  * живёт в Edge Function, потому что разбор договора идёт минутами, а запрос к
  * Netlify — десять секунд.
  */
+
+const log = createLogger("job");
 
 /** Какой класс модели нужен задаче. Влияет на цену и на отпечаток. */
 const TASK_TIER: Record<TypedTask, ModelTier> = {
@@ -77,8 +80,14 @@ export async function enqueueJob<T extends TypedTask>(
    * одну из них, вправе пользоваться тем, что заполнил.
    */
   const tier = TASK_TIER[task];
+  const done = log.timer("enqueue", { задача: task, класс: tier });
 
   if (!isLlmConfigured(tier)) {
+    log.error("enqueue.not-configured", {
+      задача: task,
+      класс: tier,
+      нужно: `LLM_BASE_URL и LLM_MODEL_${tier.toUpperCase()}`,
+    });
     throw new Error(
       `Не задана модель для этой операции. Заполните LLM_BASE_URL и ` +
         `LLM_MODEL_${tier.toUpperCase()} в переменных окружения приложения.`
@@ -108,6 +117,7 @@ export async function enqueueJob<T extends TypedTask>(
     .maybeSingle();
 
   if (cached) {
+    done({ задание: shortId(cached.id), источник: "журнал" });
     return { jobId: cached.id, fromCache: true };
   }
 
@@ -129,6 +139,7 @@ export async function enqueueJob<T extends TypedTask>(
     .maybeSingle();
 
   if (running) {
+    done({ задание: shortId(running.id), источник: "уже в работе" });
     return { jobId: running.id, fromCache: false };
   }
 
@@ -161,9 +172,14 @@ export async function enqueueJob<T extends TypedTask>(
     .select("id")
     .single();
 
-  if (error) throw new Error(`Не удалось поставить задание: ${error.message}`);
+  if (error) {
+    log.error("enqueue.insert", { задача: task, ошибка: error.message });
+    throw new Error(`Не удалось поставить задание: ${error.message}`);
+  }
 
-  await pokeWorker();
+  done({ задание: shortId(data.id), источник: "новое", модель: model });
+
+  await pokeWorker(data.id);
 
   return { jobId: data.id, fromCache: false };
 }
@@ -180,22 +196,59 @@ export async function enqueueJob<T extends TypedTask>(
  * заберёт его в любом случае. Провалить постановку из-за того, что не удалось
  * позвонить в дверь, было бы странно.
  */
-async function pokeWorker(): Promise<void> {
+async function pokeWorker(jobId: string): Promise<void> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!url || !key) return;
+  /*
+   * Без служебного ключа толкнуть исполнителя нельзя — задание подождёт
+   * расписания. Это законное состояние, но молчать о нём нельзя: минута
+   * задержки на пустом месте выглядит как «ничего не работает», и разбираться
+   * в этом по одному лишь виду интерфейса невозможно.
+   */
+  if (!url || !key) {
+    log.warn("poke.skip", {
+      задание: shortId(jobId),
+      причина: "нет SUPABASE_SERVICE_ROLE_KEY",
+      следствие: "исполнитель проснётся по расписанию, до минуты",
+    });
+    return;
+  }
+
+  const done = log.timer("poke", { задание: shortId(jobId) });
 
   try {
-    await fetch(`${url}/functions/v1/ai-worker`, {
+    const response = await fetch(`${url}/functions/v1/ai-worker`, {
       method: "POST",
-      headers: { authorization: `Bearer ${key}` },
+      headers: {
+        authorization: `Bearer ${key}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ source: "action", jobId }),
       // Ответа ждать нечего: исполнитель работает минуту, а действие живёт
       // десять секунд. Нам важно только, чтобы запрос ушёл.
       signal: AbortSignal.timeout(2_000),
     });
-  } catch {
-    // Не дозвонились — заберёт расписание.
+
+    done({ код: response.status });
+
+    /*
+     * 404 значит, что исполнитель не выложен. Отдельная строка, потому что это
+     * самая частая причина «файл висит в очереди», и по коду ответа она
+     * опознаётся однозначно.
+     */
+    if (response.status === 404) {
+      log.error("poke.not-deployed", {
+        подсказка: "npx supabase functions deploy ai-worker — см. docs/START-OCR.md",
+      });
+    }
+  } catch (caught) {
+    /*
+     * Обрыв по таймауту — не беда: запрос ушёл, исполнитель работает. Отличить
+     * это от «не дозвонились» можно по имени ошибки.
+     */
+    const name = caught instanceof Error ? caught.name : "неизвестно";
+    done({ ошибка: name === "TimeoutError" ? undefined : name, обрыв: name });
   }
 }
 

@@ -7,6 +7,7 @@ import {
   searchDocumentTextAction,
   type RecognitionState,
 } from "@/app/actions/ai";
+import { createLogger, shortId } from "@/lib/logger";
 
 import { createSync, isRemote } from "../sync";
 import type { RecognitionSlice, SliceCreator } from "../types";
@@ -22,10 +23,37 @@ import type { RecognitionSlice, SliceCreator } from "../types";
  * когда вкладка закрыта, — значит, вернувшись, надо не начинать заново, а
  * снова начать смотреть. И работа может не получиться — значит, у ошибки
  * должно быть место, где её видно.
+ *
+ * ОБ ОПРОСЕ. Опрос — приём грубый, и обращаться с ним надо осторожно, иначе он
+ * превращается в поток запросов, который никого ни о чём не спрашивает. Всё,
+ * что ниже, написано по следам ровно такого случая: браузер слал по запросу в
+ * секунду, а сервер отвечал ошибкой разбора идентификатора, потому что
+ * опрашивался файл, ещё не дошедший до базы.
+ *
+ * Поэтому здесь три правила, и каждое стоило отдельной неприятности.
+ *
+ *   1. Опрашиваем только то, что в базе есть. У файла, ещё не сохранённого,
+ *      временный номер вида `doc-1786…`, и спрашивать про него бессмысленно.
+ *   2. Пока ничего не меняется, спрашиваем всё реже. Задание может стоять в
+ *      очереди часами — если исполнитель не развёрнут, оно простоит там до
+ *      вечера, и все эти часы браузер долбил бы сервер дважды в минуту.
+ *   3. Три ошибки подряд — останавливаемся и говорим об этом. Ошибка, которая
+ *      повторяется, сама не пройдёт.
  */
 
-/** Как часто спрашиваем о ходе дела. */
-const POLL_MS = 2_500;
+const log = createLogger("ocr");
+
+/**
+ * Опрос начинается часто и замедляется.
+ *
+ * Первые секунды после постановки — самое интересное время: именно тогда
+ * исполнитель берёт задание и появляется первая страница. Дальше смысл частых
+ * вопросов падает: страница читается около минуты, и спрашивать про неё чаще
+ * незачем.
+ */
+const POLL_MIN_MS = 2_000;
+const POLL_MAX_MS = 30_000;
+const POLL_GROWTH = 1.4;
 
 /**
  * Сколько всего ждём одно распознавание.
@@ -37,13 +65,48 @@ const POLL_MS = 2_500;
  */
 const GIVE_UP_AFTER_MS = 30 * 60 * 1000;
 
-/** Наблюдатели по документам. Вне состояния: их надо гасить, а не рисовать. */
-const watchers = new Map<string, number>();
+/** Сколько ошибок подряд терпим, прежде чем прекратить. */
+const MAX_FAILURES = 3;
 
-function stopWatching(documentId: string): void {
-  const handle = watchers.get(documentId);
-  if (handle !== undefined) window.clearInterval(handle);
+/**
+ * Похож ли идентификатор на выданный базой.
+ *
+ * До того как файл сохранён, у него временный номер из `nextId`. Спрашивать
+ * сервер про такой — гарантированная ошибка разбора uuid, причём повторяемая
+ * бесконечно: состояние не меняется, а значит, наблюдатель не остановится.
+ */
+const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isPersisted(id: string): boolean {
+  return UUID.test(id);
+}
+
+/** Наблюдатели по документам. Вне состояния: их надо гасить, а не рисовать. */
+interface Watcher {
+  handle: number;
+  /** Текущая пауза между вопросами: растёт, пока ничего не меняется. */
+  delay: number;
+  startedAt: number;
+  failures: number;
+  /** Последнее увиденное состояние — по нему решаем, было ли движение. */
+  seen: string;
+}
+
+const watchers = new Map<string, Watcher>();
+
+function stopWatching(documentId: string, reason: string): void {
+  const watcher = watchers.get(documentId);
+  if (!watcher) return;
+
+  window.clearTimeout(watcher.handle);
   watchers.delete(documentId);
+
+  log.debug("watch.stop", {
+    документ: shortId(documentId),
+    причина: reason,
+    осталось: watchers.size,
+  });
 }
 
 /** Дочитан ли документ: дальше следить не за чем. */
@@ -53,6 +116,11 @@ function isSettled(state: RecognitionState): boolean {
     state.ocrStatus === "failed" ||
     state.ocrStatus === "skipped"
   );
+}
+
+/** Отпечаток состояния: изменился — значит, работа сдвинулась. */
+function fingerprint(state: RecognitionState): string {
+  return `${state.ocrStatus}:${state.pagesDone}:${state.job?.status ?? "—"}`;
 }
 
 export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
@@ -81,6 +149,108 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
     }));
   }
 
+  function title(documentId: string): string {
+    return (
+      get().documents.find((item) => item.id === documentId)?.title ??
+      "документа"
+    );
+  }
+
+  /**
+   * Один вопрос к серверу и решение, что делать дальше.
+   *
+   * Вынесен отдельно от расписания намеренно: расписание должно оставаться
+   * тривиальным, иначе в нём заводятся два таймера на один документ.
+   */
+  async function tick(documentId: string): Promise<void> {
+    const watcher = watchers.get(documentId);
+    if (!watcher) return;
+
+    if (Date.now() - watcher.startedAt > GIVE_UP_AFTER_MS) {
+      stopWatching(documentId, "истекло время ожидания");
+      log.warn("watch.timeout", {
+        документ: shortId(documentId),
+        ждали: `${Math.round(GIVE_UP_AFTER_MS / 60000)}мин`,
+      });
+      set({
+        syncError: `Распознавание «${title(documentId)}» идёт слишком долго. Загляните в журнал заданий.`,
+      });
+      return;
+    }
+
+    const result = await getRecognitionAction(documentId);
+
+    // Наблюдателя могли погасить, пока ответ ехал.
+    if (!watchers.has(documentId)) return;
+
+    if (!result.ok || !result.data) {
+      watcher.failures += 1;
+
+      log.warn("watch.error", {
+        документ: shortId(documentId),
+        попытка: watcher.failures,
+        ошибка: result.ok ? "документ не найден" : result.error,
+      });
+
+      if (watcher.failures >= MAX_FAILURES) {
+        stopWatching(documentId, "ошибки подряд");
+        set({
+          syncError: `Не удалось узнать состояние «${title(documentId)}»: ${
+            result.ok ? "документ не найден" : result.error
+          }`,
+        });
+        return;
+      }
+
+      schedule(documentId, Math.min(watcher.delay * POLL_GROWTH, POLL_MAX_MS));
+      return;
+    }
+
+    watcher.failures = 0;
+    apply(documentId, result.data);
+
+    if (isSettled(result.data)) {
+      stopWatching(documentId, `состояние «${result.data.ocrStatus}»`);
+      log.info("watch.settled", {
+        документ: shortId(documentId),
+        состояние: result.data.ocrStatus,
+        страниц: result.data.pagesDone,
+        источник: result.data.textSource,
+      });
+      return;
+    }
+
+    /*
+     * Движение есть — спрашиваем снова часто. Движения нет — реже. Так вкладка,
+     * оставленная открытой на задании, которое стоит в очереди, замолкает сама.
+     */
+    const now = fingerprint(result.data);
+    const moved = now !== watcher.seen;
+    watcher.seen = now;
+
+    log.debug("watch.tick", {
+      документ: shortId(documentId),
+      состояние: result.data.ocrStatus,
+      страниц: `${result.data.pagesDone}/${result.data.pageCount ?? "?"}`,
+      движение: moved,
+      пауза: watcher.delay,
+    });
+
+    schedule(
+      documentId,
+      moved ? POLL_MIN_MS : Math.min(watcher.delay * POLL_GROWTH, POLL_MAX_MS)
+    );
+  }
+
+  /** Ставит следующий вопрос через `delay`. */
+  function schedule(documentId: string, delay: number): void {
+    const watcher = watchers.get(documentId);
+    if (!watcher) return;
+
+    watcher.delay = delay;
+    watcher.handle = window.setTimeout(() => void tick(documentId), delay);
+  }
+
   /**
    * Начинает следить за документом.
    *
@@ -89,33 +259,31 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
    * двух вкладках или нажав «распознать» повторно.
    */
   function watch(documentId: string): void {
-    stopWatching(documentId);
+    if (!isPersisted(documentId)) {
+      log.debug("watch.skip", {
+        документ: documentId,
+        причина: "файл ещё не сохранён в базе",
+      });
+      return;
+    }
 
-    const startedAt = Date.now();
+    stopWatching(documentId, "перезапуск");
 
-    const handle = window.setInterval(() => {
-      void (async () => {
-        if (Date.now() - startedAt > GIVE_UP_AFTER_MS) {
-          stopWatching(documentId);
-          set({
-            syncError: `Распознавание «${
-              get().documents.find((item) => item.id === documentId)?.title ??
-              "документа"
-            }» идёт слишком долго. Загляните в журнал заданий.`,
-          });
-          return;
-        }
+    watchers.set(documentId, {
+      handle: 0,
+      delay: POLL_MIN_MS,
+      startedAt: Date.now(),
+      failures: 0,
+      seen: "",
+    });
 
-        const result = await getRecognitionAction(documentId);
-        if (!result.ok || !result.data) return;
+    log.info("watch.start", {
+      документ: shortId(documentId),
+      файл: title(documentId),
+      наблюдателей: watchers.size,
+    });
 
-        apply(documentId, result.data);
-
-        if (isSettled(result.data)) stopWatching(documentId);
-      })();
-    }, POLL_MS);
-
-    watchers.set(documentId, handle);
+    schedule(documentId, POLL_MIN_MS);
   }
 
   return {
@@ -124,6 +292,19 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
 
     recognizeDocument: async (documentId) => {
       if (!isRemote(get)) return;
+
+      if (!isPersisted(documentId)) {
+        log.warn("enqueue.skip", {
+          документ: documentId,
+          причина: "файл ещё не сохранён в базе",
+        });
+        return;
+      }
+
+      const done = log.timer("enqueue", {
+        документ: shortId(documentId),
+        файл: title(documentId),
+      });
 
       /*
        * Состояние переводим в «в очереди» сразу, не дожидаясь ответа сервера.
@@ -138,10 +319,9 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
         ),
       }));
 
-      const enqueued = await sync(
-        recognizeDocumentAction({ documentId }),
-        { fallback: "Не удалось поставить распознавание в очередь." }
-      );
+      const enqueued = await sync(recognizeDocumentAction({ documentId }), {
+        fallback: "Не удалось поставить распознавание в очередь.",
+      });
 
       /*
        * Задание не создалось — чаще всего потому, что модель не настроена.
@@ -151,6 +331,8 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
        * снова.
        */
       if (!enqueued) {
+        done({ ошибка: "задание не создано" });
+
         set((current) => ({
           documents: current.documents.map((document) =>
             document.id === documentId
@@ -160,6 +342,8 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
         }));
         return;
       }
+
+      done({ задание: shortId(enqueued.jobId), изЖурнала: enqueued.fromCache });
 
       set((current) => ({
         recognitionJobs: {
@@ -181,7 +365,13 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
       const state = await getRecognitionAction(documentId);
       if (state.ok && state.data) {
         apply(documentId, state.data);
-        if (isSettled(state.data)) return;
+        if (isSettled(state.data)) {
+          log.info("enqueue.already-done", {
+            документ: shortId(documentId),
+            состояние: state.data.ocrStatus,
+          });
+          return;
+        }
       }
 
       watch(documentId);
@@ -193,11 +383,19 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
       const available = await isAiAvailableAction();
       set({ isRecognitionAvailable: available });
 
-      for (const document of get().documents) {
-        if (document.ocrStatus !== "pending" && document.ocrStatus !== "running") {
-          continue;
-        }
+      const unfinished = get().documents.filter(
+        (document) =>
+          isPersisted(document.id) &&
+          (document.ocrStatus === "pending" || document.ocrStatus === "running")
+      );
 
+      log.info("resume", {
+        распознаваниеНастроено: available,
+        незавершённых: unfinished.length,
+        всегоФайлов: get().documents.length,
+      });
+
+      for (const document of unfinished) {
         /*
          * «В очереди» без задания — файл, который загрузился, но поставить его
          * не вышло: в тот момент не была настроена модель или отказала сеть.
@@ -216,8 +414,18 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
           state.data.ocrStatus === "pending" &&
           state.data.job === null
         ) {
+          log.info("resume.requeue", {
+            документ: shortId(document.id),
+            файл: document.title,
+            причина: "задания в очереди нет",
+          });
           void get().recognizeDocument(document.id);
           continue;
+        }
+
+        if (state.ok && state.data) {
+          apply(document.id, state.data);
+          if (isSettled(state.data)) continue;
         }
 
         watch(document.id);
@@ -225,10 +433,14 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
     },
 
     readDocumentText: async (documentId) => {
-      if (!isRemote(get)) return null;
+      if (!isRemote(get) || !isPersisted(documentId)) return null;
 
       const result = await getDocumentTextAction(documentId);
       if (!result.ok) {
+        log.error("text.read", {
+          документ: shortId(documentId),
+          ошибка: result.error,
+        });
         set({ syncError: result.error });
         return null;
       }
@@ -237,13 +449,22 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
     },
 
     readDocumentPages: async (documentId) => {
-      if (!isRemote(get)) return [];
+      if (!isRemote(get) || !isPersisted(documentId)) return [];
 
       const result = await getDocumentPagesAction(documentId);
       if (!result.ok) {
+        log.error("pages.read", {
+          документ: shortId(documentId),
+          ошибка: result.error,
+        });
         set({ syncError: result.error });
         return [];
       }
+
+      log.debug("pages.read", {
+        документ: shortId(documentId),
+        страниц: result.data?.length ?? 0,
+      });
 
       return result.data ?? [];
     },
@@ -251,12 +472,16 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
     searchDocumentText: async (query, documentId = null) => {
       if (!isRemote(get)) return [];
 
+      const done = log.timer("search", { запрос: query });
       const result = await searchDocumentTextAction(query, documentId);
+
       if (!result.ok) {
+        done({ ошибка: result.error });
         set({ syncError: result.error });
         return [];
       }
 
+      done({ найдено: result.data?.length ?? 0 });
       return result.data ?? [];
     },
   };
@@ -265,11 +490,13 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
 /**
  * Гасит всех наблюдателей.
  *
- * Нужен на выходе из приложения и в тестах: интервал, переживший размонтирование,
+ * Нужен на выходе из приложения и в тестах: таймер, переживший размонтирование,
  * продолжает ходить на сервер и писать в стор, которого уже никто не читает.
  */
 export function stopAllRecognitionWatchers(): void {
-  for (const documentId of [...watchers.keys()]) stopWatching(documentId);
+  for (const documentId of [...watchers.keys()]) {
+    stopWatching(documentId, "остановка приложения");
+  }
 }
 
 /**

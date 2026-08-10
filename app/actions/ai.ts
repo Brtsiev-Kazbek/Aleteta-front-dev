@@ -10,6 +10,7 @@ import { enqueueJob, readJob, recordCorrection } from "@/lib/ai/jobs";
 import { isLlmConfigured } from "@/lib/ai/config";
 import { requireSession } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
+import { createLogger, shortId } from "@/lib/logger";
 import type { RecognizedPage, SearchHit } from "@/types";
 import type { JobStatus, OcrStatus } from "@/types/rows";
 import type {
@@ -18,6 +19,8 @@ import type {
   OcrInput,
   TypedTask,
 } from "@/lib/ai/types";
+
+const log = createLogger("ai");
 
 /**
  * Действия для форм, работающих с моделью.
@@ -55,6 +58,13 @@ export async function recognizeDocumentAction(
     const result = await enqueueJob("ocr", input, {
       documentId: input.documentId,
     });
+
+    log.info("recognize", {
+      документ: shortId(input.documentId),
+      задание: shortId(result.jobId),
+      изЖурнала: result.fromCache,
+    });
+
     return actionOk(result);
   } catch (caught) {
     return actionError(caught, "Не удалось поставить распознавание в очередь.");
@@ -134,6 +144,13 @@ export async function getRecognitionAction(
       .limit(1)
       .maybeSingle();
 
+    log.debug("state", {
+      документ: shortId(documentId),
+      состояние: document.ocr_status,
+      страниц: `${document.pages_done}/${document.page_count ?? "?"}`,
+      задание: job ? `${shortId(job.id)}:${job.status}` : "нет",
+    });
+
     return actionOk({
       ocrStatus: document.ocr_status,
       pagesDone: document.pages_done,
@@ -188,6 +205,12 @@ export async function getDocumentTextAction(
     });
 
     if (error) return actionFail(error.message);
+
+    log.debug("text", {
+      документ: shortId(documentId),
+      символов: (data ?? "").length,
+    });
+
     return actionOk(data ?? "");
   } catch (caught) {
     return actionError(caught, "Не удалось прочитать распознанный текст.");
@@ -265,6 +288,8 @@ export async function searchDocumentTextAction(
     });
 
     if (error) return actionFail(error.message);
+
+    log.info("search", { запрос: trimmed, найдено: (data ?? []).length });
 
     return actionOk(
       (data ?? []).map((row) => ({

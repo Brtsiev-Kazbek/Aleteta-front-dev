@@ -8,9 +8,9 @@ rem    2. задаёт ему секреты, включая ключ к мод�
 rem    3. кладёт служебный ключ в vault — им расписание будит исполнителя;
 rem    4. проверяет, что исполнитель отвечает.
 rem
-rem  Чего он НЕ делает: переменные Netlify. Их задают в панели Netlify —
-rem  LLM_BASE_URL, LLM_MODEL_VISION и SUPABASE_SERVICE_ROLE_KEY. В конце
-rem  скрипт напомнит.
+rem  Чего он НЕ делает: переменные самого приложения. Их задают в .env.local
+rem  или в панели хостинга — LLM_BASE_URL, LLM_MODEL_VISION и
+rem  SUPABASE_SERVICE_ROLE_KEY. В конце скрипт напомнит.
 rem
 rem  Запускать из папки проекта двойным щелчком или командой:
 rem    scripts\setup-ocr.bat
@@ -183,8 +183,9 @@ echo ================================================================
 echo   ГОТОВО
 echo ================================================================
 echo.
-echo Осталось одно, и это делается в панели Netlify —
-echo Site configuration - Environment variables:
+echo Осталось одно — переменные самого приложения.
+echo Локально это файл .env.local в корне проекта, на хостинге —
+echo его панель переменных окружения:
 echo.
 echo   LLM_BASE_URL              https://routerai.ru/api/v1
 echo   LLM_MODEL_VISION          %VISION_MODEL%
@@ -193,8 +194,8 @@ echo.
 echo Ключ к модели туда НЕ кладите: приложение не должно уметь
 echo позвать модель напрямую. Он уже там, где нужно — у исполнителя.
 echo.
-echo После правки переменных: Deploys - Trigger deploy -
-echo Clear cache and deploy site. Затем загрузите скан на странице
+echo После правки перезапустите приложение: .env.local на лету
+echo не перечитывается. Затем загрузите скан на странице
 echo «Распознавание» — строка должна пойти со «Страница 1 из N».
 echo.
 goto :done

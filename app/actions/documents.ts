@@ -12,6 +12,7 @@ import {
 import { requireSession } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
 import { toDocument } from "@/lib/data/mappers";
+import { createLogger, shortId } from "@/lib/logger";
 import type { Document } from "@/types";
 
 /**
@@ -30,6 +31,8 @@ import type { Document } from "@/types";
  * Путь считает сервер, а не клиент: первый сегмент пути — идентификатор
  * пространства, и именно по нему хранилище решает, кому файл доступен.
  */
+
+const log = createLogger("document");
 
 const BUCKET = "case-documents";
 
@@ -207,6 +210,13 @@ export async function registerDocumentAction(
       .single();
 
     if (error) return actionFail(error.message);
+
+    log.info("register", {
+      документ: shortId(data.id),
+      файл: title,
+      дело: input.caseId ? shortId(input.caseId) : "без дела",
+      байт: input.sizeBytes ?? 0,
+    });
 
     await supabase.from("activity").insert({
       workspace_id: session.workspaceId,

@@ -6,10 +6,13 @@ import {
 } from "@/app/actions/documents";
 import { MOCK_DOCUMENTS } from "@/data/mock-data";
 import { createClient } from "@/lib/supabase/client";
+import { createLogger } from "@/lib/logger";
 import type { Document } from "@/types";
 
 import { createSync, isRemote, nextId } from "../sync";
 import type { DocumentsSlice, SliceCreator } from "../types";
+
+const log = createLogger("upload");
 
 /** Тип документа по расширению — для колонки во вкладке «Документы». */
 function detectDocumentType(fileName: string): string {
@@ -114,6 +117,12 @@ export const createDocumentsSlice: SliceCreator<DocumentsSlice> = (
           );
           if (!target) return;
 
+          const done = log.timer("storage", {
+            файл: picked.name,
+            байт: picked.sizeBytes,
+            путь: target.path,
+          });
+
           const supabase = createClient();
           const { error } = await supabase.storage
             .from(target.bucket)
@@ -123,12 +132,15 @@ export const createDocumentsSlice: SliceCreator<DocumentsSlice> = (
             });
 
           if (error) {
+            done({ ошибка: error.message });
             drop();
             set({
               syncError: `Файл «${picked.name}» не загрузился: ${error.message}`,
             });
             return;
           }
+
+          done({});
 
           const saved = await sync(
             registerDocumentAction({
@@ -159,7 +171,10 @@ export const createDocumentsSlice: SliceCreator<DocumentsSlice> = (
            * страницу один раз в любом случае, так что откладывать нечего —
            * пусть текст будет готов к тому моменту, когда понадобится.
            */
-          if (saved) void get().recognizeDocument(saved.id);
+          if (saved) {
+            log.info("done", { файл: picked.name, документ: saved.id });
+            void get().recognizeDocument(saved.id);
+          }
         })
       );
     },
