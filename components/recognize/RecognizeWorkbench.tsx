@@ -85,6 +85,8 @@ export function RecognizeWorkbench() {
    */
   const [showOriginal, setShowOriginal] = useState(true);
   const [openPage, setOpenPage] = useState(1);
+  /** Вести оригинал за прокруткой текста. Смысл имеет только при сверке. */
+  const [syncScroll, setSyncScroll] = useState(true);
   const [isDragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -199,6 +201,7 @@ export function RecognizeWorkbench() {
                   showOriginal={showOriginal}
                   onToggleOriginal={() => setShowOriginal((value) => !value)}
                   canShowOriginal={isPdf}
+                  syncScroll={syncScroll}
                 />
               </div>
 
@@ -210,6 +213,8 @@ export function RecognizeWorkbench() {
                     page={openPage}
                     pageCount={selected.pageCount ?? null}
                     onPageChange={setOpenPage}
+                    syncScroll={syncScroll}
+                    onToggleSync={() => setSyncScroll((value) => !value)}
                   />
                 </div>
               )}
@@ -733,6 +738,7 @@ function TextPane({
   showOriginal,
   onToggleOriginal,
   canShowOriginal,
+  syncScroll = false,
 }: {
   document: Document | null;
   readPages: (documentId: string) => Promise<RecognizedPage[]>;
@@ -746,6 +752,8 @@ function TextPane({
   showOriginal: boolean;
   onToggleOriginal: () => void;
   canShowOriginal: boolean;
+  /** Вести оригинал за прокруткой текста. Имеет смысл только при сверке. */
+  syncScroll?: boolean;
 }) {
   const [pages, setPages] = useState<RecognizedPage[]>([]);
   const [isLoading, setLoading] = useState(false);
@@ -825,57 +833,162 @@ function TextPane({
     return { offsets, total: running };
   }, [filled, terms]);
 
-  /* Новый запрос — начинаем с первого совпадения, а не с того, где были. */
+  /*
+   * Номер текущего совпадения держим в границах.
+   *
+   * Совпадений становится то больше, то меньше — от каждой набранной буквы, —
+   * и номер, законный секунду назад, легко оказывается за пределами. Чинить
+   * это состоянием значило бы гоняться за ним из нескольких мест; проще
+   * приводить к границам при чтении.
+   */
+  const at = marks.total === 0 ? -1 : Math.min(Math.max(active, 0), marks.total - 1);
+
+  /*
+   * Переход из общего поиска — ровно один раз на переход.
+   *
+   * Здесь была поломка, стоившая работающего поиска по файлу: эффект зависел
+   * от `marks.offsets`, а этот массив пересоздаётся при каждом изменении
+   * запроса, то есть на каждое нажатие клавиши. Значит, после первого же
+   * перехода из общего поиска ввод в поле «в этом файле» откатывал позицию к
+   * старой странице — и стрелки будто переставали работать.
+   *
+   * Признак перехода — сам объект `target`: он создаётся заново на каждый
+   * щелчок по находке. Запоминаем обработанный и больше на него не смотрим.
+   */
+  const handledTarget = useRef<typeof target>(null);
+  const pendingActive = useRef<number | null>(null);
+
   useEffect(() => {
-    setActive(marks.total > 0 ? 0 : -1);
-  }, [marks.total, query]);
+    if (!target || handledTarget.current === target) return;
+    // Страницы ещё не приехали — обработаем на следующем проходе.
+    if (filled.length === 0) return;
+
+    handledTarget.current = target;
+
+    const entry = marks.offsets.find((item) => item.page === target.page);
+    const position = entry?.offset ?? 0;
+
+    /*
+     * Смена запроса сбрасывает позицию на первое совпадение — это правильно,
+     * когда человек печатает сам, и неправильно сейчас. Оставляем записку,
+     * которую сброс прочитает вместо нуля.
+     */
+    pendingActive.current = position;
+
+    setQuery(target.query);
+    onOpenPage(target.page);
+    setActive(position);
+
+    /*
+     * Ведём текст к странице отдельно от перехода по совпадениям.
+     *
+     * Совпадения в тексте может не оказаться вовсе: база ищет своим разбором
+     * основ, подсветка — своим, и на редком слове они расходятся. Тогда номер
+     * совпадения не меняется, прокрутка по нему не срабатывает, и получается
+     * то, что видно глазом: оригинал уехал на нужную страницу, а текст остался
+     * на месте.
+     *
+     * Откладываем на следующий кадр: разметка с новой подсветкой ещё не
+     * построена, и прокручивать пока не к чему.
+     */
+    const page = target.page;
+    window.requestAnimationFrame(() => {
+      scrollRef.current
+        ?.querySelector(`#page-${page}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [target, filled.length, marks.offsets, onOpenPage]);
+
+  /* Новый запрос — с первого совпадения. Кроме перехода из общего поиска. */
+  useEffect(() => {
+    setActive(pendingActive.current ?? 0);
+    pendingActive.current = null;
+  }, [query]);
 
   /* На какой странице стоит текущее совпадение: туда же ведём и оригинал. */
   const activePage = useMemo(() => {
-    if (active < 0) return null;
+    if (at < 0) return null;
 
     const found = [...marks.offsets]
       .reverse()
-      .find((entry) => entry.offset <= active);
+      .find((entry) => entry.offset <= at);
 
     return found?.page ?? null;
-  }, [active, marks.offsets]);
+  }, [at, marks.offsets]);
 
   useEffect(() => {
     if (activePage) onOpenPage(activePage);
   }, [activePage, onOpenPage]);
 
-  /* Прокрутка к текущему совпадению. */
+  /*
+   * Прокрутка к текущему совпадению.
+   *
+   * Зависимость — число страниц, а не сам список: список приезжает заново на
+   * каждом опросе состояния, и прокрутка дёргалась бы у человека под руками.
+   */
   useEffect(() => {
-    if (active < 0) return;
+    if (at < 0) return;
 
-    const anchor = scrollRef.current?.querySelector(`#match-${active}`);
+    const anchor = scrollRef.current?.querySelector(`#match-${at}`);
     anchor?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [active, pages]);
+  }, [at, filled.length]);
 
   /*
-   * Переход из поиска: подставляем запрос в поле подсветки и прокручиваем к
-   * найденной странице. Прокрутка ждёт, пока страницы приедут, — иначе
-   * прокручивать нечего, элемента ещё нет.
+   * Оригинал следует за чтением.
+   *
+   * Прокрутил текст до девятой страницы — справа девятая. Иначе сверка
+   * распадается на два независимых занятия: читаешь в одном месте, листаешь в
+   * другом, и держать соответствие приходится в голове.
+   *
+   * Обратной связи нет и быть не может: просмотрщик встроен в браузер и с
+   * другого домена о своей прокрутке ничего не сообщает.
    */
   useEffect(() => {
-    if (!target) return;
-    setQuery(target.query);
-    onOpenPage(target.page);
-  }, [target, onOpenPage]);
+    const node = scrollRef.current;
+    if (!node || !syncScroll || filled.length === 0) return;
 
-  /*
-   * Переход из поиска ведёт не к первому совпадению в файле, а к тому, что на
-   * найденной странице. Иначе щелчок по «страница 12» открывал бы страницу 1 —
-   * ту, где нашлось первое вхождение, — и человек оказывался бы не там, куда
-   * шёл.
-   */
-  useEffect(() => {
-    if (!target || filled.length === 0) return;
+    let timer = 0;
 
-    const entry = marks.offsets.find((item) => item.page === target.page);
-    if (entry) setActive(entry.offset);
-  }, [target, filled.length, marks.offsets]);
+    function decide() {
+      if (!node) return;
+
+      const top = node.getBoundingClientRect().top;
+      let best: number | null = null;
+      let nearest = Number.POSITIVE_INFINITY;
+
+      for (const page of filled) {
+        const section = node.querySelector(`#page-${page.page}`);
+        if (!section) continue;
+
+        // Насколько начало страницы отстоит от верха окна чтения.
+        const distance = section.getBoundingClientRect().top - top;
+
+        // Берём ближайшую из тех, что уже начались или вот-вот начнутся.
+        if (distance <= 80 && Math.abs(distance) < nearest) {
+          nearest = Math.abs(distance);
+          best = page.page;
+        }
+      }
+
+      if (best !== null) onOpenPage(best);
+    }
+
+    function onScroll() {
+      /*
+       * Ждём остановки: смена страницы перезагружает просмотрщик, и делать это
+       * на каждый пиксель прокрутки — значит мигать им без остановки.
+       */
+      window.clearTimeout(timer);
+      timer = window.setTimeout(decide, 200);
+    }
+
+    node.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      node.removeEventListener("scroll", onScroll);
+      window.clearTimeout(timer);
+    };
+  }, [filled, onOpenPage, syncScroll]);
 
   const fullText = filled
     .map((page) => `— Страница ${page.page} —\n\n${page.text}`)
@@ -883,7 +996,10 @@ function TextPane({
 
   function step(direction: number) {
     if (marks.total === 0) return;
-    setActive((current) => (current + direction + marks.total) % marks.total);
+
+    // Считаем от приведённого номера, а не от сырого: сырой мог уехать за край.
+    const from = at < 0 ? 0 : at;
+    setActive((from + direction + marks.total) % marks.total);
   }
 
   async function handleCopy() {
@@ -952,7 +1068,7 @@ function TextPane({
             <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center">
               {terms.length > 0 && (
                 <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.1em] text-stone-400">
-                  {marks.total === 0 ? "нет" : `${active + 1}/${marks.total}`}
+                  {marks.total === 0 ? "нет" : `${at + 1}/${marks.total}`}
                 </span>
               )}
               <StepButton
@@ -1109,7 +1225,7 @@ function TextPane({
                           marks.offsets.find((entry) => entry.page === page.page)
                             ?.offset ?? 0
                         }
-                        active={active}
+                        active={at}
                       />
                     </pre>
                   </section>

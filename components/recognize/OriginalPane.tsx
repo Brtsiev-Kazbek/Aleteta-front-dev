@@ -6,10 +6,13 @@ import {
   ChevronRight,
   ExternalLink,
   FileWarning,
+  Link2,
+  Link2Off,
   Loader2,
 } from "lucide-react";
 
 import { createDocumentUrlAction } from "@/app/actions/documents";
+import { cn } from "@/lib/utils";
 import { createLogger, shortId } from "@/lib/logger";
 
 const log = createLogger("original");
@@ -40,6 +43,8 @@ export function OriginalPane({
   page,
   pageCount,
   onPageChange,
+  syncScroll,
+  onToggleSync,
 }: {
   documentId: string;
   title: string;
@@ -47,6 +52,9 @@ export function OriginalPane({
   page: number;
   pageCount: number | null;
   onPageChange: (page: number) => void;
+  /** Следовать за прокруткой текста. */
+  syncScroll: boolean;
+  onToggleSync: () => void;
 }) {
   /** Ссылка на скачивание — подписанная, живёт час. */
   const [link, setLink] = useState<string | null>(null);
@@ -116,7 +124,7 @@ export function OriginalPane({
 
   if (error) {
     return (
-      <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={null}>
+      <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={null} syncScroll={syncScroll} onToggleSync={onToggleSync}>
         <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
           <FileWarning className="h-5 w-5 text-stone-300" />
           <p className="text-[13px] text-stone-900">Оригинал не открылся</p>
@@ -130,7 +138,7 @@ export function OriginalPane({
 
   if (!source) {
     return (
-      <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={null}>
+      <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={null} syncScroll={syncScroll} onToggleSync={onToggleSync}>
         <div className="flex h-full items-center justify-center gap-2 text-[12.5px] text-stone-500">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
           Открываю оригинал
@@ -148,7 +156,7 @@ export function OriginalPane({
   const address = `${source}#page=${page}&view=FitH`;
 
   return (
-    <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={link}>
+    <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={link} syncScroll={syncScroll} onToggleSync={onToggleSync}>
       <iframe key={address} src={address} title={`Оригинал: ${title}`} className="h-full w-full" />
     </Frame>
   );
@@ -161,12 +169,16 @@ function Frame({
   pageCount,
   onPageChange,
   link,
+  syncScroll,
+  onToggleSync,
 }: {
   children: React.ReactNode;
   page: number;
   pageCount: number | null;
   onPageChange: (page: number) => void;
   link: string | null;
+  syncScroll: boolean;
+  onToggleSync: () => void;
 }) {
   const last = pageCount ?? page;
 
@@ -176,6 +188,34 @@ function Frame({
         <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
           Оригинал
         </span>
+
+        {/*
+          Связь с текстом видно сразу: включена — оригинал сам идёт за чтением,
+          выключена — листается отдельно. Без пометки человек не понимает, почему
+          страница «сама переехала».
+        */}
+        <button
+          type="button"
+          onClick={onToggleSync}
+          title={
+            syncScroll
+              ? "Следует за текстом — выключить"
+              : "Листается отдельно — связать с текстом"
+          }
+          className={cn(
+            "flex items-center gap-1.5 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] transition-colors",
+            syncScroll
+              ? "border-amber-200 bg-amber-50 text-amber-700"
+              : "border-stone-200 text-stone-400 hover:text-stone-900"
+          )}
+        >
+          {syncScroll ? (
+            <Link2 className="h-3 w-3" />
+          ) : (
+            <Link2Off className="h-3 w-3" />
+          )}
+          {syncScroll ? "за текстом" : "отдельно"}
+        </button>
 
         <div className="ml-auto flex items-center gap-1">
           <PageStep
