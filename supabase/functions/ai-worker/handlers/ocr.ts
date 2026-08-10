@@ -50,6 +50,30 @@ const TEXT_LAYER_MIN_CHARS = 150;
  */
 const BLANK_INK = 0.0003;
 
+/**
+ * Сколько страниц уходит в модель одновременно.
+ *
+ * Здесь всё и ускоряется. Ожидание ответа не тратит процессор: пока модель
+ * читает одну страницу, ничто не мешает ей читать ещё девять. Сто страниц по
+ * пятьдесят пять секунд последовательно — это полтора часа; волнами по
+ * десять — четверть от этого.
+ *
+ * Ограничение здесь не наше, а поставщика: слишком широкая волна упрётся в его
+ * предел частоты и вернётся отказами. Десять выбрано с запасом — замеры дают
+ * сорок пять килобайт и пятьдесят миллисекунд процессора на страницу, так что
+ * ни объём запроса, ни вычисления помехой не станут.
+ */
+const CONCURRENCY = Number(Deno.env.get("OCR_CONCURRENCY") ?? 10);
+
+/**
+ * Сколько времени должно остаться, чтобы начинать новую волну.
+ *
+ * Страница читается около пятидесяти пяти секунд. Начать волну и оборваться
+ * посередине — худший из исходов: за прерванный запрос поставщик деньги
+ * возьмёт, а текста мы не получим.
+ */
+const MIN_WAVE_MS = 70_000;
+
 const OCR_PROMPT = `Перенеси в текст всё, что написано на странице документа.
 
 Правила:
@@ -95,7 +119,7 @@ export async function runOcr(
 
   const { data: document } = await supabase
     .from("documents")
-    .select("bucket, path, title, mime_type, page_count, pages_done")
+    .select("bucket, path, title, mime_type")
     .eq("id", input.documentId)
     .maybeSingle();
 
@@ -125,10 +149,7 @@ export async function runOcr(
     const bytes = new Uint8Array(await blob.arrayBuffer());
 
     return looksLikePdf(bytes)
-      ? await recognizePdf(bytes, job, supabase, run, {
-          documentId: input.documentId,
-          pagesDone: document.pages_done ?? 0,
-        })
+      ? await recognizePdf(bytes, job, supabase, run, input.documentId)
       : await recognizeImage(
           bytes,
           job,
@@ -160,10 +181,8 @@ async function recognizePdf(
   job: Job,
   supabase: SupabaseClient,
   run: Run,
-  document: { documentId: string; pagesDone: number }
+  documentId: string
 ): Promise<HandlerResult> {
-  const { documentId } = document;
-
   const pdf = await openPdf(bytes, {
     wasmUrl: Deno.env.get("PDFIUM_WASM_URL") ?? undefined,
   });
@@ -179,11 +198,21 @@ async function recognizePdf(
     const model = job.model ?? Deno.env.get("LLM_MODEL_VISION") ?? "";
 
     /*
-     * Откуда продолжать, спрашивать не нужно: страницы пишутся по одной и по
-     * порядку, поэтому сколько записано — оттуда и продолжаем. Это же чинит
-     * повтор после падения: заново платить за уже разобранное не придётся.
+     * Что уже прочитано — спрашиваем у базы списком, а не считаем по числу
+     * готовых страниц.
+     *
+     * Разница принципиальная. Страницы уходят в модель пачкой, и в пачке одна
+     * может не получиться, а соседние — получиться. Тогда в прочитанном
+     * образуется дыра, и «сколько готово» перестаёт отвечать на вопрос
+     * «с какой продолжать». Список отвечает на него всегда.
      */
-    let page = document.pagesDone + 1;
+    const { data: savedRows } = await supabase
+      .from("document_pages")
+      .select("page")
+      .eq("document_id", documentId);
+
+    const saved = new Set<number>((savedRows ?? []).map((row) => row.page));
+
     let reported = -1;
 
     /*
@@ -192,8 +221,8 @@ async function recognizePdf(
      * триста страниц, читаемых из текстового слоя, обновление на каждой
      * удвоило бы число обращений к базе ради одной и той же цифры.
      */
-    const reportProgress = async (done: number) => {
-      const percent = Math.round((done / total) * 100);
+    const reportProgress = async () => {
+      const percent = Math.round((saved.size / total) * 100);
       if (percent === reported) return;
       reported = percent;
       await supabase
@@ -202,69 +231,146 @@ async function recognizePdf(
         .eq("id", job.id);
     };
 
-    for (; page <= total; page += 1) {
-      // Проверка в начале круга: тогда `page` всегда указывает на первую
-      // несделанную страницу, и следующий запуск возьмёт ровно её.
-      if (Date.now() >= run.deadline) break;
+    /** Сколько осталось до того, как исполнителя погасят. */
+    const remaining = () => run.hardStop - Date.now();
 
-      /* --- текстовый слой: даром --------------------------------- */
+    let page = 1;
+    let failures = 0;
 
-      const layer = pdf.text(page);
+    while (page <= total) {
+      /*
+       * Новую волну начинаем, только если на неё заведомо хватит времени.
+       * Начать и оборваться посередине — худший исход: за прерванный запрос
+       * поставщик всё равно возьмёт деньги, а текста мы не получим.
+       */
+      if (run.pages <= 0 || remaining() < MIN_WAVE_MS) break;
 
-      if (layer.length >= TEXT_LAYER_MIN_CHARS) {
-        // Ни рисования, ни модели — бюджет страниц эта страница не тратит.
-        await savePage(supabase, documentId, page, layer, null, "embedded");
-        await reportProgress(page);
-        continue;
+      /* --- набираем волну ------------------------------------------ */
+
+      const wave: { page: number; dataUrl: string }[] = [];
+
+      while (page <= total && wave.length < CONCURRENCY && run.pages > 0) {
+        const current = page;
+        page += 1;
+
+        // Страница уже прочитана: либо этим запуском, либо предыдущим.
+        if (saved.has(current)) continue;
+
+        const layer = pdf.text(current);
+
+        if (layer.length >= TEXT_LAYER_MIN_CHARS) {
+          // Ни рисования, ни модели — волну эта страница не занимает.
+          await savePage(supabase, documentId, current, layer, null, "embedded");
+          saved.add(current);
+          continue;
+        }
+
+        run.pages -= 1;
+        const image = await pdf.render(current);
+
+        if (image.ink < BLANK_INK) {
+          // Чистый лист. Спрашивать у модели, что на нём написано, незачем.
+          await savePage(supabase, documentId, current, "", null, "blank");
+          saved.add(current);
+          continue;
+        }
+
+        wave.push({ page: current, dataUrl: image.dataUrl });
       }
 
-      /* --- дальше платно: сверяемся с бюджетом -------------------- */
+      await reportProgress();
 
-      if (run.pages <= 0) break;
-      run.pages -= 1;
+      if (wave.length === 0) continue;
 
-      const image = await pdf.render(page);
-
-      if (image.ink < BLANK_INK) {
-        // Чистый лист. Спрашивать у модели, что на нём написано, незачем.
-        await savePage(supabase, documentId, page, "", null, "blank");
-        await reportProgress(page);
-        continue;
-      }
-
-      const answer = await complete(
-        model,
-        [
-          { role: "system", content: OCR_PROMPT },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: `Страница ${page} из ${total}` },
-              { type: "image_url", image_url: { url: image.dataUrl } },
-            ],
-          },
-        ],
-        { temperature: 0, timeoutMs: PAGE_TIMEOUT_MS, sessionId: job.id }
-      );
-
-      await savePage(supabase, documentId, page, answer.text, model, "vision");
+      /* --- волна уходит в модель разом ----------------------------- */
 
       /*
-       * Расход записываем сразу, а не в конце задания: деньги за эту страницу
-       * потрачены независимо от того, чем кончится следующая.
+       * Здесь всё и ускоряется. Ожидание ответа процессор не тратит: пока
+       * модель читает одну страницу, ничто не мешает ей читать ещё девять.
+       * Последовательно сто страниц по пятьдесят секунд — это полтора часа;
+       * волнами по десять — четверть от этого.
+       *
+       * Срок каждого запроса подрезан по остатку времени: ответ, который
+       * придёт после того, как исполнителя погасят, никому не нужен.
        */
-      await supabase.rpc("record_job_spend", {
-        job_id: job.id,
-        tokens_in: answer.tokensIn,
-        tokens_out: answer.tokensOut,
-        cost: answer.cost,
-      });
+      const deadline = Math.min(PAGE_TIMEOUT_MS, Math.max(remaining() - 5_000, 1_000));
 
-      await reportProgress(page);
+      const answers = await Promise.allSettled(
+        wave.map((item) =>
+          complete(
+            model,
+            [
+              { role: "system", content: OCR_PROMPT },
+              {
+                role: "user",
+                content: [
+                  { type: "text", text: `Страница ${item.page} из ${total}` },
+                  { type: "image_url", image_url: { url: item.dataUrl } },
+                ],
+              },
+            ],
+            { temperature: 0, timeoutMs: deadline, sessionId: job.id }
+          )
+        )
+      );
+
+      /* --- записываем, что получилось ------------------------------ */
+
+      for (const [index, answer] of answers.entries()) {
+        const item = wave[index];
+        if (!item) continue;
+
+        if (answer.status === "rejected") {
+          /*
+           * Одна страница не далась — остальные из волны не виноваты. Дыру
+           * закроет следующий запуск: он спросит у базы, чего не хватает.
+           */
+          failures += 1;
+          console.error(`страница ${item.page} не распознана:`, answer.reason);
+          continue;
+        }
+
+        await savePage(
+          supabase,
+          documentId,
+          item.page,
+          answer.value.text,
+          model,
+          "vision"
+        );
+        saved.add(item.page);
+
+        /*
+         * Расход записываем сразу, а не в конце задания: деньги за эту
+         * страницу потрачены независимо от того, чем кончится следующая.
+         */
+        await supabase.rpc("record_job_spend", {
+          job_id: job.id,
+          tokens_in: answer.value.tokensIn,
+          tokens_out: answer.value.tokensOut,
+          cost: answer.value.cost,
+        });
+      }
+
+      await reportProgress();
+
+      /*
+       * Волна не дала ни одной страницы — дело не в отдельном файле, а в
+       * поставщике: кончились деньги, отозван ключ, лежит модель. Продолжать
+       * значит методично оплачивать неудачи, поэтому отдаём ошибку наверх, и
+       * очередь решит, повторять ли.
+       */
+      if (!answers.some((answer) => answer.status === "fulfilled")) {
+        const first = answers[0];
+        throw new Error(
+          first && first.status === "rejected"
+            ? String(first.reason)
+            : "Ни одна страница волны не распознана"
+        );
+      }
     }
 
-    const recognized = page - 1;
-    const done = page > total;
+    const done = saved.size >= total;
 
     /*
      * Сколько страниц в итоге ушло в модель, считаем по базе, а не по этому
@@ -278,7 +384,7 @@ async function recognizePdf(
       .eq("source", "vision");
 
     const paid = billed ?? 0;
-    const source = paid === 0 ? "embedded" : paid === recognized ? "vision" : "mixed";
+    const source = paid === 0 ? "embedded" : paid === saved.size ? "vision" : "mixed";
 
     if (done) {
       await supabase
@@ -287,10 +393,19 @@ async function recognizePdf(
         .eq("id", documentId);
     }
 
+    /*
+     * Незакрытые страницы — не повод объявлять задание неудачным: оно
+     * вернётся в очередь и доберёт их следующим запуском. Неудачным его
+     * сделает только полностью провалившаяся волна, а это уже другой случай.
+     */
+    if (failures > 0) {
+      console.error(`страниц не далось: ${failures}, вернёмся к ним следующим запуском`);
+    }
+
     return {
-      output: { pages: recognized, billedPages: paid, source },
+      output: { pages: saved.size, billedPages: paid, source },
       unfinished: !done,
-      progress: Math.round((recognized / total) * 100),
+      progress: Math.round((saved.size / total) * 100),
     };
   } finally {
     // Память движка не освобождается сама: следующий документ придёт в тот же
