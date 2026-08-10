@@ -8,8 +8,8 @@
  * на формате картинки или на самой модели.
  *
  * Запуск:
- *   npm run check:vision -- --list
- *   npm run check:vision -- договор.pdf --model gemini-2.5-flash
+ *   npm run check:vision -- --list                     что есть в каталоге
+ *   npm run check:vision -- скан.pdf --model <имя>     распознать страницу
  *
  * Ключ берётся из переменной LLM_API_KEY или из .env.local. В аргументах его
  * передавать не надо: командная строка попадает в историю оболочки.
@@ -20,6 +20,15 @@
 import { readFileSync, existsSync } from "node:fs";
 
 import { openPdf, looksLikePdf } from "../supabase/functions/_shared/pdf.ts";
+
+/**
+ * Адрес API маршрутизатора.
+ *
+ * Именно `/api/v1`, а не `/v1`: по второму отдаётся страница сайта, и запрос
+ * возвращает кусок HTML вместо ответа — ошибку в этом месте легко принять за
+ * неправильный ключ.
+ */
+const DEFAULT_BASE_URL = "https://routerai.ru/api/v1";
 
 const OCR_PROMPT = `Перенеси в текст всё, что написано на странице документа.
 
@@ -33,108 +42,228 @@ const OCR_PROMPT = `Перенеси в текст всё, что написан
 Верни только текст страницы, без пояснений и без обрамления.`;
 
 /* ------------------------------------------------------------------ */
-
-/*
- * Разбор аргументов: всё, что начинается с двух дефисов, — ключ, следующее за
- * ним слово — значение, остальное складывается в свободные аргументы.
- * Отдельно `--list`, у которого значения нет.
- */
-const args = process.argv.slice(2);
-const flags = new Map<string, string>();
-const positional: string[] = [];
-
-for (let i = 0; i < args.length; i += 1) {
-  const argument = args[i];
-
-  if (!argument.startsWith("--")) {
-    positional.push(argument);
-    continue;
-  }
-
-  const name = argument.slice(2);
-  if (name === "list") {
-    flags.set(name, "yes");
-    continue;
-  }
-
-  flags.set(name, args[i + 1] ?? "");
-  i += 1;
-}
-
-const flag = (name: string): string | undefined => flags.get(name);
-
-loadEnvFile(".env.local");
-loadEnvFile(".env");
-
-const baseUrl = (
-  flag("base-url") ?? process.env.LLM_BASE_URL ?? "https://routerai.ru/v1"
-).replace(/\/$/, "");
-const apiKey = process.env.LLM_API_KEY ?? "";
-
-if (!apiKey) {
-  fail(
-    "Нет ключа. Положите его в .env.local строкой LLM_API_KEY=... или задайте\n" +
-      "переменной окружения: LLM_API_KEY=... npm run check:vision -- --list"
-  );
-}
-
-if (flag("list")) {
-  await listModels();
-  process.exit(0);
-}
-
-const file = positional[0];
-const model = flag("model") ?? process.env.LLM_MODEL_VISION ?? "";
-const pageNumber = Number(flag("page") ?? 1);
-
-if (!file) fail("Укажите файл: npm run check:vision -- договор.pdf --model ...");
-if (!model) fail("Укажите модель: --model <имя> или LLM_MODEL_VISION в .env.local");
-if (!existsSync(file)) fail(`Файл не найден: ${file}`);
-
-await recognize(file, model, pageNumber);
-
+/*  АРГУМЕНТЫ                                                          */
 /* ------------------------------------------------------------------ */
 
-/** Что вообще есть в каталоге маршрутизатора. */
-async function listModels(): Promise<void> {
-  const response = await post(`${baseUrl}/models`, {
-    method: "GET",
-    headers: { authorization: `Bearer ${apiKey}` },
-  });
+/**
+ * Всё, что начинается с двух дефисов, — ключ, следующее слово — его значение.
+ * Кроме `--list`: у него значения нет.
+ */
+function parseArgs(argv: string[]) {
+  const flags = new Map<string, string>();
+  const positional: string[] = [];
 
-  if (!response.ok) {
-    fail(`Каталог ответил ${response.status}: ${(await response.text()).slice(0, 300)}`);
+  for (let i = 0; i < argv.length; i += 1) {
+    const argument = argv[i] ?? "";
+
+    if (!argument.startsWith("--")) {
+      positional.push(argument);
+      continue;
+    }
+
+    const name = argument.slice(2);
+
+    if (name === "list") {
+      flags.set(name, "yes");
+      continue;
+    }
+
+    flags.set(name, argv[i + 1] ?? "");
+    i += 1;
   }
 
-  const data = await response.json();
-  const names: string[] = (data.data ?? data.models ?? [])
-    .map((item: { id?: string; name?: string }) => item.id ?? item.name ?? "")
-    .filter(Boolean)
-    .sort();
-
-  console.log(`Моделей в каталоге: ${names.length}\n`);
-
-  /*
-   * Названия vision-моделей никак не размечены, поэтому просто подсказываем,
-   * на что смотреть в первую очередь: эти семейства читают документы хорошо и
-   * стоят недорого.
-   */
-  const worthTrying = names.filter((name) =>
-    /gemini|qwen.*vl|gpt-4\.1|gpt-5|pixtral|internvl|llama.*vision|claude/i.test(name)
-  );
-
-  if (worthTrying.length) {
-    console.log("Похожие на подходящие:");
-    for (const name of worthTrying) console.log(`  ${name}`);
-    console.log();
-  }
-
-  console.log("Все:");
-  for (const name of names) console.log(`  ${name}`);
+  return { flags, positional };
 }
 
-/** Одна страница: рендер, отправка, ответ. */
-async function recognize(path: string, modelName: string, page: number): Promise<void> {
+/** Простое чтение .env: тянуть ради этого зависимость незачем. */
+function loadEnvFile(name: string): void {
+  if (!existsSync(name)) return;
+
+  for (const line of readFileSync(name, "utf8").split("\n")) {
+    const match = /^\s*([A-Z0-9_]+)\s*=\s*(.*)$/.exec(line);
+    if (!match) continue;
+
+    const key = match[1] ?? "";
+    const raw = match[2] ?? "";
+    if (!key || process.env[key]) continue;
+
+    process.env[key] = raw.trim().replace(/^["']|["']$/g, "");
+  }
+}
+
+/**
+ * Ошибка, которую надо показать человеком, а не стеком.
+ *
+ * Раньше здесь стоял `process.exit()`, и на Windows он ронял процесс с
+ * `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)`: выход посреди
+ * незакрытого сетевого соединения. Теперь исключение долетает до конца, и
+ * процесс завершается сам.
+ */
+class Stop extends Error {}
+
+function fail(message: string): never {
+  throw new Stop(message);
+}
+
+/* ------------------------------------------------------------------ */
+/*  ЗАПРОСЫ                                                            */
+/* ------------------------------------------------------------------ */
+
+interface Router {
+  baseUrl: string;
+  apiKey: string;
+}
+
+/** Запрос с понятной ошибкой вместо стека undici. */
+async function request(url: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(url, init);
+  } catch (caught) {
+    const reason = caught instanceof Error ? (caught.cause ?? caught.message) : caught;
+    fail(`Не удалось обратиться к ${url}\n${String(reason)}`);
+  }
+}
+
+/**
+ * Ответ маршрутизатора или внятное объяснение, почему его нет.
+ *
+ * Отдельно ловим HTML: если вместо JSON пришла страница, значит запрос ушёл не
+ * на API, а на сайт — почти всегда из-за адреса без `/api`.
+ */
+async function readJson(response: Response, what: string): Promise<any> {
+  const body = await response.text();
+
+  if (body.trimStart().startsWith("<")) {
+    fail(
+      `${what}: вместо ответа пришла веб-страница (${response.status}).\n` +
+        `Проверьте LLM_BASE_URL — у RouterAI это ${DEFAULT_BASE_URL}, с «/api».`
+    );
+  }
+
+  if (!response.ok) {
+    fail(`${what}: ответ ${response.status}\n${body.slice(0, 500)}`);
+  }
+
+  try {
+    return JSON.parse(body);
+  } catch {
+    fail(`${what}: ответ не разбирается как JSON\n${body.slice(0, 300)}`);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  КАТАЛОГ                                                            */
+/* ------------------------------------------------------------------ */
+
+interface ModelCard {
+  id: string;
+  name?: string;
+  context_length?: number;
+  architecture?: { input_modalities?: string[]; output_modalities?: string[] };
+  pricing?: Record<string, unknown>;
+}
+
+/**
+ * Каталог приходит в нескольких обёртках сразу: то массивом, то объектом с
+ * `data`, то массивом из одного объекта с `data`. Разворачиваем все три.
+ */
+function unwrapModels(payload: unknown): ModelCard[] {
+  const candidates: unknown[] = Array.isArray(payload) ? payload : [payload];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate) && candidate.length && typeof candidate[0] === "object") {
+      const first = candidate[0] as { id?: string };
+      if (first.id) return candidate as ModelCard[];
+    }
+
+    const inner = (candidate as { data?: unknown })?.data;
+    if (Array.isArray(inner)) return inner as ModelCard[];
+  }
+
+  return [];
+}
+
+/** Цена за миллион токенов: сырые цифры за токен читать невозможно. */
+function perMillion(pricing: Record<string, unknown> | undefined, key: string): string {
+  const raw = pricing?.[key];
+  const value = typeof raw === "string" ? Number(raw) : typeof raw === "number" ? raw : NaN;
+
+  if (!Number.isFinite(value) || value === 0) return "—";
+  return (value * 1_000_000).toFixed(2);
+}
+
+async function listModels(router: Router, limit: number): Promise<void> {
+  const response = await request(`${router.baseUrl}/models`, {
+    method: "GET",
+    headers: { authorization: `Bearer ${router.apiKey}` },
+  });
+
+  const models = unwrapModels(await readJson(response, "Каталог моделей"));
+
+  if (!models.length) fail("Каталог пуст — маршрутизатор вернул список без моделей");
+
+  /*
+   * Vision-модель узнаётся по заявленным входным модальностям, а не по имени:
+   * названия у поставщиков произвольные, и угадывать по ним — верный способ
+   * пропустить половину подходящих.
+   */
+  const vision = models.filter((model) =>
+    (model.architecture?.input_modalities ?? []).some((kind) => /image/i.test(kind))
+  );
+
+  const shown = (vision.length ? vision : models)
+    .slice()
+    .sort((a, b) => {
+      const left = Number(a.pricing?.prompt ?? Infinity);
+      const right = Number(b.pricing?.prompt ?? Infinity);
+      return (Number.isFinite(left) ? left : Infinity) - (Number.isFinite(right) ? right : Infinity);
+    })
+    .slice(0, limit);
+
+  console.log(
+    `Моделей в каталоге: ${models.length}, из них читают картинки: ${vision.length}\n`
+  );
+
+  if (!vision.length) {
+    console.log(
+      "Каталог не размечает входные модальности — ниже просто начало списка.\n" +
+        "Ищите семейства gemini, qwen-vl, gpt-4.1, pixtral.\n"
+    );
+  }
+
+  console.log(
+    "Дешевле сверху. Цена за миллион токенов, в валюте маршрутизатора.\n"
+  );
+  console.log(
+    `${"модель".padEnd(46)} ${"вход".padStart(9)} ${"выход".padStart(9)} ${"контекст".padStart(9)}`
+  );
+  console.log("─".repeat(78));
+
+  for (const model of shown) {
+    const context = model.context_length ? `${Math.round(model.context_length / 1000)}K` : "—";
+    console.log(
+      `${model.id.slice(0, 46).padEnd(46)} ` +
+        `${perMillion(model.pricing, "prompt").padStart(9)} ` +
+        `${perMillion(model.pricing, "completion").padStart(9)} ` +
+        `${context.padStart(9)}`
+    );
+  }
+
+  if (shown.length < (vision.length || models.length)) {
+    console.log(`\n…показаны первые ${shown.length}. Больше — с ключом --top 50`);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  РАСПОЗНАВАНИЕ                                                      */
+/* ------------------------------------------------------------------ */
+
+async function recognize(
+  router: Router,
+  path: string,
+  modelName: string,
+  page: number
+): Promise<void> {
   const bytes = new Uint8Array(readFileSync(path));
 
   if (!looksLikePdf(bytes)) fail("Это не PDF — скрипт проверяет именно путь через рендер");
@@ -168,11 +297,11 @@ async function recognize(path: string, modelName: string, page: number): Promise
     );
 
     const startedModel = Date.now();
-    const response = await post(`${baseUrl}/chat/completions`, {
+    const response = await request(`${router.baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        authorization: `Bearer ${apiKey}`,
+        authorization: `Bearer ${router.apiKey}`,
       },
       body: JSON.stringify({
         model: modelName,
@@ -190,28 +319,40 @@ async function recognize(path: string, modelName: string, page: number): Promise
       }),
     });
 
-    const body = await response.text();
-
     if (!response.ok) {
+      const body = await response.text();
       console.error(`\nМодель ответила ${response.status}:\n${body.slice(0, 800)}`);
-      if (/image|url|base64|data:/i.test(body)) {
+
+      if (/image|url|base64|data:|modal/i.test(body)) {
         console.error(
-          "\nПохоже, поставщик не принимает картинку строкой data:. Тогда её\n" +
-            "придётся класть в хранилище и слать ссылкой — скажите, переделаю."
+          "\nПохоже, эта модель не принимает картинку строкой data: — либо она\n" +
+            "вовсе не vision. Возьмите другую из `--list`."
         );
       }
-      process.exit(1);
+      fail("Проверка не прошла");
     }
 
-    const data = JSON.parse(body);
+    const generationId = response.headers.get("x-generation-id");
+    const data = await readJson(response, "Ответ модели");
     const text: string = data.choices?.[0]?.message?.content ?? "";
 
+    /*
+     * Названия полей расхода у маршрутизатора свои: `input_tokens` вместо
+     * привычного `prompt_tokens`. Читаем оба — иначе в журнале останутся нули.
+     */
+    const usage = data.usage ?? {};
+    const tokensIn = usage.prompt_tokens ?? usage.input_tokens ?? "?";
+    const tokensOut = usage.completion_tokens ?? usage.output_tokens ?? "?";
+
     console.log(`Ответ за ${Date.now() - startedModel} мс`);
-    console.log(
-      `Токены: ${data.usage?.prompt_tokens ?? "?"} на входе, ` +
-        `${data.usage?.completion_tokens ?? "?"} на выходе` +
-        (data.usage?.cost != null ? `, стоимость ${data.usage.cost}` : "")
-    );
+    console.log(`Токены: ${tokensIn} на входе, ${tokensOut} на выходе`);
+
+    const cost = await lookupCost(router, generationId, usage);
+    if (cost !== null) {
+      console.log(`Стоимость страницы: ${cost} (валюта маршрутизатора)`);
+      console.log(`Сто страниц обойдутся примерно в ${(cost * 100).toFixed(2)}`);
+    }
+
     console.log(`\n${"─".repeat(70)}\n${text}\n${"─".repeat(70)}`);
   } finally {
     pdf.close();
@@ -219,37 +360,77 @@ async function recognize(path: string, modelName: string, page: number): Promise
 }
 
 /**
- * Запрос с понятной ошибкой вместо стека undici.
+ * Сколько стоил запрос.
  *
- * Не достучались — это почти всегда опечатка в адресе или закрытый доступ, и
- * человеку надо сказать именно это, а не показывать двадцать строк из
- * внутренностей Node.
+ * В ответе чата стоимости нет — маршрутизатор отдаёт её отдельным запросом по
+ * идентификатору из заголовка. Знать цену важнее, чем сэкономить один вызов:
+ * без неё выбор модели делается на глаз.
  */
-async function post(url: string, init: RequestInit): Promise<Response> {
+async function lookupCost(
+  router: Router,
+  generationId: string | null,
+  usage: { cost?: number }
+): Promise<number | null> {
+  if (typeof usage.cost === "number") return usage.cost;
+  if (!generationId) return null;
+
   try {
-    return await fetch(url, init);
-  } catch (caught) {
-    const reason = caught instanceof Error ? (caught.cause ?? caught.message) : caught;
-    fail(`Не удалось обратиться к ${url}\n${String(reason)}`);
+    const response = await fetch(
+      `${router.baseUrl}/generation?id=${encodeURIComponent(generationId)}`,
+      { headers: { authorization: `Bearer ${router.apiKey}` } }
+    );
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return typeof data.total_cost === "number" ? data.total_cost : null;
+  } catch {
+    // Не узнали цену — не повод считать проверку неудачной.
+    return null;
   }
 }
 
-/** Простое чтение .env: тянуть ради этого зависимость незачем. */
-function loadEnvFile(name: string): void {
-  if (!existsSync(name)) return;
+/* ------------------------------------------------------------------ */
 
-  for (const line of readFileSync(name, "utf8").split("\n")) {
-    const match = /^\s*([A-Z0-9_]+)\s*=\s*(.*)$/.exec(line);
-    if (!match) continue;
+async function main(): Promise<void> {
+  const { flags, positional } = parseArgs(process.argv.slice(2));
 
-    const [, key, raw] = match;
-    if (process.env[key]) continue;
+  loadEnvFile(".env.local");
+  loadEnvFile(".env");
 
-    process.env[key] = raw.trim().replace(/^["']|["']$/g, "");
+  const router: Router = {
+    baseUrl: (flags.get("base-url") || process.env.LLM_BASE_URL || DEFAULT_BASE_URL).replace(
+      /\/$/,
+      ""
+    ),
+    apiKey: process.env.LLM_API_KEY ?? "",
+  };
+
+  if (!router.apiKey) {
+    fail(
+      "Нет ключа. Положите его в .env.local строкой LLM_API_KEY=... или задайте\n" +
+        "переменной окружения перед запуском."
+    );
   }
+
+  if (flags.has("list")) {
+    await listModels(router, Number(flags.get("top") ?? 30));
+    return;
+  }
+
+  const file = positional[0];
+  const model = flags.get("model") || process.env.LLM_MODEL_VISION || "";
+
+  if (!file) fail("Укажите файл: npm run check:vision -- скан.pdf --model <имя>");
+  if (!model) fail("Укажите модель: --model <имя> или LLM_MODEL_VISION в .env.local");
+  if (!existsSync(file)) fail(`Файл не найден: ${file}`);
+
+  await recognize(router, file, model, Number(flags.get("page") ?? 1));
 }
 
-function fail(message: string): never {
-  console.error(message);
-  process.exit(1);
+try {
+  await main();
+} catch (caught) {
+  console.error(caught instanceof Stop ? `\n${caught.message}` : caught);
+  process.exitCode = 1;
 }
