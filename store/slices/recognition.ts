@@ -4,6 +4,7 @@ import {
   getRecognitionAction,
   isAiAvailableAction,
   recognizeDocumentAction,
+  searchDocumentTextAction,
   type RecognitionState,
 } from "@/app/actions/ai";
 
@@ -198,6 +199,18 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
       if (!isRemote(get)) return [];
 
       const result = await getDocumentPagesAction(documentId);
+      if (!result.ok) {
+        set({ syncError: result.error });
+        return [];
+      }
+
+      return result.data ?? [];
+    },
+
+    searchDocumentText: async (query, documentId = null) => {
+      if (!isRemote(get)) return [];
+
+      const result = await searchDocumentTextAction(query, documentId);
       if (!result.ok) {
         set({ syncError: result.error });
         return [];

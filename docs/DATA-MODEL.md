@@ -168,7 +168,7 @@ REST:
 
 | Бакет | Доступ |
 |---|---|
-| `case-documents` | Закрытый. Путь `<workspace_id>/<case_id>/<uuid>-<имя>` |
+| `case-documents` | Закрытый. Путь `<workspace_id>/<case_id>/<uuid>-<имя>`, а у файла без дела — `<workspace_id>/loose/<uuid>-<имя>` |
 | `avatars` | Публичный на чтение, запись только в свою папку |
 
 Право на файл выводится из первого сегмента пути: `app.storage_workspace()`

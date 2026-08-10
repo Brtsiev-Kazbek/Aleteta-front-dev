@@ -259,7 +259,8 @@ export type OcrStatus = "pending" | "running" | "done" | "failed" | "skipped";
 
 export interface Document {
   id: string;
-  caseId: string;
+  /** Пусто — файл загружен вне дела, ради одного лишь распознавания. */
+  caseId: string | null;
   title: string;
   type: string;
   status: DocumentStatus;
@@ -300,6 +301,21 @@ export interface RecognizedPage {
   model: string | null;
   /** 0–1, если поставщик её вернул. Обычно не возвращает. */
   confidence: number | null;
+}
+
+/**
+ * Найденное место в распознанном тексте.
+ *
+ * `fragment` приходит из базы уже с подсветкой — совпавшие слова обёрнуты в
+ * `<mark>`. Разметку не вставляют в разметку: интерфейс режет строку по этим
+ * меткам и собирает её из обычных элементов, поэтому текст документа никогда
+ * не исполняется как HTML.
+ */
+export interface SearchHit {
+  documentId: string;
+  documentTitle: string;
+  page: number;
+  fragment: string;
 }
 
 export const DOCUMENT_STATUS_META: Record<

@@ -464,6 +464,7 @@ export type Database = {
           id: string
           model: string | null
           page: number
+          search: unknown
           source: string | null
           text: string
           workspace_id: string
@@ -475,6 +476,7 @@ export type Database = {
           id?: string
           model?: string | null
           page: number
+          search?: unknown
           source?: string | null
           text: string
           workspace_id: string
@@ -486,6 +488,7 @@ export type Database = {
           id?: string
           model?: string | null
           page?: number
+          search?: unknown
           source?: string | null
           text?: string
           workspace_id?: string
@@ -608,7 +611,7 @@ export type Database = {
       documents: {
         Row: {
           bucket: string
-          case_id: string
+          case_id: string | null
           created_at: string
           created_by: string | null
           deleted_at: string | null
@@ -631,7 +634,7 @@ export type Database = {
         }
         Insert: {
           bucket?: string
-          case_id: string
+          case_id?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -654,7 +657,7 @@ export type Database = {
         }
         Update: {
           bucket?: string
-          case_id?: string
+          case_id?: string | null
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
@@ -1421,6 +1424,16 @@ export type Database = {
           page: number
           score: number
           text: string
+        }[]
+      }
+      search_document_text: {
+        Args: { limit_count?: number; query: string; target_document?: string }
+        Returns: {
+          document_id: string
+          document_title: string
+          fragment: string
+          page: number
+          rank: number
         }[]
       }
     }

@@ -55,6 +55,28 @@ export interface UploadTarget {
   path: string;
 }
 
+/**
+ * Путь для файла, загруженного вне дела.
+ *
+ * Такой сценарий у распознавания законный и частый: человеку надо прочитать
+ * один скан, не заводя папки и не убирая потом за собой. Дела в пути нет,
+ * поэтому вместо него стоит `loose` — но первым сегментом, как и везде,
+ * остаётся пространство: именно по нему хранилище решает, кому файл доступен.
+ */
+export async function prepareLooseUploadAction(
+  fileName: string
+): Promise<ActionResult<UploadTarget>> {
+  try {
+    const session = await requireSession();
+
+    const path = `${session.workspaceId}/loose/${randomUUID()}-${slugifyFileName(fileName)}`;
+
+    return actionOk({ bucket: BUCKET, path });
+  } catch (caught) {
+    return actionError(caught, "Не удалось подготовить загрузку.");
+  }
+}
+
 export async function prepareDocumentUploadAction(
   caseId: string,
   fileName: string
@@ -86,7 +108,8 @@ export async function prepareDocumentUploadAction(
 }
 
 export interface RegisterDocumentInput {
-  caseId: string;
+  /** Пусто — файл живёт сам по себе: его загрузили ради распознавания. */
+  caseId: string | null;
   title: string;
   /** Человеческое описание вида: «Выписка ЕГРН», «Скан». */
   kind?: string;
@@ -113,7 +136,9 @@ export async function registerDocumentAction(
      * заметит — оно проверяет право на запись, а не на то, что записал именно
      * этот человек.
      */
-    if (!input.path.startsWith(`${session.workspaceId}/${input.caseId}/`)) {
+    const expectedPrefix = `${session.workspaceId}/${input.caseId ?? "loose"}/`;
+
+    if (!input.path.startsWith(expectedPrefix)) {
       return actionFail("Путь файла не соответствует делу.");
     }
 
@@ -147,7 +172,7 @@ export async function registerDocumentAction(
       actor_id: session.userId,
     });
 
-    revalidatePath(`/cases/${input.caseId}`);
+    revalidatePath(input.caseId ? `/cases/${input.caseId}` : "/dashboard/recognize");
     return actionOk(toDocument(data));
   } catch (caught) {
     return actionError(caught, "Не удалось сохранить документ.");

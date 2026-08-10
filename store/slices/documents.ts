@@ -1,6 +1,7 @@
 import {
   deleteDocumentAction,
   prepareDocumentUploadAction,
+  prepareLooseUploadAction,
   registerDocumentAction,
 } from "@/app/actions/documents";
 import { MOCK_DOCUMENTS } from "@/data/mock-data";
@@ -100,8 +101,15 @@ export const createDocumentsSlice: SliceCreator<DocumentsSlice> = (
             return;
           }
 
+          /*
+           * Дела может не быть: файл, загруженный ради распознавания, живёт
+           * сам по себе. Путь тогда выдаёт другое действие — в нём вместо дела
+           * стоит `loose`, а проверка прав идёт по пространству.
+           */
           const target = await sync(
-            prepareDocumentUploadAction(caseId, picked.name),
+            caseId === null
+              ? prepareLooseUploadAction(picked.name)
+              : prepareDocumentUploadAction(caseId, picked.name),
             { onFailure: drop, fallback: "Не удалось подготовить загрузку." }
           );
           if (!target) return;

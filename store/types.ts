@@ -10,6 +10,7 @@ import type {
   GeneratedDocument,
   GenerationStatus,
   RecognizedPage,
+  SearchHit,
   TemplateMatch,
 } from "@/types";
 
@@ -158,8 +159,16 @@ export interface EntitiesSlice {
 export interface DocumentsSlice {
   documents: Document[];
   addDocument: (document: Omit<Document, "id" | "createdAt">) => Document;
-  /** Загрузка готовых файлов во вкладку «Документы» дела. */
-  addDocuments: (caseId: string, files: UploadedFile[]) => Promise<void>;
+  /**
+   * Загрузка готовых файлов.
+   *
+   * `null` вместо дела — файл сам по себе: его загрузили ради распознавания, и
+   * в списке документов дела он не появится.
+   */
+  addDocuments: (
+    caseId: string | null,
+    files: UploadedFile[]
+  ) => Promise<void>;
   deleteDocument: (documentId: string) => void;
 
   selectedDocumentIds: string[];
@@ -188,6 +197,14 @@ export interface RecognitionSlice {
   readDocumentText: (documentId: string) => Promise<string | null>;
   /** То же постранично: видно границы страниц и происхождение каждой. */
   readDocumentPages: (documentId: string) => Promise<RecognizedPage[]>;
+  /**
+   * Поиск по расшифровкам. Пустой `documentId` — по всем документам
+   * пространства, иначе только внутри одного.
+   */
+  searchDocumentText: (
+    query: string,
+    documentId?: string | null
+  ) => Promise<SearchHit[]>;
   /** Настроена ли работа с моделью: без неё кнопки прячутся. */
   isRecognitionAvailable: boolean;
   /**

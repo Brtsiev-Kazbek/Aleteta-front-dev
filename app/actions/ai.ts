@@ -10,7 +10,7 @@ import { enqueueJob, readJob, recordCorrection } from "@/lib/ai/jobs";
 import { isLlmConfigured } from "@/lib/ai/config";
 import { requireSession } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
-import type { RecognizedPage } from "@/types";
+import type { RecognizedPage, SearchHit } from "@/types";
 import type { JobStatus, OcrStatus } from "@/types/rows";
 import type {
   ExtractInput,
@@ -228,6 +228,49 @@ export async function getDocumentPagesAction(
     );
   } catch (caught) {
     return actionError(caught, "Не удалось прочитать страницы документа.");
+  }
+}
+
+/**
+ * Поиск по распознанному тексту.
+ *
+ * Юрист ищет не документ, а условие: «где у нас про неустойку 0,1 %». Поэтому
+ * ищем по страницам и возвращаем фрагмент — ответ «нашлось в договоре аренды»
+ * бесполезен, если в договоре сорок страниц.
+ *
+ * Права проверяет база: функция объявлена `security invoker`, и политики
+ * `document_pages` работают как обычно. Чужая страница не найдётся, даже если
+ * слово в ней есть.
+ */
+export async function searchDocumentTextAction(
+  query: string,
+  documentId: string | null = null
+): Promise<ActionResult<SearchHit[]>> {
+  const trimmed = query.trim();
+  if (trimmed.length < 2) return actionOk([]);
+
+  try {
+    await requireSession();
+    const supabase = createClient();
+
+    const { data, error } = await supabase.rpc("search_document_text", {
+      query: trimmed,
+      target_document: documentId ?? undefined,
+      limit_count: 40,
+    });
+
+    if (error) return actionFail(error.message);
+
+    return actionOk(
+      (data ?? []).map((row) => ({
+        documentId: row.document_id,
+        documentTitle: row.document_title,
+        page: row.page,
+        fragment: row.fragment,
+      }))
+    );
+  } catch (caught) {
+    return actionError(caught, "Не удалось выполнить поиск.");
   }
 }
 
