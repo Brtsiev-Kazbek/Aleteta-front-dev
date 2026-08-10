@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatDate } from "@/lib/utils";
 import { validateEmail } from "@/lib/auth/validation";
 import type { SettingsInvite, SettingsMember } from "@/lib/data/workspace";
-import type { WorkspaceRole } from "@/types/database";
+import type { WorkspaceRole } from "@/types/rows";
 
 const ROLE_LABELS: Record<WorkspaceRole, string> = {
   owner: "Владелец",

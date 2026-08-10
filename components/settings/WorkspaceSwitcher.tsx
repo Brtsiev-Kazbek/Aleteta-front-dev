@@ -6,7 +6,7 @@ import { Check, Loader2 } from "lucide-react";
 
 import { switchWorkspaceAction } from "@/app/actions/workspace";
 import { cn } from "@/lib/utils";
-import type { WorkspaceRole } from "@/types/database";
+import type { WorkspaceRole } from "@/types/rows";
 
 const ROLE_LABELS: Record<WorkspaceRole, string> = {
   owner: "Владелец",

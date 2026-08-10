@@ -3,8 +3,9 @@ import type {
   DocumentRow,
   EntityRow,
   EntityTypeRow,
-} from "@/types/database";
+} from "@/types/rows";
 import type { Case, Document, Entity, EntitySchema } from "@/types";
+import { readEntityData, readFieldDefinitions } from "./json";
 
 /**
  * Перевод строк базы в типы интерфейса.
@@ -39,7 +40,7 @@ export function toEntitySchema(row: EntityTypeRow): EntitySchema {
      * на существование. Регулярное выражение приходит строкой (POSIX), поэтому
      * собираем RegExp — база и браузер проверяют по одному и тому же шаблону.
      */
-    fields: row.fields.map((field) => ({
+    fields: readFieldDefinitions(row.fields).map((field) => ({
       key: field.key,
       label: field.label,
       required: field.required,
@@ -70,7 +71,7 @@ export function toEntity(row: EntityRow): Entity {
     id: row.id,
     caseId: row.case_id,
     type: row.type_id,
-    data: row.data,
+    data: readEntityData(row.data),
     validationErrors: row.validation_errors,
   };
 }
@@ -85,5 +86,11 @@ export function toDocument(row: DocumentRow): Document {
     // Ссылку собирает клиент из bucket/path — в базе полного адреса нет.
     url: row.path ?? "#",
     createdAt: row.created_at,
+
+    // Состояние распознавания показывается прямо в строке файла.
+    ocrStatus: row.ocr_status,
+    pagesDone: row.pages_done,
+    pageCount: row.page_count,
+    textSource: row.text_source,
   };
 }

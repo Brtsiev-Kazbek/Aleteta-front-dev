@@ -15,7 +15,7 @@ import { requireSession } from "@/lib/data/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { validateInn } from "@/lib/validation";
-import type { WorkspaceRole } from "@/types/database";
+import type { WorkspaceRole } from "@/types/rows";
 
 /**
  * Профиль, реквизиты организации и состав участников.

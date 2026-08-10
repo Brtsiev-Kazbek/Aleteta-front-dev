@@ -8,6 +8,9 @@ import {
 } from "@/lib/actions/result";
 import { enqueueJob, readJob, recordCorrection } from "@/lib/ai/jobs";
 import { isLlmConfigured } from "@/lib/ai/config";
+import { requireSession } from "@/lib/data/session";
+import { createClient } from "@/lib/supabase/server";
+import type { JobStatus, OcrStatus } from "@/types/rows";
 import type {
   ExtractInput,
   JobState,
@@ -85,6 +88,103 @@ export async function getJobStateAction<T extends TypedTask>(
     return actionOk(await readJob<T>(jobId));
   } catch (caught) {
     return actionError(caught, "Не удалось прочитать состояние задания.");
+  }
+}
+
+/**
+ * Состояние распознавания одного документа.
+ *
+ * Одним запросом, а не двумя: интерфейс опрашивает его, пока идёт работа, и
+ * лишний круг до сервера на каждом опросе стоит дороже, чем чуть более широкая
+ * выборка. Здесь и прогресс по страницам, и ошибка задания, если оно упало.
+ */
+export async function getRecognitionAction(
+  documentId: string
+): Promise<ActionResult<RecognitionState | null>> {
+  try {
+    await requireSession();
+    const supabase = createClient();
+
+    const { data: document, error } = await supabase
+      .from("documents")
+      .select("ocr_status, pages_done, page_count, text_source")
+      .eq("id", documentId)
+      .maybeSingle();
+
+    if (error) return actionFail(error.message);
+    if (!document) return actionOk(null);
+
+    /*
+     * Задание берём последнее по времени: у длинного документа их несколько —
+     * первая попытка, возвраты в очередь после перерыва, повтор после сбоя.
+     * Показывать надо то, что происходит сейчас.
+     */
+    const { data: job } = await supabase
+      .from("ai_jobs")
+      .select("id, status, progress, error")
+      .eq("document_id", documentId)
+      .eq("task", "ocr")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    return actionOk({
+      ocrStatus: document.ocr_status,
+      pagesDone: document.pages_done,
+      pageCount: document.page_count,
+      textSource: document.text_source,
+      job: job
+        ? {
+            jobId: job.id,
+            status: job.status,
+            progress: job.progress,
+            error: job.error,
+          }
+        : null,
+    });
+  } catch (caught) {
+    return actionError(caught, "Не удалось узнать состояние распознавания.");
+  }
+}
+
+export interface RecognitionState {
+  ocrStatus: OcrStatus;
+  pagesDone: number;
+  pageCount: number | null;
+  textSource: string | null;
+  job: {
+    jobId: string;
+    status: JobStatus;
+    progress: number;
+    error: string | null;
+  } | null;
+}
+
+/**
+ * Распознанный текст документа.
+ *
+ * Читается под правами пользователя: чужой документ просто не найдётся. Нужен
+ * человеку, чтобы убедиться своими глазами, что модель прочитала файл верно —
+ * без этого доверять извлечённым реквизитам не за что.
+ */
+export async function getDocumentTextAction(
+  documentId: string,
+  range: { from?: number; to?: number } = {}
+): Promise<ActionResult<string>> {
+  try {
+    await requireSession();
+    const supabase = createClient();
+
+    const { data, error } = await supabase.rpc("document_text", {
+      target_document: documentId,
+      from_page: range.from ?? 1,
+      to_page: range.to ?? 10000,
+    });
+
+    if (error) return actionFail(error.message);
+    return actionOk(data ?? "");
+  } catch (caught) {
+    return actionError(caught, "Не удалось прочитать распознанный текст.");
   }
 }
 

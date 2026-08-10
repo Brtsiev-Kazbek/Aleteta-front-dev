@@ -2,7 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import { requireSession } from "@/lib/data/session";
-import type { WorkspaceRole } from "@/types/database";
+import type { WorkspaceRole } from "@/types/rows";
 
 /**
  * Данные страницы настроек.

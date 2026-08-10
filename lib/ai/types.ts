@@ -1,4 +1,4 @@
-import type { AiTask, JobStatus } from "@/types/database";
+import type { AiTask, JobStatus } from "@/types/rows";
 
 /**
  * Задачи модели: что подаётся на вход и что ожидается на выходе.

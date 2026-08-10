@@ -248,6 +248,15 @@ export const BUILTIN_SCHEMAS: EntitySchema[] = [
 
 export type DocumentStatus = "draft" | "ready" | "signed" | "generating";
 
+/**
+ * Состояние распознавания файла.
+ *
+ * Повторяет перечисление `ocr_status` в базе. Дублирование намеренное: этот
+ * модуль описывает мир интерфейса и не должен зависеть от сгенерированных
+ * типов схемы — иначе демонстрационный стенд без базы перестанет собираться.
+ */
+export type OcrStatus = "pending" | "running" | "done" | "failed" | "skipped";
+
 export interface Document {
   id: string;
   caseId: string;
@@ -256,6 +265,23 @@ export interface Document {
   status: DocumentStatus;
   url: string;
   createdAt: string;
+
+  /*
+   * Состояние распознавания. Заполняется только у документов из базы: на
+   * встроенном наборе распознавать нечего.
+   *
+   * Держим его прямо на документе, а не отдельным списком, потому что
+   * показывается оно там же, где сам файл — строкой в таблице документов. Так
+   * не приходится держать два списка в согласии.
+   */
+  /** pending — ждёт очереди, running — идёт, skipped — текст взят из файла. */
+  ocrStatus?: OcrStatus;
+  /** Сколько страниц уже распознано: «страница 12 из 18». */
+  pagesDone?: number;
+  /** Сколько всего страниц. Пока файл не открыли — неизвестно. */
+  pageCount?: number | null;
+  /** Откуда взялся текст: embedded, vision, mixed, reused. */
+  textSource?: string | null;
 }
 
 export const DOCUMENT_STATUS_META: Record<

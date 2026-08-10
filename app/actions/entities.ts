@@ -11,6 +11,7 @@ import {
 import { requireSession } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/server";
 import { toEntity, toEntitySchema } from "@/lib/data/mappers";
+import { readEntityData, readFieldDefinitions } from "@/lib/data/json";
 import type { Entity, EntitySchema } from "@/types";
 
 /**
@@ -81,7 +82,7 @@ export async function updateEntityDataAction(
 
     const { data, error } = await supabase
       .from("entities")
-      .update({ data: { ...current.data, ...patch } })
+      .update({ data: { ...readEntityData(current.data), ...patch } })
       .eq("id", entityId)
       .select("*")
       .single();
@@ -116,7 +117,7 @@ export async function updateEntityFieldAction(
 
     const { data, error } = await supabase
       .from("entities")
-      .update({ data: { ...current.data, [field]: value } })
+      .update({ data: { ...readEntityData(current.data), [field]: value } })
       .eq("id", entityId)
       .select("*")
       .single();
@@ -176,8 +177,8 @@ export async function duplicateEntityAction(
       .eq("id", source.type_id)
       .maybeSingle();
 
-    const nameKey = type?.fields?.[0]?.key;
-    const copied = { ...source.data };
+    const nameKey = readFieldDefinitions(type?.fields ?? null)[0]?.key;
+    const copied = readEntityData(source.data);
     if (nameKey && copied[nameKey]) {
       copied[nameKey] = `${copied[nameKey]} (копия)`;
     }

@@ -134,7 +134,40 @@ export async function enqueueJob<T extends TypedTask>(
 
   if (error) throw new Error(`Не удалось поставить задание: ${error.message}`);
 
+  await pokeWorker();
+
   return { jobId: data.id, fromCache: false };
+}
+
+/**
+ * Будим исполнителя, не дожидаясь расписания.
+ *
+ * Очередь разбирает `pg_cron` раз в минуту, и без этого толчка человек, только
+ * что загрузивший файл, целую минуту смотрел бы на надпись «в очереди» при
+ * полностью свободном исполнителе. Минута ожидания на пустом месте выглядит как
+ * поломка, а не как очередь.
+ *
+ * Ответа не ждём и ошибку глотаем намеренно: задание уже в базе, и расписание
+ * заберёт его в любом случае. Провалить постановку из-за того, что не удалось
+ * позвонить в дверь, было бы странно.
+ */
+async function pokeWorker(): Promise<void> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) return;
+
+  try {
+    await fetch(`${url}/functions/v1/ai-worker`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${key}` },
+      // Ответа ждать нечего: исполнитель работает минуту, а действие живёт
+      // десять секунд. Нам важно только, чтобы запрос ушёл.
+      signal: AbortSignal.timeout(2_000),
+    });
+  } catch {
+    // Не дозвонились — заберёт расписание.
+  }
 }
 
 /**

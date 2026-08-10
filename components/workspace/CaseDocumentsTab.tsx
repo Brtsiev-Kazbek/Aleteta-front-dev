@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Download,
+  FileSearch,
   FileText,
   MoreHorizontal,
   ScanLine,
@@ -31,6 +32,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { createDocumentUrlAction } from "@/app/actions/documents";
+import { RecognitionStatus } from "@/components/documents/RecognitionStatus";
+import { RecognizedTextSheet } from "@/components/documents/RecognizedTextSheet";
 import { ReviewSplitView } from "@/components/documents/ReviewSplitView";
 import { MetaLabel } from "@/components/layout/PanelHeading";
 import { BatchReviewSheet } from "@/components/workspace/BatchReviewSheet";
@@ -49,6 +52,10 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const addDocuments = useAppStore((state) => state.addDocuments);
   const deleteDocument = useAppStore((state) => state.deleteDocument);
   const startExtraction = useAppStore((state) => state.startExtraction);
+  const recognizeDocument = useAppStore((state) => state.recognizeDocument);
+
+  /* Какой документ показываем распознанным текстом. */
+  const [textDocumentId, setTextDocumentId] = useState<string | null>(null);
 
   const selectedIds = useAppStore((state) => state.selectedDocumentIds);
   const toggleSelection = useAppStore((state) => state.toggleDocumentSelection);
@@ -266,6 +273,11 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                   </span>
                 </button>
 
+                <RecognitionStatus
+                  document={document}
+                  onRetry={() => void recognizeDocument(document.id)}
+                />
+
                 <span
                   className={cn(
                     "hidden shrink-0 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] sm:inline-flex",
@@ -300,6 +312,13 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                     >
                       <ScanLine className="h-4 w-4 text-stone-400" />
                       Извлечь реквизиты
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => setTextDocumentId(document.id)}
+                      disabled={!document.ocrStatus}
+                    >
+                      <FileSearch className="h-4 w-4 text-stone-400" />
+                      Распознанный текст
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={() => void handleDownload(document.id)}
@@ -352,6 +371,15 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
 
       {/* Результаты пакетной проверки */}
       <BatchReviewSheet />
+
+      {/* Что модель прочитала в файле — дословно */}
+      <RecognizedTextSheet
+        documentId={textDocumentId}
+        title={
+          documents.find((item) => item.id === textDocumentId)?.title ?? ""
+        }
+        onClose={() => setTextDocumentId(null)}
+      />
     </div>
   );
 }
