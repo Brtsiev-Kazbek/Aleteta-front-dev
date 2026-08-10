@@ -128,7 +128,7 @@ ${fieldList}
         content: `Документ «${document.title}», распознанный текст:\n\n${text}`,
       },
     ],
-    { json: true }
+    { json: true, sessionId: job.id }
   );
 
   const answer = parseJson<ModelAnswer>(result.text);

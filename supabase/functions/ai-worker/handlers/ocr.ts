@@ -244,7 +244,7 @@ async function recognizePdf(
             ],
           },
         ],
-        { temperature: 0, timeoutMs: PAGE_TIMEOUT_MS }
+        { temperature: 0, timeoutMs: PAGE_TIMEOUT_MS, sessionId: job.id }
       );
 
       await savePage(supabase, documentId, page, answer.text, model, "vision");
@@ -345,7 +345,7 @@ async function recognizeImage(
         ],
       },
     ],
-    { temperature: 0, timeoutMs: PAGE_TIMEOUT_MS }
+    { temperature: 0, timeoutMs: PAGE_TIMEOUT_MS, sessionId: job.id }
   );
 
   await savePage(supabase, documentId, 1, answer.text, model, "vision");

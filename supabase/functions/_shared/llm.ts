@@ -63,7 +63,18 @@ export interface CompletionResult {
 export async function complete(
   model: string,
   messages: ChatMessage[],
-  options: { json?: boolean; temperature?: number; timeoutMs?: number } = {}
+  options: {
+    json?: boolean;
+    temperature?: number;
+    timeoutMs?: number;
+    /**
+     * Идентификатор задания. Маршрутизатор группирует по нему запросы, и в его
+     * консоли расход виден по документам, а не сплошным потоком: страницы
+     * одного скана собираются в одну строку. У нас тот же идентификатор лежит
+     * в `ai_jobs`, так что две картины расхода сходятся.
+     */
+    sessionId?: string;
+  } = {}
 ): Promise<CompletionResult> {
   if (!API_KEY) {
     throw new Error("LLM_API_KEY не задан в секретах функции");
@@ -92,6 +103,7 @@ export async function complete(
          * добавляет пояснение вокруг, и разбор падает.
          */
         ...(options.json ? { response_format: { type: "json_object" } } : {}),
+        ...(options.sessionId ? { session_id: options.sessionId } : {}),
       }),
       signal: controller.signal,
     });
