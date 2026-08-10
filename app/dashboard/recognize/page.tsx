@@ -20,7 +20,8 @@ export default async function RecognizePage() {
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-6xl px-8 py-12">
+        {/* Шире обычного: расшифровка и оригинал стоят рядом. */}
+        <div className="mx-auto max-w-[100rem] px-8 py-12">
           <PanelHeading
             eyebrow="Распознавание"
             title="Загрузите файл — получите текст"
