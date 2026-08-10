@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -29,6 +29,7 @@ import {
   SearchFragment,
 } from "@/components/recognize/HighlightedText";
 import { OriginalPane } from "@/components/recognize/OriginalPane";
+import { createLogger } from "@/lib/logger";
 import { cn, formatDate, plural } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 import type { Document, RecognizedPage, SearchHit } from "@/types";
@@ -47,6 +48,8 @@ import type { Document, RecognizedPage, SearchHit } from "@/types";
  * он ищет не по этой странице, а по всем расшифровкам пространства, потому что
  * искать условие в договоре обычно приходят тогда, когда сам договор уже забыт.
  */
+
+const log = createLogger("recognize");
 
 /** Что считаем разумным размером: у бакета предел пятьдесят мегабайт. */
 const MAX_BYTES = 50 * 1024 * 1024;
@@ -858,6 +861,85 @@ function TextPane({
   const handledTarget = useRef<typeof target>(null);
   const pendingActive = useRef<number | null>(null);
 
+  /**
+   * Прокрутка внутри окна чтения.
+   *
+   * Считаем смещение сами и двигаем именно наш контейнер, а не полагаемся на
+   * `scrollIntoView`. Тот сам решает, какой из прокручиваемых предков двигать,
+   * и в разметке из вложенных `flex` с `overflow` регулярно выбирает не тот —
+   * снаружи это выглядит как «текст не прокручивается вообще».
+   *
+   * Ждём кадр: разметку с новой подсветкой браузер ещё не построил, и
+   * искать в ней нечего.
+   */
+  const scrollTo = useCallback((selector: string, ratio = 0.35) => {
+    window.requestAnimationFrame(() => {
+      const node = scrollRef.current;
+
+      if (!node) {
+        log.debug("scroll.no-container", { куда: selector });
+        return;
+      }
+
+      const element = node.querySelector(selector);
+
+      if (!element) {
+        log.debug("scroll.no-anchor", { куда: selector });
+        return;
+      }
+
+      const before = node.scrollTop;
+      const shift =
+        element.getBoundingClientRect().top -
+        node.getBoundingClientRect().top +
+        before -
+        node.clientHeight * ratio;
+
+      node.scrollTo({ top: Math.max(0, shift), behavior: "smooth" });
+
+      /*
+       * Страховка. Если наш контейнер прокручивать нечем — разметка изменилась,
+       * высота не задана, содержимое короче окна, — просим браузер довести до
+       * элемента как умеет. Хуже от этого не станет, а «текст не прокрутился»
+       * перестанет быть возможным.
+       */
+      if (node.scrollHeight <= node.clientHeight + 4) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      log.debug("scroll", {
+        куда: selector,
+        было: Math.round(before),
+        стало: Math.round(shift),
+        высота: node.scrollHeight,
+        окно: node.clientHeight,
+      });
+    });
+  }, []);
+
+  /**
+   * Ведём текст к совпадению, а если его нет — к началу страницы.
+   *
+   * Совпадения может не быть законно: база ищет по основам своим разбором,
+   * подсветка — своим, и на редком слове они расходятся.
+   */
+  const reveal = useCallback(
+    (index: number, page: number | null) => {
+      window.requestAnimationFrame(() => {
+        const node = scrollRef.current;
+        if (!node) return;
+
+        if (index >= 0 && node.querySelector(`#match-${index}`)) {
+          scrollTo(`#match-${index}`, 0.35);
+          return;
+        }
+
+        if (page !== null) scrollTo(`#page-${page}`, 0.02);
+      });
+    },
+    [scrollTo]
+  );
+
   useEffect(() => {
     if (!target || handledTarget.current === target) return;
     // Страницы ещё не приехали — обработаем на следующем проходе.
@@ -880,24 +962,13 @@ function TextPane({
     setActive(position);
 
     /*
-     * Ведём текст к странице отдельно от перехода по совпадениям.
-     *
-     * Совпадения в тексте может не оказаться вовсе: база ищет своим разбором
-     * основ, подсветка — своим, и на редком слове они расходятся. Тогда номер
-     * совпадения не меняется, прокрутка по нему не срабатывает, и получается
-     * то, что видно глазом: оригинал уехал на нужную страницу, а текст остался
-     * на месте.
-     *
-     * Откладываем на следующий кадр: разметка с новой подсветкой ещё не
-     * построена, и прокручивать пока не к чему.
+     * Прокручиваем явно, а не полагаемся на эффект по номеру совпадения.
+     * Номер мог не измениться — тогда React не перерисовывает, эффект не
+     * срабатывает, и текст остаётся на месте, пока оригинал уезжает. Ровно это
+     * и выглядело как «прокручивается только PDF».
      */
-    const page = target.page;
-    window.requestAnimationFrame(() => {
-      scrollRef.current
-        ?.querySelector(`#page-${page}`)
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }, [target, filled.length, marks.offsets, onOpenPage]);
+    reveal(position, target.page);
+  }, [target, filled.length, marks.offsets, onOpenPage, reveal]);
 
   /* Новый запрос — с первого совпадения. Кроме перехода из общего поиска. */
   useEffect(() => {
@@ -928,10 +999,8 @@ function TextPane({
    */
   useEffect(() => {
     if (at < 0) return;
-
-    const anchor = scrollRef.current?.querySelector(`#match-${at}`);
-    anchor?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [at, filled.length]);
+    reveal(at, activePage);
+  }, [at, filled.length, reveal, activePage]);
 
   /*
    * Оригинал следует за чтением.
@@ -999,7 +1068,20 @@ function TextPane({
 
     // Считаем от приведённого номера, а не от сырого: сырой мог уехать за край.
     const from = at < 0 ? 0 : at;
-    setActive((from + direction + marks.total) % marks.total);
+    const next = (from + direction + marks.total) % marks.total;
+
+    setActive(next);
+
+    /*
+     * И прокручиваем сразу, не дожидаясь эффекта. Единственное совпадение в
+     * документе означает, что номер не меняется, React не перерисовывает и
+     * эффект не срабатывает, — а перейти к нему человек всё равно просит.
+     */
+    const page =
+      [...marks.offsets].reverse().find((entry) => entry.offset <= next)?.page ??
+      null;
+
+    reveal(next, page);
   }
 
   async function handleCopy() {
