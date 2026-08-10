@@ -50,7 +50,7 @@ begin
    * индексу, а поднятый впустую исполнитель стоит холодного старта.
    */
   select count(*) into pending
-  from app.ai_jobs
+  from public.ai_jobs
   where status = 'queued'
     and (next_retry_at is null or next_retry_at <= now());
 
