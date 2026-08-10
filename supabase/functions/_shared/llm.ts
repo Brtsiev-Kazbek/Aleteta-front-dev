@@ -12,8 +12,26 @@
  * сайта, и вместо ответа приходит кусок HTML. Ошибку в этом месте легко
  * принять за неправильный ключ.
  */
-const BASE_URL = Deno.env.get("LLM_BASE_URL") ?? "https://routerai.ru/api/v1";
-const API_KEY = Deno.env.get("LLM_API_KEY") ?? "";
+/**
+ * Секрет из окружения, очищенный от того, что прилипает при вставке.
+ *
+ * Пробел в конце и кавычки вокруг — две самые обидные причины отказа: ключ
+ * верный, а заголовок `Bearer sk-xxx ` маршрутизатор не принимает, и ответ
+ * приходит тот же самый 401, что и на неверный ключ. Отличить их по ответу
+ * невозможно, поэтому чистим заранее.
+ */
+function secret(name: string, fallback = ""): string {
+  const raw = Deno.env.get(name);
+  if (!raw) return fallback;
+
+  return raw.trim().replace(/^['"]|['"]$/g, "");
+}
+
+const BASE_URL = secret("LLM_BASE_URL", "https://routerai.ru/api/v1").replace(
+  /\/+$/,
+  ""
+);
+const API_KEY = secret("LLM_API_KEY");
 
 /** Сколько ждём ответа. Дольше — почти всегда значит, что что-то зависло. */
 const TIMEOUT_MS = 120_000;
@@ -114,10 +132,17 @@ export async function complete(
        * лимитами, но обращаться к моделям им нельзя.
        */
       if (response.status === 401 || response.status === 403) {
+        /*
+         * К отказу прикладываем приметы ключа — длину и первые знаки. Сам ключ
+         * в сообщение не попадает, но по этим двум признакам сразу видно
+         * подмену: пусто, обрезано, вставлено не то. Без них человек второй
+         * раз вписывает ровно то же самое.
+         */
         throw new Error(
           `Маршрутизатор не принял ключ (${response.status}). ` +
             `Проверьте секрет LLM_API_KEY у исполнителя: нужен обычный ключ API, ` +
-            `а не мастер-ключ. Проверить можно командой npm run check:vision -- --whoami`
+            `а не мастер-ключ. Сейчас задан ключ ${describeKey(API_KEY)}, ` +
+            `адрес ${BASE_URL}.`
         );
       }
 
@@ -261,4 +286,18 @@ export function parseJson<T>(text: string): T {
 export function isTransient(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   return /\b(429|500|502|503|504)\b/.test(message) || /abort|timeout/i.test(message);
+}
+
+/**
+ * Приметы ключа для сообщения об ошибке.
+ *
+ * Ровно столько, чтобы человек узнал свой ключ или увидел, что задан чужой, —
+ * и ни знаком больше: сообщение попадает в журнал заданий, а журнал показывают
+ * и пересылают.
+ */
+function describeKey(key: string): string {
+  if (!key) return "пустой";
+  if (key.length < 12) return `подозрительно короткий, ${key.length} знаков`;
+
+  return `${key.slice(0, 5)}…${key.slice(-2)}, ${key.length} знаков`;
 }
