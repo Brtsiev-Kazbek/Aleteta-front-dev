@@ -104,7 +104,7 @@ export function DemoExtractionSheet() {
                           isStepDone
                             ? "bg-emerald-100 text-emerald-600"
                             : isCurrent
-                              ? "bg-stone-900 text-white"
+                              ? "bg-fg text-inverse-fg"
                               : "bg-surface-2 text-fg-ghost"
                         )}
                       >
@@ -220,7 +220,7 @@ export function DemoExtractionSheet() {
                         className={cn(
                           "flex items-center gap-2.5 rounded border px-3 py-2.5 text-left transition-colors",
                           targetCaseId === item.id
-                            ? "border-stone-900 bg-stone-50"
+                            ? "border-fg bg-bg"
                             : "border-line hover:border-line-strong"
                         )}
                       >
@@ -228,8 +228,8 @@ export function DemoExtractionSheet() {
                           className={cn(
                             "h-1.5 w-1.5 shrink-0 rounded-full",
                             targetCaseId === item.id
-                              ? "bg-stone-900"
-                              : "bg-stone-300"
+                              ? "bg-fg"
+                              : "bg-fg-ghost"
                           )}
                         />
                         <span className="min-w-0 flex-1 truncate text-[13px] text-fg-muted">

@@ -78,8 +78,8 @@ export function SectionHeading({
           className={cn(
             "h-px flex-1",
             isDark
-              ? "bg-gradient-to-r from-stone-800 to-transparent"
-              : "bg-gradient-to-r from-stone-200 to-transparent",
+              ? "bg-gradient-to-r from-inverse-line to-transparent"
+              : "bg-gradient-to-r from-line to-transparent",
             align === "center" && "hidden"
           )}
         />
@@ -88,7 +88,7 @@ export function SectionHeading({
       <h2
         className={cn(
           "mt-6 max-w-3xl text-[2rem] font-medium leading-[1.12] tracking-[-0.025em] sm:text-[2.75rem]",
-          isDark ? "text-white" : "text-fg",
+          isDark ? "text-inverse-fg" : "text-fg",
           align === "center" && "mx-auto"
         )}
       >

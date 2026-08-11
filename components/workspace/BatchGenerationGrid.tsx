@@ -264,7 +264,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
             transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
             className={cn(
               "h-px",
-              stats.allValid ? "bg-emerald-500" : "bg-stone-900"
+              stats.allValid ? "bg-emerald-500" : "bg-fg"
             )}
           />
         </div>
@@ -462,7 +462,7 @@ function EntityGroupTable({
   return (
     <section className="border-b border-line last:border-b-0">
       {/* Заголовок группы */}
-      <div className="sticky left-0 flex items-center gap-2 bg-stone-50 px-4 py-2.5">
+      <div className="sticky left-0 flex items-center gap-2 bg-bg px-4 py-2.5">
         <Icon className="h-3 w-3 shrink-0 text-fg-faint" />
         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
           {schema.label}
@@ -521,7 +521,7 @@ function EntityGroupTable({
                 duration: 0.22,
                 delay: Math.min(index * 0.04, 0.24),
               }}
-              className="group hover:bg-stone-50/70"
+              className="group hover:bg-bg/70"
             >
               {row.getVisibleCells().map((cell) => {
                 const meta = cell.column.columnDef.meta;
@@ -537,7 +537,7 @@ function EntityGroupTable({
                     className={cn(
                       "border-b border-line/70 p-0 align-middle",
                       isSticky &&
-                        "sticky z-10 bg-surface shadow-[1px_0_0_0_rgb(231,229,228)] group-hover:bg-stone-50/70"
+                        "sticky z-10 bg-surface shadow-[1px_0_0_0_rgb(231,229,228)] group-hover:bg-bg/70"
                     )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -610,7 +610,7 @@ function EntityCell({
               setEditingCell(null);
             }
           }}
-          className="h-full w-full rounded border border-stone-900 bg-surface px-2.5 text-sm text-fg shadow-[0_0_0_3px_rgba(28,25,23,0.08)] outline-none placeholder:text-fg-ghost"
+          className="h-full w-full rounded border border-fg bg-surface px-2.5 text-sm text-fg shadow-[0_0_0_3px_rgba(28,25,23,0.08)] outline-none placeholder:text-fg-ghost"
         />
       </div>
     );
@@ -650,9 +650,9 @@ function EntityCell({
         onClick={() =>
           setEditingCell({ entityId: entity.id, field: field.key })
         }
-        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
+        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
       >
-        <Plus className="h-3.5 w-3.5 shrink-0 text-stone-200 transition-colors group-hover/cell:text-fg" />
+        <Plus className="h-3.5 w-3.5 shrink-0 text-inverse-fg transition-colors group-hover/cell:text-fg" />
         <span className="truncate text-sm text-fg-ghost transition-colors group-hover/cell:text-fg-subtle">
           Добавить
         </span>

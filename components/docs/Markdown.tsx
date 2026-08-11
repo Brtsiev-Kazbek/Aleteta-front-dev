@@ -49,7 +49,7 @@ export function Markdown({ content }: { content: string }) {
             {/* Маркер списка — точка того же цвета, что акценты интерфейса. */}
             <span
               aria-hidden
-              className="absolute left-0 top-[0.6em] hidden h-1 w-1 rounded-full bg-stone-300 [ul>li>&]:block"
+              className="absolute left-0 top-[0.6em] hidden h-1 w-1 rounded-full bg-fg-ghost [ul>li>&]:block"
             />
             {children}
           </li>
@@ -60,7 +60,7 @@ export function Markdown({ content }: { content: string }) {
         a: ({ href, children }) => (
           <a
             href={normalizeHref(href)}
-            className="border-b border-line-strong pb-0.5 text-fg transition-colors hover:border-stone-900"
+            className="border-b border-line-strong pb-0.5 text-fg transition-colors hover:border-fg"
           >
             {children}
           </a>
@@ -70,19 +70,19 @@ export function Markdown({ content }: { content: string }) {
           const isBlock = Boolean(className);
           if (isBlock) {
             return (
-              <code className="font-mono text-[13px] leading-relaxed text-stone-100">
+              <code className="font-mono text-[13px] leading-relaxed text-inverse-fg">
                 {children}
               </code>
             );
           }
           return (
-            <code className="rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[12.5px] text-stone-800">
+            <code className="rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[12.5px] text-fg">
               {children}
             </code>
           );
         },
         pre: ({ children }) => (
-          <pre className="scrollable-area mt-5 overflow-x-auto rounded-lg bg-stone-950 px-5 py-4">
+          <pre className="scrollable-area mt-5 overflow-x-auto rounded-lg bg-inverse px-5 py-4">
             {children}
           </pre>
         ),

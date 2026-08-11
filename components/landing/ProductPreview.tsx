@@ -152,8 +152,8 @@ export function ProductPreview() {
               className={cn(
                 "h-1 rounded-full transition-all duration-500",
                 index === datasetIndex
-                  ? "w-5 bg-stone-900"
-                  : "w-1 bg-stone-300"
+                  ? "w-5 bg-fg"
+                  : "w-1 bg-fg-ghost"
               )}
             />
           ))}
@@ -255,7 +255,7 @@ export function ProductPreview() {
                             aria-hidden
                             animate={{ opacity: [1, 0, 1] }}
                             transition={{ duration: 0.85, repeat: Infinity }}
-                            className="inline-block h-4 w-px bg-stone-900"
+                            className="inline-block h-4 w-px bg-fg"
                           />
                         )}
                       </motion.div>

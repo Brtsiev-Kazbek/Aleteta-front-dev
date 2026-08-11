@@ -70,7 +70,7 @@ export function GenerationShowcase() {
   const progress = (ready / OUTPUT.length) * 100;
 
   return (
-    <section className="grain relative overflow-hidden border-b border-inverse-line bg-stone-950">
+    <section className="grain relative overflow-hidden border-b border-inverse-line bg-inverse">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-grid-dark opacity-60"
@@ -82,13 +82,13 @@ export function GenerationShowcase() {
             <span className="font-mono text-[11px] tabular-nums text-violet-400">
               05
             </span>
-            <span className="h-px w-8 bg-stone-700" />
+            <span className="h-px w-8 bg-inverse-3" />
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
               Генерация пакета
             </span>
           </div>
 
-          <h2 className="mt-5 max-w-2xl text-3xl font-medium leading-[1.15] tracking-[-0.02em] text-white sm:text-[2.5rem]">
+          <h2 className="mt-5 max-w-2xl text-3xl font-medium leading-[1.15] tracking-[-0.02em] text-inverse-fg sm:text-[2.5rem]">
             Четыре объекта — десять документов. Одно нажатие.
           </h2>
         </Reveal>
@@ -111,7 +111,7 @@ export function GenerationShowcase() {
                         : "rgb(109 40 217)",
                   }}
                   transition={{ duration: 0.4, delay: index * 0.08 }}
-                  className="flex items-center gap-2.5 rounded border bg-stone-900/60 px-3 py-2.5"
+                  className="flex items-center gap-2.5 rounded border bg-fg/60 px-3 py-2.5"
                 >
                   <FileText className="h-3.5 w-3.5 shrink-0 text-fg-soft" />
                   <span className="min-w-0 flex-1 truncate text-xs text-fg-ghost">
@@ -162,7 +162,7 @@ export function GenerationShowcase() {
 
             {/* Прогресс */}
             <div className="mt-5">
-              <div className="h-px w-full bg-stone-800">
+              <div className="h-px w-full bg-inverse-3">
                 <motion.div
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.25 }}
@@ -174,7 +174,7 @@ export function GenerationShowcase() {
                 <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
                   Готово
                 </span>
-                <span className="font-mono text-sm tabular-nums text-white">
+                <span className="font-mono text-sm tabular-nums text-inverse-fg">
                   {ready} / {OUTPUT.length}
                 </span>
               </div>
@@ -206,7 +206,7 @@ export function GenerationShowcase() {
                     initial={{ opacity: 0, x: 8 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0 }}
-                    className="inline-flex items-center gap-1.5 rounded border border-stone-700 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-ghost"
+                    className="inline-flex items-center gap-1.5 rounded border border-inverse-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-ghost"
                   >
                     <Download className="h-3 w-3" />
                     Скачать .zip
@@ -230,7 +230,7 @@ export function GenerationShowcase() {
                         : "rgb(28 25 23)",
                     }}
                     transition={{ duration: 0.3 }}
-                    className="flex items-center gap-2.5 rounded border bg-stone-900/50 px-3 py-2.5"
+                    className="flex items-center gap-2.5 rounded border bg-fg/50 px-3 py-2.5"
                   >
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center">
                       {isReady ? (

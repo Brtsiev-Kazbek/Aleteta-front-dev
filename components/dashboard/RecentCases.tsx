@@ -62,7 +62,7 @@ export function RecentCases() {
             transition={{ duration: 0.25, delay: index * 0.06 }}
             className={cn(
               "flex flex-col p-5 transition-colors",
-              isSelected ? "bg-stone-50" : "bg-surface hover:bg-stone-50/60"
+              isSelected ? "bg-bg" : "bg-surface hover:bg-bg/60"
             )}
           >
             <div className="flex items-start justify-between gap-3">
@@ -130,7 +130,7 @@ export function RecentCases() {
 
             <Link
               href={`/cases/${caseItem.id}`}
-              className="group mt-4 inline-flex w-fit items-center gap-1.5 border-b border-line pb-0.5 text-[13px] text-fg-muted transition-colors hover:border-stone-900 hover:text-fg"
+              className="group mt-4 inline-flex w-fit items-center gap-1.5 border-b border-line pb-0.5 text-[13px] text-fg-muted transition-colors hover:border-fg hover:text-fg"
             >
               Открыть дело
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />

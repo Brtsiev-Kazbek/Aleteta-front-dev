@@ -106,7 +106,7 @@ export function CustomTypeDemo() {
               key={item.name}
               className={cn(
                 "h-1 rounded-full transition-all duration-500",
-                index === presetIndex ? "w-4 bg-stone-900" : "w-1 bg-stone-300"
+                index === presetIndex ? "w-4 bg-fg" : "w-1 bg-fg-ghost"
               )}
             />
           ))}
@@ -124,7 +124,7 @@ export function CustomTypeDemo() {
               aria-hidden
               animate={{ opacity: [1, 0, 1] }}
               transition={{ duration: 0.85, repeat: Infinity }}
-              className="inline-block h-4 w-px bg-stone-900"
+              className="inline-block h-4 w-px bg-fg"
             />
           )}
         </div>
@@ -148,7 +148,7 @@ export function CustomTypeDemo() {
                 transition={{ duration: 0.25 }}
                 className="flex items-center gap-2.5 rounded border border-line px-3 py-2.5"
               >
-                <span className="min-w-0 flex-1 truncate text-xs text-stone-800">
+                <span className="min-w-0 flex-1 truncate text-xs text-fg">
                   {field.label}
                 </span>
 

@@ -27,7 +27,7 @@ export const CASE_STATUS_META: Record<
   in_progress: {
     label: "В работе",
     badgeClassName: "border-line text-fg-soft",
-    dotClassName: "bg-stone-900",
+    dotClassName: "bg-fg",
   },
   collecting: {
     label: "Сбор данных",
@@ -42,7 +42,7 @@ export const CASE_STATUS_META: Record<
   archived: {
     label: "В архиве",
     badgeClassName: "border-line text-fg-faint",
-    dotClassName: "bg-stone-300",
+    dotClassName: "bg-fg-ghost",
   },
 };
 
@@ -413,7 +413,7 @@ export const RISK_LEVEL_META: Record<
   },
   info: {
     label: "Замечание",
-    cardClassName: "border-line bg-stone-50",
+    cardClassName: "border-line bg-bg",
     badgeClassName: "border-line bg-surface text-fg-soft",
     iconClassName: "text-fg-subtle",
   },

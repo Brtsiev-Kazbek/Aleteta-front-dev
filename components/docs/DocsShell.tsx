@@ -29,13 +29,13 @@ export function DocsShell({
   sourceFile?: string;
 }) {
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-bg">
       {/* Шапка */}
-      <header className="sticky top-0 z-30 border-b border-line bg-stone-50/90 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-line bg-bg/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-6">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded bg-stone-950 text-[13px] font-medium text-white">
+              <span className="flex h-7 w-7 items-center justify-center rounded bg-inverse text-[13px] font-medium text-inverse-fg">
                 А
               </span>
               <span className="text-sm font-medium tracking-[-0.01em] text-fg">
@@ -94,7 +94,7 @@ export function DocsShell({
                       className={cn(
                         "-ml-px flex items-baseline gap-2.5 border-l py-2 pl-4 text-[13px] transition-colors",
                         isActive
-                          ? "border-stone-900 text-fg"
+                          ? "border-fg text-fg"
                           : "border-transparent text-fg-subtle hover:border-line-strong hover:text-fg"
                       )}
                     >

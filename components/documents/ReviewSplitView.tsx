@@ -208,7 +208,7 @@ export function ReviewSplitView({
                               : level === "warning"
                                 ? "bg-amber-500"
                                 : level
-                                  ? "bg-stone-400"
+                                  ? "bg-fg-faint"
                                   : "bg-transparent"
                           )}
                         />
@@ -242,7 +242,7 @@ export function ReviewSplitView({
             </span>
           </header>
 
-          <div className="scrollable-area min-h-0 flex-1 overflow-auto bg-stone-50/60 px-5 py-5">
+          <div className="scrollable-area min-h-0 flex-1 overflow-auto bg-bg/60 px-5 py-5">
             <div className="flex flex-col gap-2.5">
               {REVIEW_RISKS.map((risk, index) => {
                 const meta = RISK_LEVEL_META[risk.level];
@@ -263,7 +263,7 @@ export function ReviewSplitView({
                     className={cn(
                       "w-full rounded border p-4 text-left transition-colors",
                       meta.cardClassName,
-                      isActive && "border-stone-900"
+                      isActive && "border-fg"
                     )}
                   >
                     <div className="flex items-start gap-2.5">
@@ -445,7 +445,7 @@ function CasePractice({
               >
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Gavel className="h-3 w-3 shrink-0 text-fg-ghost" />
-                  <span className="text-[11px] font-medium text-stone-800">
+                  <span className="text-[11px] font-medium text-fg">
                     {item.court}
                   </span>
                   <span className="font-mono text-[10px] text-fg-faint">

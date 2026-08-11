@@ -32,7 +32,7 @@ export function FinalCTA() {
             <div className="flex flex-col items-start gap-4 lg:col-span-5 lg:items-end">
               <Link
                 href="/auth/register"
-                className="group inline-flex h-12 items-center gap-2 rounded-md bg-stone-950 px-7 text-sm font-medium text-white transition-colors hover:bg-stone-900"
+                className="group inline-flex h-12 items-center gap-2 rounded-md bg-inverse px-7 text-sm font-medium text-inverse-fg transition-colors hover:bg-fg"
               >
                 Начать работу
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />

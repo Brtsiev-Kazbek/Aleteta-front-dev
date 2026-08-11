@@ -150,7 +150,7 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
               <div
                 className={cn(
                   "mt-2.5 rounded-md border bg-surface p-2.5 transition-colors",
-                  prompt.trim() ? "border-stone-900" : "border-line"
+                  prompt.trim() ? "border-fg" : "border-line"
                 )}
               >
                 <AutoGrowTextarea

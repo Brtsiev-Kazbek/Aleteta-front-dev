@@ -212,7 +212,7 @@ export function CaseSelectionBar() {
                               className={cn(
                                 "flex cursor-pointer items-center gap-2.5 rounded border px-3 py-2 transition-colors",
                                 isPicked
-                                  ? "border-stone-900 bg-stone-50"
+                                  ? "border-fg bg-bg"
                                   : "border-line hover:border-line-strong"
                               )}
                             >
@@ -244,7 +244,7 @@ export function CaseSelectionBar() {
                       <div
                         className={cn(
                           "rounded-md border bg-surface p-3 transition-colors",
-                          prompt.trim() ? "border-stone-900" : "border-line"
+                          prompt.trim() ? "border-fg" : "border-line"
                         )}
                       >
                         <AutoGrowTextarea
@@ -267,7 +267,7 @@ export function CaseSelectionBar() {
                             key={item}
                             type="button"
                             onClick={() => setPrompt(item)}
-                            className="rounded border border-line px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-stone-900 hover:text-fg"
+                            className="rounded border border-line px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-fg hover:text-fg"
                           >
                             {item}
                           </button>

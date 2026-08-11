@@ -145,7 +145,7 @@ export function LoginForm({
         Нет аккаунта?{" "}
         <Link
           href={`/auth/register?next=${encodeURIComponent(nextPath)}`}
-          className="border-b border-line-strong pb-0.5 text-fg transition-colors hover:border-stone-900"
+          className="border-b border-line-strong pb-0.5 text-fg transition-colors hover:border-fg"
         >
           Зарегистрироваться
         </Link>

@@ -25,12 +25,12 @@ export function AuthShell({
   footnote?: string;
 }) {
   return (
-    <div className="flex min-h-screen bg-stone-50">
+    <div className="flex min-h-screen bg-bg">
       {/* Форма */}
       <div className="flex w-full flex-col px-6 py-8 sm:px-10 lg:w-[46%] lg:px-14 lg:py-10">
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="group flex w-fit items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded bg-stone-950 text-[13px] font-medium text-white">
+            <span className="flex h-7 w-7 items-center justify-center rounded bg-inverse text-[13px] font-medium text-inverse-fg">
               А
             </span>
             <span className="text-sm font-medium tracking-[-0.01em] text-fg">
@@ -58,7 +58,7 @@ export function AuthShell({
       </div>
 
       {/* Смысловая часть — зачем этот экран */}
-      <div className="relative hidden overflow-hidden bg-stone-950 lg:flex lg:w-[54%]">
+      <div className="relative hidden overflow-hidden bg-inverse lg:flex lg:w-[54%]">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-grid-dark opacity-60"
@@ -74,7 +74,7 @@ export function AuthShell({
         {/* Мягкое затемнение к низу: список не «висит» в пустоте. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-stone-950 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-inverse to-transparent"
         />
 
         <div className="relative flex w-full flex-col justify-center px-14 xl:px-20">
@@ -85,11 +85,11 @@ export function AuthShell({
             </span>
           </span>
 
-          <h2 className="mt-6 max-w-lg text-[2rem] font-medium leading-[1.15] tracking-[-0.03em] text-white xl:text-[2.25rem]">
+          <h2 className="mt-6 max-w-lg text-[2rem] font-medium leading-[1.15] tracking-[-0.03em] text-inverse-fg xl:text-[2.25rem]">
             {heading}
           </h2>
 
-          <ul className="mt-12 flex max-w-lg flex-col divide-y divide-stone-800/80 border-y border-inverse-line/80">
+          <ul className="mt-12 flex max-w-lg flex-col divide-y divide-inverse-line/80 border-y border-inverse-line/80">
             {points.map((item, index) => (
               <li
                 key={item}
@@ -98,7 +98,7 @@ export function AuthShell({
                 <span className="shrink-0 font-mono text-[10px] tabular-nums text-fg-soft transition-colors group-hover:text-violet-400">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="text-sm leading-relaxed text-fg-faint transition-colors group-hover:text-stone-200">
+                <span className="text-sm leading-relaxed text-fg-faint transition-colors group-hover:text-inverse-fg">
                   {item}
                 </span>
               </li>

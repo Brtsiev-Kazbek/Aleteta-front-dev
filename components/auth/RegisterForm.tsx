@@ -228,7 +228,7 @@ export function RegisterForm({
         Уже есть аккаунт?{" "}
         <Link
           href={`/auth/login?next=${encodeURIComponent(nextPath)}`}
-          className="border-b border-line-strong pb-0.5 text-fg transition-colors hover:border-stone-900"
+          className="border-b border-line-strong pb-0.5 text-fg transition-colors hover:border-fg"
         >
           Войти
         </Link>

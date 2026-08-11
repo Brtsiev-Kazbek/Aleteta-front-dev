@@ -110,7 +110,7 @@ export function Sidebar() {
           className="group flex min-w-0 items-center gap-2.5"
           aria-label="На главную"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-stone-950 text-[13px] font-medium text-white">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-inverse text-[13px] font-medium text-inverse-fg">
             А
           </span>
 
@@ -181,7 +181,7 @@ export function Sidebar() {
                   isExpanded ? "w-full gap-3 px-3" : "w-9 justify-center",
                   active
                     ? "bg-surface-2 text-fg"
-                    : "text-fg-faint hover:bg-stone-50 hover:text-fg"
+                    : "text-fg-faint hover:bg-bg hover:text-fg"
                 )}
               >
                 {/* Активный пункт помечен волосяной линией, а не заливкой цветом */}

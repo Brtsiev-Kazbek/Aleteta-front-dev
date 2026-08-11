@@ -102,7 +102,7 @@ export function ProfileForm({
         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
           Электронная почта
         </span>
-        <div className="flex h-10 items-center rounded-md border border-line bg-stone-50 px-3 text-sm text-fg-subtle">
+        <div className="flex h-10 items-center rounded-md border border-line bg-bg px-3 text-sm text-fg-subtle">
           {email}
         </div>
       </div>

@@ -77,7 +77,7 @@ const PLANS: Plan[] = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="bg-stone-50">
+    <section id="pricing" className="bg-bg">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="12"
@@ -98,8 +98,8 @@ export function Pricing() {
                   */
                   "group relative flex h-full flex-col p-7 transition-colors lg:p-8",
                   plan.highlighted
-                    ? "bg-stone-950"
-                    : "bg-surface hover:bg-stone-50/80"
+                    ? "bg-inverse"
+                    : "bg-surface hover:bg-bg/80"
                 )}
               >
                 {plan.highlighted && (
@@ -112,7 +112,7 @@ export function Pricing() {
                   <h3
                     className={cn(
                       "text-sm font-medium",
-                      plan.highlighted ? "text-white" : "text-fg"
+                      plan.highlighted ? "text-inverse-fg" : "text-fg"
                     )}
                   >
                     {plan.name}
@@ -138,7 +138,7 @@ export function Pricing() {
                   <span
                     className={cn(
                       "font-mono text-3xl tracking-tight",
-                      plan.highlighted ? "text-white" : "text-fg"
+                      plan.highlighted ? "text-inverse-fg" : "text-fg"
                     )}
                   >
                     {plan.price}
@@ -159,7 +159,7 @@ export function Pricing() {
                   className={cn(
                     "mt-7 flex flex-1 flex-col divide-y border-y",
                     plan.highlighted
-                      ? "divide-stone-800 border-inverse-line"
+                      ? "divide-inverse-line border-inverse-line"
                       : "divide-line-soft border-line-soft"
                   )}
                 >
@@ -181,8 +181,8 @@ export function Pricing() {
                   className={cn(
                     "mt-7 inline-flex h-11 items-center justify-center rounded-md text-sm font-medium transition-colors",
                     plan.highlighted
-                      ? "bg-surface text-stone-950 hover:bg-surface-2"
-                      : "border border-line text-fg hover:bg-stone-50"
+                      ? "bg-surface text-fg hover:bg-surface-2"
+                      : "border border-line text-fg hover:bg-bg"
                   )}
                 >
                   {plan.cta}

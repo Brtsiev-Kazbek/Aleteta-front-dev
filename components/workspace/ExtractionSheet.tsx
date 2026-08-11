@@ -315,7 +315,7 @@ function Progress({
                 isStepDone
                   ? "bg-emerald-100 text-emerald-600"
                   : isCurrent
-                    ? "bg-stone-900 text-white"
+                    ? "bg-fg text-inverse-fg"
                     : "bg-surface-2 text-fg-ghost"
               )}
             >
@@ -368,7 +368,7 @@ function PagesNote({ looked, total }: { looked: number; total: number }) {
     <div
       className={cn(
         "mt-5 flex items-start gap-2 rounded border px-3.5 py-2.5",
-        full ? "border-line bg-stone-50" : "border-amber-200 bg-amber-50/60"
+        full ? "border-line bg-bg" : "border-amber-200 bg-amber-50/60"
       )}
     >
       <ScanLine

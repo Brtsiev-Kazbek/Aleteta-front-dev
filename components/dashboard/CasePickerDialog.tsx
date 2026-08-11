@@ -67,7 +67,7 @@ export function CasePickerDialog({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: index * 0.05 }}
                 onClick={() => onPick(item.id)}
-                className="group flex items-center gap-3 py-3.5 text-left transition-colors hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
+                className="group flex items-center gap-3 py-3.5 text-left transition-colors hover:bg-bg focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
               >
                 <span
                   className={cn(

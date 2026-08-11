@@ -64,7 +64,7 @@ export function ChatDemo() {
       {/* Шапка шторки */}
       <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-500">
-          <Sparkles className="h-3.5 w-3.5 text-white" />
+          <Sparkles className="h-3.5 w-3.5 text-inverse-fg" />
         </div>
         <div className="flex flex-col leading-none">
           <span className="text-sm font-semibold text-fg">Алетейя AI</span>
@@ -84,7 +84,7 @@ export function ChatDemo() {
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-end"
             >
-              <span className="rounded-2xl rounded-tr-sm bg-violet-600 px-3.5 py-2 text-sm text-white">
+              <span className="rounded-2xl rounded-tr-sm bg-violet-600 px-3.5 py-2 text-sm text-inverse-fg">
                 Проверить риски
               </span>
             </motion.div>
@@ -101,7 +101,7 @@ export function ChatDemo() {
               {[0, 1, 2].map((dot) => (
                 <motion.span
                   key={dot}
-                  className="h-1.5 w-1.5 rounded-full bg-stone-400"
+                  className="h-1.5 w-1.5 rounded-full bg-fg-faint"
                   animate={{ opacity: [0.3, 1, 0.3] }}
                   transition={{ duration: 1, repeat: Infinity, delay: dot * 0.18 }}
                 />
@@ -181,7 +181,7 @@ export function ChatDemo() {
           <span className="flex-1 text-xs text-fg-ghost">
             Спросите Алетейю о деле…
           </span>
-          <span className="flex h-6 w-6 items-center justify-center rounded bg-violet-600 text-[10px] text-white">
+          <span className="flex h-6 w-6 items-center justify-center rounded bg-violet-600 text-[10px] text-inverse-fg">
             ↑
           </span>
         </div>

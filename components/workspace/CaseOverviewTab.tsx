@@ -106,7 +106,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
             transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
             className={cn(
               "h-px",
-              isReady ? "bg-emerald-500" : "bg-stone-900"
+              isReady ? "bg-emerald-500" : "bg-fg"
             )}
           />
         </div>
@@ -120,7 +120,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           ].map((tile) => (
             <div
               key={tile.label}
-              className="bg-surface px-4 py-5 transition-colors hover:bg-stone-50"
+              className="bg-surface px-4 py-5 transition-colors hover:bg-bg"
             >
               <span className="font-mono text-2xl tabular-nums text-fg">
                 <AnimatedNumber value={tile.value} />
@@ -141,7 +141,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
               <button
                 type="button"
                 onClick={() => setActiveTab("entities")}
-                className="border-b border-line pb-0.5 text-xs text-fg-subtle transition-colors hover:border-stone-900 hover:text-fg"
+                className="border-b border-line pb-0.5 text-xs text-fg-subtle transition-colors hover:border-fg hover:text-fg"
               >
                 Открыть матрицу
               </button>
@@ -163,7 +163,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.24, delay: index * 0.05 }}
-                  className="group flex cursor-pointer items-center gap-4 py-4 transition-colors hover:bg-stone-50"
+                  className="group flex cursor-pointer items-center gap-4 py-4 transition-colors hover:bg-bg"
                   onClick={() => setActiveTab("entities")}
                 >
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-red-500" />

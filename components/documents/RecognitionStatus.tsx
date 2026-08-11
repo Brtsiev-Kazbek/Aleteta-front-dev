@@ -96,7 +96,7 @@ function Badge({
     tone === "quiet" && "border-line text-fg-subtle",
     tone === "active" && "border-violet-200 bg-violet-50/60 text-violet-700",
     tone === "alarm" && "border-red-200 text-red-600",
-    onClick && "transition-colors hover:border-stone-400 hover:text-fg"
+    onClick && "transition-colors hover:border-fg-faint hover:text-fg"
   );
 
   if (!onClick) return <span className={className}>{children}</span>;

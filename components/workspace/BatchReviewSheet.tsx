@@ -118,7 +118,7 @@ export function BatchReviewSheet() {
                   <span
                     className={cn(
                       "min-w-0 flex-1 truncate text-[13px] transition-colors",
-                      result ? "text-stone-800" : "text-fg-faint"
+                      result ? "text-fg" : "text-fg-faint"
                     )}
                   >
                     {item.title}
@@ -206,7 +206,7 @@ export function BatchReviewSheet() {
                         <span className="shrink-0 font-mono text-[10px] tabular-nums text-fg-ghost">
                           {String(index + 1).padStart(2, "0")}
                         </span>
-                        <span className="min-w-0 flex-1 truncate text-[13px] text-stone-800">
+                        <span className="min-w-0 flex-1 truncate text-[13px] text-fg">
                           {item.title}
                         </span>
                         {item.critical > 0 && (

@@ -289,7 +289,7 @@ function Dropzone({
         compact ? "px-6 py-8" : "px-6 py-20",
         isDragging
           ? "border-violet-400 bg-violet-50/50"
-          : "border-line-strong bg-surface/60 hover:border-stone-400"
+          : "border-line-strong bg-surface/60 hover:border-fg-faint"
       )}
     >
       <Upload
@@ -500,7 +500,7 @@ function SearchPanel({
                     onClick={() => onOpen(hit, query.trim())}
                     className={cn(
                       "flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors",
-                      isCurrent ? "bg-amber-50/70" : "hover:bg-stone-50"
+                      isCurrent ? "bg-amber-50/70" : "hover:bg-bg"
                     )}
                   >
                     <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
@@ -582,8 +582,8 @@ function FileList({
               className={cn(
                 "group rounded-lg border p-3 transition-colors",
                 isSelected
-                  ? "border-stone-900 bg-surface"
-                  : "border-line bg-surface/60 hover:border-stone-400"
+                  ? "border-fg bg-surface"
+                  : "border-line bg-surface/60 hover:border-fg-faint"
               )}
             >
               <button
@@ -669,8 +669,8 @@ function FileStrip({
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 transition-colors",
               isSelected
-                ? "border-stone-900 bg-surface"
-                : "border-line bg-surface/60 hover:border-stone-400"
+                ? "border-fg bg-surface"
+                : "border-line bg-surface/60 hover:border-fg-faint"
             )}
           >
             <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />

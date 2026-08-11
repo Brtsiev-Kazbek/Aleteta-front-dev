@@ -120,7 +120,7 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
                       isDone
                         ? "bg-emerald-100 text-emerald-600"
                         : isCurrent
-                          ? "bg-stone-900 text-white"
+                          ? "bg-fg text-inverse-fg"
                           : "bg-surface-2 text-fg-ghost"
                     )}
                   >

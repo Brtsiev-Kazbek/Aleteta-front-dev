@@ -96,7 +96,7 @@ export function FeatureShowcase({
                     <span
                       className={cn(
                         "absolute -left-px top-0 h-full w-px transition-colors",
-                        isActive ? "bg-stone-900" : "bg-transparent"
+                        isActive ? "bg-fg" : "bg-transparent"
                       )}
                     />
 

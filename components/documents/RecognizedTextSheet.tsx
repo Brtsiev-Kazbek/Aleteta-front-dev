@@ -158,7 +158,7 @@ export function RecognizedTextSheet({
         </SheetHeader>
 
         {/* Ярус 2: состояние и действия */}
-        <div className="shrink-0 border-b border-line bg-stone-50/70 px-6 py-3">
+        <div className="shrink-0 border-b border-line bg-bg/70 px-6 py-3">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <StatusLine
               status={status}

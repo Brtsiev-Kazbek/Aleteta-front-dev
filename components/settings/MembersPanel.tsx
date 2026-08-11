@@ -55,7 +55,7 @@ function RoleSelect({
         onChange={(event) => onChange(event.target.value as WorkspaceRole)}
         aria-label={label}
         className={cn(
-          "w-full appearance-none rounded-md border border-line bg-surface pl-2.5 pr-7 text-[13px] text-fg-muted transition-colors hover:border-line-strong focus-visible:border-stone-900 focus-visible:outline-none disabled:opacity-50",
+          "w-full appearance-none rounded-md border border-line bg-surface pl-2.5 pr-7 text-[13px] text-fg-muted transition-colors hover:border-line-strong focus-visible:border-fg focus-visible:outline-none disabled:opacity-50",
           className
         )}
       >

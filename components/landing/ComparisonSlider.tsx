@@ -62,7 +62,7 @@ export function ComparisonSlider() {
   }, [isDragging, updateFromClientX]);
 
   return (
-    <section className="bg-stone-50">
+    <section className="bg-bg">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="02"
@@ -93,7 +93,7 @@ export function ComparisonSlider() {
 
             {/* Разделитель */}
             <div
-              className="absolute inset-y-0 z-20 w-px bg-stone-900"
+              className="absolute inset-y-0 z-20 w-px bg-fg"
               style={{ left: `${position}%` }}
             >
               <button
@@ -115,7 +115,7 @@ export function ComparisonSlider() {
                   }
                 }}
                 className={cn(
-                  "absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border border-line-strong bg-surface shadow-md transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900",
+                  "absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border border-line-strong bg-surface shadow-md transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-fg",
                   isDragging && "scale-110"
                 )}
               >
@@ -127,7 +127,7 @@ export function ComparisonSlider() {
             <span className="pointer-events-none absolute left-4 top-4 z-10 rounded bg-surface/90 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle backdrop-blur">
               Как сейчас
             </span>
-            <span className="pointer-events-none absolute right-4 top-4 z-10 rounded bg-stone-950 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white">
+            <span className="pointer-events-none absolute right-4 top-4 z-10 rounded bg-inverse px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-inverse-fg">
               С Алетейей
             </span>
           </div>
@@ -141,7 +141,7 @@ function TableLayer({ variant }: { variant: "before" | "after" }) {
   const isBefore = variant === "before";
 
   return (
-    <div className={cn("min-w-full", isBefore && "bg-stone-50")}>
+    <div className={cn("min-w-full", isBefore && "bg-bg")}>
       <table className="w-full min-w-[640px] border-separate border-spacing-0 text-left">
         <thead>
           <tr>
@@ -164,7 +164,7 @@ function TableLayer({ variant }: { variant: "before" | "after" }) {
 
             return (
               <tr key={row.name}>
-                <td className="whitespace-nowrap border-b border-line-soft px-4 py-3.5 text-sm text-stone-800">
+                <td className="whitespace-nowrap border-b border-line-soft px-4 py-3.5 text-sm text-fg">
                   {row.name}
                 </td>
 
@@ -221,7 +221,7 @@ function TableLayer({ variant }: { variant: "before" | "after" }) {
             "whitespace-nowrap rounded px-4 py-2 text-sm font-medium",
             isBefore
               ? "bg-surface-3 text-fg-faint"
-              : "bg-stone-950 text-white"
+              : "bg-inverse text-inverse-fg"
           )}
         >
           Сгенерировать пакет

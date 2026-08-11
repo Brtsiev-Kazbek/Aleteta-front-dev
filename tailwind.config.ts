@@ -49,6 +49,7 @@ const config: Config = {
         inverse: {
           DEFAULT: channel("inverse"),
           2: channel("inverse-2"),
+          3: channel("inverse-3"),
           fg: channel("inverse-fg"),
           line: channel("inverse-line"),
         },

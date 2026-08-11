@@ -87,7 +87,7 @@ export function ExtractionStartDialog({
                   className={cn(
                     "flex flex-col gap-0.5 rounded border px-3.5 py-3 text-left transition-colors",
                     typeId === schema.id
-                      ? "border-stone-900 bg-stone-50"
+                      ? "border-fg bg-bg"
                       : "border-line hover:border-line-strong"
                   )}
                 >
@@ -95,7 +95,7 @@ export function ExtractionStartDialog({
                     <span
                       className={cn(
                         "h-1.5 w-1.5 shrink-0 rounded-full",
-                        typeId === schema.id ? "bg-stone-900" : "bg-stone-300"
+                        typeId === schema.id ? "bg-fg" : "bg-fg-ghost"
                       )}
                     />
                     <span className="text-[13px] text-fg">

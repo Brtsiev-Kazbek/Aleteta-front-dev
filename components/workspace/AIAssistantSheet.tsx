@@ -102,7 +102,7 @@ export function AIAssistantSheet({
                       "max-w-[88%] rounded-lg px-3.5 py-2.5 text-[13px] leading-relaxed",
                       message.role === "assistant"
                         ? "border border-line bg-surface text-fg"
-                        : "bg-stone-950 text-white"
+                        : "bg-inverse text-inverse-fg"
                     )}
                   >
                     {message.text}
@@ -145,7 +145,7 @@ export function AIAssistantSheet({
                 {[0, 1, 2].map((dot) => (
                   <motion.span
                     key={dot}
-                    className="h-1 w-1 rounded-full bg-stone-400"
+                    className="h-1 w-1 rounded-full bg-fg-faint"
                     animate={{ opacity: [0.25, 1, 0.25] }}
                     transition={{
                       duration: 1.1,
@@ -170,7 +170,7 @@ export function AIAssistantSheet({
                 type="button"
                 onClick={() => handleSend(prompt)}
                 disabled={isThinking}
-                className="rounded border border-line px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-stone-900 hover:text-fg disabled:opacity-40"
+                className="rounded border border-line px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-fg hover:text-fg disabled:opacity-40"
               >
                 {prompt}
               </button>
@@ -188,13 +188,13 @@ export function AIAssistantSheet({
                 }
               }}
               placeholder="Спросите Алетейю о деле…"
-              className="h-10 w-full rounded-md border border-line bg-surface pl-3.5 pr-11 text-[13px] text-fg outline-none transition-colors placeholder:text-fg-faint focus:border-stone-900"
+              className="h-10 w-full rounded-md border border-line bg-surface pl-3.5 pr-11 text-[13px] text-fg outline-none transition-colors placeholder:text-fg-faint focus:border-fg"
             />
             <button
               type="button"
               onClick={() => handleSend(draft)}
               disabled={!draft.trim() || isThinking}
-              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded bg-stone-950 text-white transition-colors hover:bg-stone-800 disabled:bg-surface-2 disabled:text-fg-faint"
+              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded bg-inverse text-inverse-fg transition-colors hover:bg-inverse-3 disabled:bg-surface-2 disabled:text-fg-faint"
               aria-label="Отправить сообщение"
             >
               <ArrowUp className="h-3.5 w-3.5" />
@@ -274,7 +274,7 @@ function CitationCard({
     >
       <div className="flex flex-wrap items-center gap-2">
         <FileText className="h-3 w-3 shrink-0 text-fg-ghost" />
-        <span className="min-w-0 truncate text-[11px] font-medium text-stone-800">
+        <span className="min-w-0 truncate text-[11px] font-medium text-fg">
           {citation.document}
         </span>
         <span className="ml-auto shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">

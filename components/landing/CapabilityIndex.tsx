@@ -74,7 +74,7 @@ export function CapabilityIndex() {
   const total = GROUPS.reduce((sum, group) => sum + group.items.length, 0);
 
   return (
-    <section id="capabilities" className="bg-stone-50">
+    <section id="capabilities" className="bg-bg">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="07"
@@ -114,7 +114,7 @@ export function CapabilityIndex() {
                         <span
                           className={cn(
                             "block text-[13px] leading-snug transition-colors",
-                            "text-stone-800 group-hover/item:text-violet-700"
+                            "text-fg group-hover/item:text-violet-700"
                           )}
                         >
                           {item.name}

@@ -33,7 +33,7 @@ export function LandingHeader() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         isScrolled
-          ? "border-b border-line bg-stone-50/85 backdrop-blur-md"
+          ? "border-b border-line bg-bg/85 backdrop-blur-md"
           : "border-b border-transparent"
       )}
     >
@@ -42,7 +42,7 @@ export function LandingHeader() {
           <span
             className={cn(
               "flex h-7 w-7 items-center justify-center rounded text-[13px] font-medium transition-colors",
-              isScrolled ? "bg-stone-950 text-white" : "bg-surface text-stone-950"
+              isScrolled ? "bg-inverse text-inverse-fg" : "bg-surface text-fg"
             )}
           >
             А
@@ -50,7 +50,7 @@ export function LandingHeader() {
           <span
             className={cn(
               "text-sm font-medium tracking-[-0.01em] transition-colors",
-              isScrolled ? "text-fg" : "text-white"
+              isScrolled ? "text-fg" : "text-inverse-fg"
             )}
           >
             Алетейя
@@ -66,7 +66,7 @@ export function LandingHeader() {
                 "text-[13px] transition-colors",
                 isScrolled
                   ? "text-fg-subtle hover:text-fg"
-                  : "text-fg-faint hover:text-white"
+                  : "text-fg-faint hover:text-inverse-fg"
               )}
             >
               {link.label}
@@ -81,7 +81,7 @@ export function LandingHeader() {
               "hidden text-[13px] transition-colors sm:block",
               isScrolled
                 ? "text-fg-subtle hover:text-fg"
-                : "text-fg-faint hover:text-white"
+                : "text-fg-faint hover:text-inverse-fg"
             )}
           >
             Войти
@@ -92,8 +92,8 @@ export function LandingHeader() {
             className={cn(
               "inline-flex h-9 items-center rounded-md px-4 text-[13px] font-medium transition-colors",
               isScrolled
-                ? "bg-stone-950 text-white hover:bg-stone-900"
-                : "bg-surface text-stone-950 hover:bg-surface-3"
+                ? "bg-inverse text-inverse-fg hover:bg-fg"
+                : "bg-surface text-fg hover:bg-surface-3"
             )}
           >
             Начать работу

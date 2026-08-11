@@ -62,7 +62,7 @@ export default async function SettingsPage() {
   const canManage = settings.myRole === "owner" || settings.myRole === "admin";
 
   return (
-    <div className="flex h-screen overflow-hidden bg-stone-50">
+    <div className="flex h-screen overflow-hidden bg-bg">
       {/* Сайдбару нужно имя вошедшего — данные дел здесь не читаем. */}
       <StoreBootstrap
         snapshot={{
@@ -98,7 +98,7 @@ export default async function SettingsPage() {
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="-ml-px block border-l border-transparent py-2 pl-4 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:border-stone-900 hover:text-fg"
+                      className="-ml-px block border-l border-transparent py-2 pl-4 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:border-fg hover:text-fg"
                     >
                       {link.label}
                     </a>
@@ -202,7 +202,7 @@ export default async function SettingsPage() {
                   </span>
                   <button
                     type="submit"
-                    className="shrink-0 border-b border-line-strong pb-0.5 text-[13px] text-fg-muted transition-colors hover:border-stone-900 hover:text-fg"
+                    className="shrink-0 border-b border-line-strong pb-0.5 text-[13px] text-fg-muted transition-colors hover:border-fg hover:text-fg"
                   >
                     Выйти
                   </button>
@@ -219,7 +219,7 @@ export default async function SettingsPage() {
 /** Стенд без переменных окружения: настройки читать неоткуда. */
 function NotConfigured() {
   return (
-    <div className="flex h-screen overflow-hidden bg-stone-50">
+    <div className="flex h-screen overflow-hidden bg-bg">
       <Sidebar />
 
       <main className="scrollable-area min-w-0 flex-1 overflow-y-auto">

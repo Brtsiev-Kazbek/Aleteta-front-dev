@@ -74,8 +74,8 @@ export function FileDropzone({
         className={cn(
           "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed px-8 py-14 text-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus",
           isDragging
-            ? "border-stone-900 bg-stone-50"
-            : "border-line-strong bg-surface hover:border-stone-400 hover:bg-stone-50/60"
+            ? "border-fg bg-bg"
+            : "border-line-strong bg-surface hover:border-fg-faint hover:bg-bg/60"
         )}
       >
         <Upload
@@ -111,7 +111,7 @@ export function FileDropzone({
         <button
           type="button"
           onClick={() => onPick(demoFile)}
-          className="self-center border-b border-line pb-0.5 text-xs text-fg-subtle transition-colors hover:border-stone-400 hover:text-fg"
+          className="self-center border-b border-line pb-0.5 text-xs text-fg-subtle transition-colors hover:border-fg-faint hover:text-fg"
         >
           {demoLabel}
         </button>

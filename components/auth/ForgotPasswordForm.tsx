@@ -59,7 +59,7 @@ export function ForgotPasswordForm() {
 
         <Link
           href="/auth/login"
-          className="mt-6 w-fit border-b border-line-strong pb-0.5 text-sm text-fg-soft transition-colors hover:border-stone-900 hover:text-fg"
+          className="mt-6 w-fit border-b border-line-strong pb-0.5 text-sm text-fg-soft transition-colors hover:border-fg hover:text-fg"
         >
           Вернуться ко входу
         </Link>

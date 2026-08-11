@@ -47,7 +47,7 @@ export function DashboardHero() {
   ];
 
   return (
-    <section className="grain relative overflow-hidden bg-stone-950">
+    <section className="grain relative overflow-hidden bg-inverse">
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-grid-dark" />
         <div
@@ -72,7 +72,7 @@ export function DashboardHero() {
           </span>
         </motion.div>
 
-        <h1 className="mt-6 max-w-2xl text-[2rem] font-medium leading-[1.08] tracking-[-0.035em] text-white sm:text-[2.5rem]">
+        <h1 className="mt-6 max-w-2xl text-[2rem] font-medium leading-[1.08] tracking-[-0.035em] text-inverse-fg sm:text-[2.5rem]">
           {HEADLINE.map((chunk, index) => (
             <motion.span
               key={chunk}
@@ -134,7 +134,7 @@ export function DashboardHero() {
         >
           {stats.map((stat) => (
             <li key={stat.label} className="flex items-baseline gap-2">
-              <span className="font-mono text-lg tabular-nums text-white">
+              <span className="font-mono text-lg tabular-nums text-inverse-fg">
                 <AnimatedNumber value={stat.value} />
               </span>
               <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">

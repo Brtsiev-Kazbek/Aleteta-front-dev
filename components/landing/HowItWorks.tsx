@@ -46,7 +46,7 @@ export function HowItWorks() {
       id="how"
       ref={sectionRef}
       onMouseMove={handleMove}
-      className="grain relative overflow-hidden border-b border-inverse-line bg-stone-950"
+      className="grain relative overflow-hidden border-b border-inverse-line bg-inverse"
     >
       {/* Свет за курсором */}
       {!reduceMotion && (
@@ -65,30 +65,30 @@ export function HowItWorks() {
             <span className="font-mono text-[11px] tabular-nums text-violet-400">
               10
             </span>
-            <span className="h-px w-8 bg-stone-700" />
+            <span className="h-px w-8 bg-inverse-3" />
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
               Как это работает
             </span>
           </div>
 
-          <h2 className="mt-5 max-w-2xl text-3xl font-medium leading-[1.15] tracking-[-0.02em] text-white sm:text-[2.5rem]">
+          <h2 className="mt-5 max-w-2xl text-3xl font-medium leading-[1.15] tracking-[-0.02em] text-inverse-fg sm:text-[2.5rem]">
             От папки со сканами до готового пакета — три шага
           </h2>
         </Reveal>
 
-        <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden rounded-lg bg-stone-800 md:grid-cols-3">
+        <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden rounded-lg bg-inverse-3 md:grid-cols-3">
           {STEPS.map((step, index) => (
             <Reveal key={step.number} delay={index * 0.12}>
               <motion.div
                 whileHover={{ backgroundColor: "rgb(24 24 27)" }}
                 transition={{ duration: 0.25 }}
-                className="flex h-full flex-col bg-stone-950 p-7 lg:p-8"
+                className="flex h-full flex-col bg-inverse p-7 lg:p-8"
               >
                 <span className="font-mono text-[11px] tabular-nums text-violet-400">
                   {step.number}
                 </span>
 
-                <h3 className="mt-5 text-lg font-medium text-white">
+                <h3 className="mt-5 text-lg font-medium text-inverse-fg">
                   {step.title}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-fg-faint">

@@ -154,7 +154,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
         <div
           className={cn(
             "rounded-lg border bg-surface p-4 transition-colors",
-            prompt.trim() ? "border-stone-900" : "border-line"
+            prompt.trim() ? "border-fg" : "border-line"
           )}
         >
           <AutoGrowTextarea
@@ -194,7 +194,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                 key={item}
                 type="button"
                 onClick={() => setPrompt(item)}
-                className="rounded border border-line bg-surface px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-stone-900 hover:text-fg"
+                className="rounded border border-line bg-surface px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-fg hover:text-fg"
               >
                 {item}
               </button>
@@ -338,7 +338,7 @@ function MarkdownDocument({
       {lines.map((line, index) => {
         const isLast = index === lines.length - 1;
         const caret = showCaret && isLast && (
-          <span className="ml-0.5 inline-block h-3 w-px animate-pulse bg-stone-900 align-middle" />
+          <span className="ml-0.5 inline-block h-3 w-px animate-pulse bg-fg align-middle" />
         );
 
         if (line.startsWith("## ")) {

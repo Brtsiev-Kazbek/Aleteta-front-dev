@@ -21,7 +21,7 @@ import { measurePassword } from "@/lib/auth/validation";
  * ходить по форме надо не глядя.
  */
 const FIELD_CLASSES =
-  "h-11 rounded-md transition-shadow focus-visible:border-stone-900 focus-visible:ring-4 focus-visible:ring-stone-900/5";
+  "h-11 rounded-md transition-shadow focus-visible:border-fg focus-visible:ring-4 focus-visible:ring-fg/5";
 
 const FIELD_ERROR_CLASSES =
   "border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/10";

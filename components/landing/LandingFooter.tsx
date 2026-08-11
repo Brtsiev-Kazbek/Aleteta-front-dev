@@ -36,12 +36,12 @@ const COLUMNS = [
 
 export function LandingFooter() {
   return (
-    <footer className="bg-stone-50">
+    <footer className="bg-bg">
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-5">
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded bg-stone-950 text-[13px] font-medium text-white">
+              <span className="flex h-7 w-7 items-center justify-center rounded bg-inverse text-[13px] font-medium text-inverse-fg">
                 А
               </span>
               <span className="text-sm font-medium tracking-[-0.01em] text-fg">

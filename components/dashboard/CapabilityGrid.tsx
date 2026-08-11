@@ -281,7 +281,7 @@ export function CapabilityGrid() {
                     }}
                     className={cn(
                       "group relative flex flex-col items-start overflow-hidden bg-surface p-5 text-left",
-                      "transition-colors duration-300 hover:bg-stone-50",
+                      "transition-colors duration-300 hover:bg-bg",
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
                     )}
                   >
@@ -309,7 +309,7 @@ export function CapabilityGrid() {
                       {item.action}
                       <span
                         aria-hidden
-                        className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-stone-900 transition-transform duration-300 ease-out group-hover:scale-x-100"
+                        className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-fg transition-transform duration-300 ease-out group-hover:scale-x-100"
                       />
                     </span>
                   </motion.button>
@@ -347,7 +347,7 @@ export function CapabilityGrid() {
             </SheetDescription>
           </SheetHeader>
 
-          <div className="min-h-0 flex-1 overflow-hidden bg-stone-50">
+          <div className="min-h-0 flex-1 overflow-hidden bg-bg">
             <AIGenerator onClose={() => setGeneratorOpen(false)} />
           </div>
         </SheetContent>

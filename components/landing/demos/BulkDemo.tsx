@@ -92,7 +92,7 @@ export function BulkDemo() {
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 500, damping: 20 }}
                   >
-                    <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                    <Check className="h-3 w-3 text-inverse-fg" strokeWidth={3} />
                   </motion.span>
                 )}
               </motion.span>
@@ -147,7 +147,7 @@ export function BulkDemo() {
               <span className="h-4 w-px bg-surface-3" />
 
               <span
-                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium text-white transition-colors ${
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium text-inverse-fg transition-colors ${
                   stage === 4 ? "bg-violet-700" : "bg-violet-600"
                 }`}
               >

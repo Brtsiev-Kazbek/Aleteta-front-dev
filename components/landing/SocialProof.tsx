@@ -95,7 +95,7 @@ export function SocialProof() {
         <div className="mt-12 grid grid-cols-1 gap-px bg-surface-3 md:grid-cols-3">
           {TESTIMONIALS.map((testimonial, index) => (
             <Reveal key={testimonial.id} delay={index * 0.08}>
-              <figure className="flex h-full flex-col bg-stone-50 p-7">
+              <figure className="flex h-full flex-col bg-bg p-7">
                 <blockquote className="flex-1 text-sm leading-relaxed text-fg-subtle">
                   {testimonial.quote}
                 </blockquote>

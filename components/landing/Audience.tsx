@@ -103,7 +103,7 @@ export function Audience() {
   if (!active) return null;
 
   return (
-    <section id="audience" className="bg-stone-50">
+    <section id="audience" className="bg-bg">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="09"
@@ -129,7 +129,7 @@ export function Audience() {
                     <span
                       className={cn(
                         "absolute -left-px top-0 h-full w-px transition-colors",
-                        isActive ? "bg-stone-900" : "bg-transparent"
+                        isActive ? "bg-fg" : "bg-transparent"
                       )}
                     />
 
@@ -193,7 +193,7 @@ export function Audience() {
                         key={task}
                         className="flex items-start gap-3 py-3 sm:py-3.5"
                       >
-                        <span className="mt-2 h-px w-3 shrink-0 bg-stone-300" />
+                        <span className="mt-2 h-px w-3 shrink-0 bg-fg-ghost" />
                         <span className="text-sm leading-snug text-fg-muted">
                           {task}
                         </span>

@@ -74,7 +74,7 @@ export function ReviewDemo() {
     <div className="grid h-full grid-cols-1 overflow-hidden rounded-xl border border-line bg-surface md:grid-cols-2">
       {/* Левая панель — оригинал */}
       <div className="flex flex-col border-b border-line md:border-b-0 md:border-r">
-        <div className="flex items-center gap-2 border-b border-line bg-stone-50/70 px-3 py-2">
+        <div className="flex items-center gap-2 border-b border-line bg-bg/70 px-3 py-2">
           <FileText className="h-3.5 w-3.5 text-fg-faint" />
           <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
             Договор оказания услуг
@@ -126,8 +126,8 @@ export function ReviewDemo() {
       </div>
 
       {/* Правая панель — анализ */}
-      <div className="flex flex-col bg-stone-50/40">
-        <div className="flex items-center gap-2 border-b border-line bg-stone-50/70 px-3 py-2">
+      <div className="flex flex-col bg-bg/40">
+        <div className="flex items-center gap-2 border-b border-line bg-bg/70 px-3 py-2">
           <span className="text-[10px] font-medium uppercase tracking-wide text-fg-subtle">
             Анализ Алетейи
           </span>
@@ -150,7 +150,7 @@ export function ReviewDemo() {
                   isCritical
                     ? "border-red-200 bg-red-50/70"
                     : "border-amber-200 bg-amber-50/70"
-                } ${isActive ? "ring-2 ring-stone-300" : ""}`}
+                } ${isActive ? "ring-2 ring-line-strong" : ""}`}
               >
                 <div className="flex items-start gap-2">
                   {isCritical ? (
@@ -194,7 +194,7 @@ export function ReviewDemo() {
             );
           })}
 
-          <div className="mt-1 rounded-lg bg-violet-600 px-3 py-2 text-center text-[11px] font-medium text-white">
+          <div className="mt-1 rounded-lg bg-violet-600 px-3 py-2 text-center text-[11px] font-medium text-inverse-fg">
             Сгенерировать исправленную версию
           </div>
         </div>

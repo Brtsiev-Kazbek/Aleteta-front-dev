@@ -15,7 +15,7 @@ export default async function RecognizePage() {
   const snapshot = await loadWorkspaceSnapshot();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-stone-50">
+    <div className="flex h-screen overflow-hidden bg-bg">
       {snapshot && <StoreBootstrap snapshot={snapshot} />}
       <Sidebar />
 

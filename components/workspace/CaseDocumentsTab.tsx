@@ -154,7 +154,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
       <div
         className={cn(
           "flex flex-wrap items-center gap-x-5 gap-y-3 border-b pb-3.5 transition-colors",
-          isDragging ? "border-stone-900" : "border-line"
+          isDragging ? "border-fg" : "border-line"
         )}
       >
         <label className="flex cursor-pointer items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint transition-colors hover:text-fg">
@@ -263,7 +263,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                 transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.2) }}
                 className={cn(
                   "group flex items-center gap-3.5 px-1 py-3.5 transition-colors",
-                  isSelected ? "bg-stone-50" : "hover:bg-stone-50/60"
+                  isSelected ? "bg-bg" : "hover:bg-bg/60"
                 )}
               >
                 <Checkbox

@@ -112,7 +112,7 @@ export function ExtractDemo() {
                 key={item.file}
                 className={cn(
                   "h-1 rounded-full transition-all duration-500",
-                  index === sourceIndex ? "w-4 bg-stone-900" : "w-1 bg-stone-300"
+                  index === sourceIndex ? "w-4 bg-fg" : "w-1 bg-fg-ghost"
                 )}
               />
             ))}
@@ -151,7 +151,7 @@ export function ExtractDemo() {
                     isDone
                       ? "bg-emerald-100 text-emerald-600"
                       : isCurrent
-                        ? "bg-stone-900 text-white"
+                        ? "bg-fg text-inverse-fg"
                         : "bg-surface-2 text-fg-ghost"
                   )}
                 >
@@ -183,7 +183,7 @@ export function ExtractDemo() {
       </div>
 
       {/* Справа — извлечённые реквизиты */}
-      <div className="flex flex-col bg-stone-50/50 p-4">
+      <div className="flex flex-col bg-bg/50 p-4">
         <AnimatePresence mode="wait">
           <motion.span
             key={source.target}

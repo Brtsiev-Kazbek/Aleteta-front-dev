@@ -78,7 +78,7 @@ export default function CaseWorkspacePage() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-stone-50">
+    <div className="flex h-screen overflow-hidden bg-bg">
       <Sidebar />
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -134,7 +134,7 @@ export default function CaseWorkspacePage() {
             <Button onClick={handleToggleAssistant} className="shrink-0 gap-2">
               <Sparkles className="h-4 w-4" />
               Ассистент
-              <kbd className="ml-0.5 rounded border border-white/20 bg-surface/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70">
+              <kbd className="ml-0.5 rounded border border-white/20 bg-surface/10 px-1.5 py-0.5 font-mono text-[10px] text-inverse-fg/70">
                 ⌘J
               </kbd>
             </Button>
@@ -173,7 +173,7 @@ export default function CaseWorkspacePage() {
                     {isActive && (
                       <motion.span
                         layoutId="case-tab-underline"
-                        className="absolute inset-x-0 -bottom-px h-px bg-stone-900"
+                        className="absolute inset-x-0 -bottom-px h-px bg-fg"
                         transition={{
                           duration: 0.28,
                           ease: [0.22, 0.61, 0.36, 1],

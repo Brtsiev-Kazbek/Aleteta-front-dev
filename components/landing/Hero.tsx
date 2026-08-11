@@ -43,7 +43,7 @@ export function Hero() {
   const scale = useTransform(scrollYProgress, [0, 1], [0.92, 1]);
 
   return (
-    <section className="grain relative overflow-hidden bg-stone-950">
+    <section className="grain relative overflow-hidden bg-inverse">
       {/* Сетка и мягкое свечение */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="animate-grid-pan absolute inset-0 bg-grid-dark" />
@@ -69,7 +69,7 @@ export function Hero() {
           }}
         />
         {/* Переход к светлой части страницы */}
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent to-stone-950" />
+        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent to-inverse" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6 pb-28 pt-32 sm:pt-40">
@@ -87,7 +87,7 @@ export function Hero() {
         </motion.div>
 
         {/* Заголовок: слова проявляются по очереди */}
-        <h1 className="mt-7 max-w-4xl text-[2.5rem] font-medium leading-[1.06] tracking-[-0.035em] text-white sm:text-6xl">
+        <h1 className="mt-7 max-w-4xl text-[2.5rem] font-medium leading-[1.06] tracking-[-0.035em] text-inverse-fg sm:text-6xl">
           {HEADLINE.map((chunk, index) => (
             <motion.span
               key={chunk.text}
@@ -127,7 +127,7 @@ export function Hero() {
         >
           <MagneticLink
             href="/auth/register"
-            className="group inline-flex h-11 items-center gap-2 rounded-md bg-surface px-6 text-sm font-medium text-stone-950 transition-colors hover:bg-surface-3"
+            className="group inline-flex h-11 items-center gap-2 rounded-md bg-surface px-6 text-sm font-medium text-fg transition-colors hover:bg-surface-3"
           >
             Начать работу
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -135,9 +135,9 @@ export function Hero() {
 
           <Link
             href="#features"
-            className="group inline-flex h-11 items-center px-1 text-sm font-medium text-fg-ghost transition-colors hover:text-white"
+            className="group inline-flex h-11 items-center px-1 text-sm font-medium text-fg-ghost transition-colors hover:text-inverse-fg"
           >
-            <span className="border-b border-stone-700 pb-0.5 transition-colors group-hover:border-line-strong">
+            <span className="border-b border-inverse-line pb-0.5 transition-colors group-hover:border-line-strong">
               Посмотреть, как это работает
             </span>
           </Link>

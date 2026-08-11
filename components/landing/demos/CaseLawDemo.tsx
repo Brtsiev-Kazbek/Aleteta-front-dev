@@ -126,7 +126,7 @@ export function CaseLawDemo() {
               key={item.clause}
               className={cn(
                 "h-1 rounded-full transition-all duration-500",
-                index === scenarioIndex ? "w-4 bg-stone-900" : "w-1 bg-stone-300"
+                index === scenarioIndex ? "w-4 bg-fg" : "w-1 bg-fg-ghost"
               )}
             />
           ))}
@@ -142,7 +142,7 @@ export function CaseLawDemo() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.22 }}
-            className="rounded border-l-2 border-violet-500 bg-stone-50 py-2.5 pl-3 pr-3"
+            className="rounded border-l-2 border-violet-500 bg-bg py-2.5 pl-3 pr-3"
           >
             <span className="font-mono text-[10px] text-fg-faint">
               п. {scenario.clause}

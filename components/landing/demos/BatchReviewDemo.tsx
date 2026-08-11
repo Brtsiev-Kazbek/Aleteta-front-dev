@@ -112,7 +112,7 @@ export function BatchReviewDemo() {
               <span
                 className={cn(
                   "min-w-0 flex-1 truncate text-xs transition-colors",
-                  isChecked ? "text-stone-800" : "text-fg-faint"
+                  isChecked ? "text-fg" : "text-fg-faint"
                 )}
               >
                 {doc.name}
@@ -149,7 +149,7 @@ export function BatchReviewDemo() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-auto rounded border border-line bg-stone-50 p-3.5"
+              className="mt-auto rounded border border-line bg-bg p-3.5"
             >
               <div className="flex items-baseline gap-2">
                 <span className="font-mono text-2xl tabular-nums text-fg">

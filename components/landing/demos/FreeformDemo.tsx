@@ -203,14 +203,14 @@ export function FreeformDemo() {
       <div className="border-b border-line p-4">
         <div className="flex min-h-[42px] items-start gap-2 rounded border border-line-strong px-3 py-2.5">
           <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-600" />
-          <span className="text-xs leading-relaxed text-stone-800">
+          <span className="text-xs leading-relaxed text-fg">
             {typed}
             {typed.length < scenario.prompt.length && (
               <motion.span
                 aria-hidden
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{ duration: 0.85, repeat: Infinity }}
-                className="ml-px inline-block h-3.5 w-px bg-stone-900 align-middle"
+                className="ml-px inline-block h-3.5 w-px bg-fg align-middle"
               />
             )}
           </span>

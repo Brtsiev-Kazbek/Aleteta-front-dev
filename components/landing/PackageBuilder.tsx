@@ -194,7 +194,7 @@ export function PackageBuilder() {
                     className={cn(
                       "rounded border px-2 py-1 font-mono text-[10px] transition-colors",
                       minutesPerDoc === preset
-                        ? "border-stone-900 bg-stone-900 text-white"
+                        ? "border-fg bg-fg text-inverse-fg"
                         : "border-line text-fg-subtle hover:border-line-strong"
                     )}
                   >
@@ -227,7 +227,7 @@ export function PackageBuilder() {
           </div>
 
           {/* Результат */}
-          <div className="flex flex-col bg-stone-950 p-6 lg:p-8">
+          <div className="flex flex-col bg-inverse p-6 lg:p-8">
             <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
               Соберётся одним действием
             </span>
@@ -244,7 +244,7 @@ export function PackageBuilder() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="font-mono text-5xl tabular-nums tracking-tight text-white"
+                    className="font-mono text-5xl tabular-nums tracking-tight text-inverse-fg"
                   >
                     {totalDocuments}
                   </motion.span>
@@ -274,7 +274,7 @@ export function PackageBuilder() {
                         </span>
                         <span className="shrink-0 font-mono text-[11px] tabular-nums text-fg-subtle">
                           {line.objects} × {line.templates} ={" "}
-                          <span className="text-stone-200">{line.documents}</span>
+                          <span className="text-inverse-fg">{line.documents}</span>
                         </span>
                       </motion.div>
                     ))}
@@ -313,7 +313,7 @@ export function PackageBuilder() {
                     <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
                       Вручную
                     </span>
-                    <p className="mt-1.5 font-mono text-xl tabular-nums text-white">
+                    <p className="mt-1.5 font-mono text-xl tabular-nums text-inverse-fg">
                       {hours > 0 ? `${hours} ч ` : ""}
                       {minutes > 0 || hours === 0 ? `${minutes} мин` : ""}
                     </p>
@@ -327,7 +327,7 @@ export function PackageBuilder() {
                       <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
                         В деньгах
                       </span>
-                      <p className="mt-1.5 font-mono text-xl tabular-nums text-white">
+                      <p className="mt-1.5 font-mono text-xl tabular-nums text-inverse-fg">
                         {cost.toLocaleString("ru-RU")} ₽
                       </p>
                       <p className="mt-1 font-mono text-[10px] text-fg-soft">

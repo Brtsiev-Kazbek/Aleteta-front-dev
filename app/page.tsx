@@ -23,7 +23,7 @@ import { SolutionIntro } from "@/components/landing/SolutionIntro";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-bg">
       <ScrollProgress />
       <LandingHeader />
 

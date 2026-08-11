@@ -14,10 +14,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-stone-950 text-white hover:bg-stone-800",
-        destructive: "bg-red-600 text-white hover:bg-red-700",
+        default: "bg-inverse text-inverse-fg hover:bg-inverse-3",
+        destructive: "bg-red-600 text-inverse-fg hover:bg-red-700",
         outline:
-          "border border-line bg-surface text-fg-muted hover:border-line-strong hover:bg-stone-50 hover:text-fg",
+          "border border-line bg-surface text-fg-muted hover:border-line-strong hover:bg-bg hover:text-fg",
         secondary: "bg-surface-2 text-fg hover:bg-surface-3",
         ghost: "text-fg-subtle hover:bg-surface-2 hover:text-fg",
         link: "text-fg underline-offset-4 hover:underline",

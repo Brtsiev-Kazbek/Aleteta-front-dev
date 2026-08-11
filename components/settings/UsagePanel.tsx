@@ -62,8 +62,8 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
               className={cn(
                 "rounded border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
                 report.days === period.days
-                  ? "border-stone-900 text-fg"
-                  : "border-line text-fg-subtle hover:border-stone-400 hover:text-fg",
+                  ? "border-fg text-fg"
+                  : "border-line text-fg-subtle hover:border-fg-faint hover:text-fg",
                 isPending && "opacity-60"
               )}
             >
