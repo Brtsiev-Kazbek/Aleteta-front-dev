@@ -229,16 +229,27 @@ async function startServer() {
     );
   });
 
+  /* `detached` и `stdio: "ignore"` — см. объяснение в scripts/shots.mjs. */
   const server = spawn("npx", ["next", "start", "--port", String(PORT)], {
     cwd: ROOT,
-    stdio: ["ignore", "pipe", "pipe"],
+    stdio: "ignore",
+    detached: true,
   });
 
-  const deadline = Date.now() + 60_000;
+  const stop = async () => {
+    try {
+      process.kill(-server.pid, "SIGTERM");
+    } catch {
+      /* Уже погас. */
+    }
+    await new Promise((r) => setTimeout(r, 400));
+  };
+
+  const deadline = Date.now() + 90_000;
   for (;;) {
     if (Date.now() > deadline) {
-      server.kill("SIGTERM");
-      throw new Error("сервер не поднялся за минуту");
+      await stop();
+      throw new Error(`сервер не поднялся — возможно, порт ${PORT} занят`);
     }
     try {
       const response = await fetch(BASE, { signal: AbortSignal.timeout(1_000) });
@@ -248,10 +259,7 @@ async function startServer() {
     }
   }
 
-  return async () => {
-    server.kill("SIGTERM");
-    await new Promise((r) => setTimeout(r, 300));
-  };
+  return stop;
 }
 
 const restoreEnv = await enterDemoMode();

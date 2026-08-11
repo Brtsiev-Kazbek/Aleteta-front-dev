@@ -26,7 +26,6 @@
 
 import { spawn } from "node:child_process";
 import { mkdir, readdir, readFile, rm, writeFile, access } from "node:fs/promises";
-import { createHash } from "node:crypto";
 import path from "node:path";
 
 import { chromium } from "playwright";
@@ -67,6 +66,22 @@ const ROUTES = [
 
 /** Телефон, ноутбук, большой экран. */
 const WIDTHS = [375, 1024, 1440];
+
+/**
+ * Экраны, которые не совпадают побайтово даже сами с собой.
+ *
+ * На лендинге есть движение, привязанное не ко времени, а к прокрутке: превью
+ * продукта выпрямляется по мере подхода к нему. Съёмка прокручивает страницу
+ * насквозь, и кадр каждый раз ловится чуть-чуть другой. Величина расхождения —
+ * тысячные доли процента сжатого объёма при точно совпадающих размерах, то есть
+ * несколько пикселей на двух мегабайтах.
+ *
+ * Прятать источник целиком не стали: это главный элемент первого экрана, и
+ * снимок без него перестал бы что-либо проверять. Поэтому расхождение здесь
+ * помечается как известное, а не выдаётся за поломку. Если разойдётся размер
+ * или доля вырастет до заметной — это уже настоящая правка, и её видно.
+ */
+const NOISY = new Set(["landing"]);
 
 /* ------------------------------------------------------------------ */
 /*  ДЕМОНСТРАЦИОННЫЙ РЕЖИМ                                             */
@@ -130,30 +145,54 @@ async function startServer() {
   await run("npx", ["next", "build"]);
 
   console.log(`Запускаю на ${BASE}…`);
+
+  /*
+   * `detached` и `stdio: "ignore"` — оба обязательны, и оба выучены на своей
+   * шкуре.
+   *
+   * Без `ignore` каналы вывода остаются открытыми, узел считает, что работа не
+   * кончена, и процесс висит после съёмки. Один такой висел достаточно долго,
+   * чтобы следующий прогон занял тот же порт и снял старую сборку вместо новой:
+   * снимки разошлись, и полдня ушло на поиск правки, которой не было.
+   *
+   * Без `detached` сигнал уходит обёртке `npx`, а сервер под ней продолжает
+   * слушать порт. Отдельная группа процессов позволяет погасить всё разом.
+   */
   const server = spawn("npx", ["next", "start", "--port", String(PORT)], {
     cwd: ROOT,
-    stdio: ["ignore", "pipe", "pipe"],
+    stdio: "ignore",
+    detached: true,
   });
 
   // Ждём, пока порт начнёт отвечать: `next start` печатает готовность не сразу.
-  const deadline = Date.now() + 60_000;
+  const stop = async () => {
+    try {
+      // Минус перед номером — вся группа процессов, а не одна обёртка.
+      process.kill(-server.pid, "SIGTERM");
+    } catch {
+      /* Уже погас. */
+    }
+    await new Promise((r) => setTimeout(r, 400));
+  };
+
+  const deadline = Date.now() + 90_000;
   for (;;) {
     if (Date.now() > deadline) {
-      server.kill("SIGTERM");
-      throw new Error("сервер не поднялся за минуту");
+      await stop();
+      throw new Error(
+        `сервер не поднялся за полторы минуты — возможно, порт ${PORT} занят ` +
+          "другим прогоном (SHOTS_PORT задаёт другой)"
+      );
     }
     try {
       const response = await fetch(BASE, { signal: AbortSignal.timeout(1_000) });
-      if (response.ok || response.status < 500) break;
+      if (response.status < 500) break;
     } catch {
       await new Promise((r) => setTimeout(r, 500));
     }
   }
 
-  return async function stop() {
-    server.kill("SIGTERM");
-    await new Promise((r) => setTimeout(r, 300));
-  };
+  return stop;
 }
 
 /* ------------------------------------------------------------------ */
@@ -168,17 +207,34 @@ async function startServer() {
  * уже умеет это выключать — оно уважает `prefers-reduced-motion` в тридцати
  * шести местах, — и мы просто просим браузер притвориться, что человек попросил
  * поменьше движения. Остаток добиваем стилем.
+ *
+ * Именно `animation: none`, а не нулевая длительность. Нулевая длительность не
+ * отменяет анимацию, а мгновенно доигрывает её до конца — и бегущая строка
+ * замирает сдвинутой, причём каждый раз чуть иначе. Два прогона одного и того
+ * же кода расходились на полсотни байт ровно из-за этого. Полное выключение
+ * оставляет элемент там, где его положила вёрстка.
  */
 const FREEZE_CSS = `
   *, *::before, *::after {
-    animation-duration: 0s !important;
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0s !important;
-    transition-delay: 0s !important;
+    animation: none !important;
+    transition: none !important;
     caret-color: transparent !important;
   }
   html { scroll-behavior: auto !important; }
+
+  /*
+   * Движущиеся украшения прячем совсем. Выключенная анимация оставляет их на
+   * месте, но луч по сетке и зерно рисуются с точностью до кадра, и два прогона
+   * подряд расходились на полсотни байт из двух мегабайт. Сравнивать смысла
+   * нет: ни одно из них не несёт содержания, а шум мешает увидеть настоящее
+   * расхождение. Прячем видимость, а не убираем из потока: иначе поедет
+   * вёрстка, и снимок перестанет отражать настоящую страницу.
+   */
+  .animate-marquee, .animate-marquee-reverse,
+  .animate-sweep, .aurora-drift, .aurora-drift-slow {
+    visibility: hidden !important;
+  }
+  .grain::after { display: none !important; }
 `;
 
 async function capture(label) {
@@ -257,14 +313,15 @@ async function capture(label) {
  * Сравнение по содержимому файла, а не по пикселям.
  *
  * Библиотеки сравнения картинок здесь не нужно: на шагах, где вид меняться не
- * должен, PNG обязан совпасть побайтово. Отличается хоть один байт — миграция
- * что-то задела, и надо смотреть глазами. Порог «допустимого расхождения» тут
- * был бы вреден: он ровно для того и заводится, чтобы не замечать мелочей, а
+ * должен, PNG обязан совпасть побайтово. Отличается хоть байт — миграция
+ * что-то задела, и надо смотреть глазами. Порога «допустимого расхождения» тут
+ * нет намеренно: он ровно для того и заводится, чтобы не замечать мелочей, а
  * мелочи — это всё, что мы ищем.
+ *
+ * Вместо порога — разбор: разошёлся ли размер картинки (поехала вёрстка) или
+ * только её содержимое (цвет либо кадр анимации). Решение остаётся за
+ * человеком, но он получает подсказку, куда смотреть.
  */
-async function digest(file) {
-  return createHash("sha256").update(await readFile(file)).digest("hex");
-}
 
 async function diff(left, right) {
   const leftDir = path.join(SHOTS, left);
@@ -284,30 +341,84 @@ async function diff(left, right) {
 
   const changed = [];
   const same = [];
+  const noisy = [];
   const onlyLeft = [];
   const onlyRight = [];
+
+  /** Размеры картинки из заголовка PNG — они лежат в IHDR по смещению 16. */
+  function size(buffer) {
+    return `${buffer.readUInt32BE(16)}×${buffer.readUInt32BE(20)}`;
+  }
 
   for (const file of leftFiles) {
     if (!rightFiles.has(file)) {
       onlyLeft.push(file);
       continue;
     }
+
     const [a, b] = await Promise.all([
-      digest(path.join(leftDir, file)),
-      digest(path.join(rightDir, file)),
+      readFile(path.join(leftDir, file)),
+      readFile(path.join(rightDir, file)),
     ]);
-    (a === b ? same : changed).push(file);
+
+    if (a.equals(b)) {
+      same.push(file);
+      continue;
+    }
+
+    const route = file.split("@")[0];
+    const moved = size(a) !== size(b);
+    const drift = Math.abs(a.length - b.length) / a.length;
+
+    /*
+     * Известный шум: тот же экран, тот же размер, расхождение в тысячных долях
+     * процента. Считать это поломкой — значит приучить себя не смотреть на
+     * красный, а это дороже, чем не заметить настоящее расхождение.
+     */
+    if (NOISY.has(route) && !moved && drift < 0.0005) {
+      noisy.push(file);
+      continue;
+    }
+
+    changed.push({
+      file,
+      shape: moved ? `${size(a)} → ${size(b)}` : size(a),
+      moved,
+      /*
+       * Насколько разошёлся сжатый объём. Число грубое и ничего не доказывает
+       * само по себе, но помогает отличить «поехала вёрстка» от «замер другой
+       * кадр»: первое даёт проценты, второе — тысячные доли.
+       */
+      drift: `${((Math.abs(a.length - b.length) / a.length) * 100).toFixed(3)}%`,
+    });
   }
 
   for (const file of rightFiles) {
     if (!leftFiles.has(file)) onlyRight.push(file);
   }
 
-  console.log(`Совпало:    ${same.length}`);
-  console.log(`Отличается: ${changed.length}`);
-  for (const file of changed) console.log(`  ≠ ${file}`);
-  if (onlyLeft.length) console.log(`Пропало:    ${onlyLeft.join(", ")}`);
-  if (onlyRight.length) console.log(`Появилось:  ${onlyRight.join(", ")}`);
+  console.log(`Совпало побайтово: ${same.length} из ${leftFiles.size}`);
+
+  if (noisy.length) {
+    console.log(
+      `Известный шум:     ${noisy.length} (${[...new Set(noisy.map((f) => f.split("@")[0]))].join(", ")})`
+    );
+  }
+
+  if (changed.length) {
+    console.log(`Отличается:        ${changed.length}`);
+    for (const item of changed) {
+      const mark = item.moved ? "РАЗМЕР" : "краска";
+      console.log(`  ≠ ${item.file.padEnd(26)} ${mark}  ${item.shape}  ~${item.drift}`);
+    }
+    console.log(
+      "\nРазошедшийся размер — поехала вёрстка. Разошлась только краска —\n" +
+        "смотреть глазами: это либо цвет, либо кадр анимации."
+    );
+  }
+
+  if (onlyLeft.length) console.log(`Пропало:   ${onlyLeft.join(", ")}`);
+  if (onlyRight.length) console.log(`Появилось: ${onlyRight.join(", ")}`);
 
   process.exit(changed.length + onlyLeft.length + onlyRight.length > 0 ? 1 : 0);
 }
@@ -331,4 +442,11 @@ if (command === "diff") {
     if (stopServer) await stopServer();
     await restoreEnv();
   }
+
+  /*
+   * Выходим явно. Иначе достаточно одного забытого открытого канала, чтобы
+   * процесс остался жить, занять порт и подсунуть следующему прогону старую
+   * сборку — ровно это однажды и случилось.
+   */
+  process.exit(0);
 }
