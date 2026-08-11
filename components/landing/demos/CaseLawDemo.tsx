@@ -117,7 +117,7 @@ export function CaseLawDemo() {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-surface">
       <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+        <span className="font-mono text-label uppercase text-fg-faint">
           Судебная практика по пункту
         </span>
         <div className="flex items-center gap-1">
@@ -142,12 +142,12 @@ export function CaseLawDemo() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.22 }}
-            className="rounded border-l-2 border-violet-500 bg-bg py-2.5 pl-3 pr-3"
+            className="rounded border-l-2 border-brand bg-bg py-2.5 pl-3 pr-3"
           >
-            <span className="font-mono text-[10px] text-fg-faint">
+            <span className="font-mono text-label text-fg-faint">
               п. {scenario.clause}
             </span>
-            <p className="mt-1 text-[11px] leading-relaxed text-fg-muted">
+            <p className="mt-1 text-label leading-relaxed text-fg-muted">
               {scenario.text}
             </p>
           </motion.div>
@@ -156,15 +156,15 @@ export function CaseLawDemo() {
         {/* Запрос */}
         <div className="mt-3 flex items-center gap-2">
           {stage === 1 ? (
-            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-violet-600" />
+            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-brand" />
           ) : (
             <Scale className="h-3.5 w-3.5 shrink-0 text-fg-faint" />
           )}
-          <span className="min-w-0 flex-1 truncate text-[11px] text-fg-subtle">
+          <span className="min-w-0 flex-1 truncate text-label text-fg-subtle">
             {stage === 0 ? "Готов к поиску" : `Ищу: ${scenario.query}`}
           </span>
           {stage >= 2 && (
-            <span className="shrink-0 font-mono text-[10px] text-fg-faint">
+            <span className="shrink-0 font-mono text-label text-fg-faint">
               {scenario.precedents.length} акта
             </span>
           )}
@@ -189,18 +189,18 @@ export function CaseLawDemo() {
 
                     <div className="flex min-w-0 flex-col gap-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[11px] font-medium text-fg">
+                        <span className="text-label font-medium text-fg">
                           {precedent.court}
                         </span>
-                        <span className="font-mono text-[10px] text-fg-faint">
+                        <span className="font-mono text-label text-fg-faint">
                           № {precedent.number} · {precedent.year}
                         </span>
                         <span
                           className={cn(
-                            "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em]",
+                            "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
                             precedent.side === "против"
-                              ? "border-red-200 bg-red-50 text-red-700"
-                              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                              ? "border-danger-line bg-danger-bg text-danger-fg"
+                              : "border-ok-line bg-ok-bg text-ok-fg"
                           )}
                         >
                           {precedent.side === "против"
@@ -209,7 +209,7 @@ export function CaseLawDemo() {
                         </span>
                       </div>
 
-                      <p className="text-[11px] leading-relaxed text-fg-soft">
+                      <p className="text-label leading-relaxed text-fg-soft">
                         {precedent.holding}
                       </p>
                     </div>
@@ -228,11 +228,11 @@ export function CaseLawDemo() {
               exit={{ opacity: 0 }}
               className="mt-3 border-t border-line pt-3"
             >
-              <p className="text-[11px] leading-relaxed text-fg-soft">
+              <p className="text-label leading-relaxed text-fg-soft">
                 Практика подставлена в замечание к пункту — можно сослаться
                 прямо в протоколе разногласий.
               </p>
-              <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-ghost">
+              <p className="mt-1.5 font-mono text-label uppercase text-fg-ghost">
                 Демонстрационные данные
               </p>
             </motion.div>

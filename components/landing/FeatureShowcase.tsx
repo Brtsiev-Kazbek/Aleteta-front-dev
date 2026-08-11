@@ -110,15 +110,15 @@ export function FeatureShowcase({
                           ease: "linear",
                         }}
                         style={{ transformOrigin: "top" }}
-                        className="absolute -left-px top-0 h-full w-px bg-violet-600"
+                        className="absolute -left-px top-0 h-full w-px bg-brand"
                       />
                     )}
 
                     <span className="flex items-baseline gap-3">
                       <span
                         className={cn(
-                          "font-mono text-[10px] tabular-nums transition-colors",
-                          isActive ? "text-violet-600" : "text-fg-ghost"
+                          "font-mono text-label tabular-nums transition-colors",
+                          isActive ? "text-brand" : "text-fg-ghost"
                         )}
                       >
                         {String(i + 1).padStart(2, "0")}
@@ -126,7 +126,7 @@ export function FeatureShowcase({
 
                       <span
                         className={cn(
-                          "text-sm transition-colors",
+                          "text-body transition-colors",
                           isActive
                             ? "font-medium text-fg"
                             : "text-fg-subtle hover:text-fg-muted"
@@ -149,16 +149,16 @@ export function FeatureShowcase({
                 transition={{ duration: 0.25 }}
                 className="mt-8"
               >
-                <h3 className="text-lg font-medium leading-snug tracking-[-0.01em] text-fg">
+                <h3 className="text-title-sm font-medium leading-snug text-fg">
                   {active.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-fg-soft">
+                <p className="mt-3 text-body leading-relaxed text-fg-soft">
                   {active.description}
                 </p>
 
                 <ul className="mt-5 flex flex-col divide-y divide-line-soft border-y border-line-soft">
                   {active.bullets.map((bullet) => (
-                    <li key={bullet} className="py-2.5 text-sm text-fg-muted">
+                    <li key={bullet} className="py-2.5 text-body text-fg-muted">
                       {bullet}
                     </li>
                   ))}

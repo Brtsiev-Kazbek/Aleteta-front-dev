@@ -79,16 +79,16 @@ export function GenerationShowcase() {
       <div className="relative mx-auto max-w-6xl px-6 py-20">
         <Reveal>
           <div className="flex items-center gap-3">
-            <span className="font-mono text-[11px] tabular-nums text-violet-400">
+            <span className="font-mono text-label tabular-nums text-brand">
               05
             </span>
             <span className="h-px w-8 bg-inverse-3" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
+            <span className="font-mono text-label uppercase text-fg-subtle">
               Генерация пакета
             </span>
           </div>
 
-          <h2 className="mt-5 max-w-2xl text-3xl font-medium leading-[1.15] tracking-[-0.02em] text-inverse-fg sm:text-[2.5rem]">
+          <h2 className="mt-5 max-w-2xl text-display font-medium leading-[1.15] text-inverse-fg sm:text-display-lg">
             Четыре объекта — десять документов. Одно нажатие.
           </h2>
         </Reveal>
@@ -96,7 +96,7 @@ export function GenerationShowcase() {
         <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* Источник */}
           <Reveal className="lg:col-span-4">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-soft">
+            <span className="font-mono text-label uppercase text-fg-soft">
               Объекты дела
             </span>
 
@@ -114,10 +114,10 @@ export function GenerationShowcase() {
                   className="flex items-center gap-2.5 rounded border bg-fg/60 px-3 py-2.5"
                 >
                   <FileText className="h-3.5 w-3.5 shrink-0 text-fg-soft" />
-                  <span className="min-w-0 flex-1 truncate text-xs text-fg-ghost">
+                  <span className="min-w-0 flex-1 truncate text-caption text-fg-ghost">
                     {source.name}
                   </span>
-                  <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-soft">
+                  <span className="shrink-0 font-mono text-label uppercase text-fg-soft">
                     {source.type}
                   </span>
                 </motion.div>
@@ -135,7 +135,7 @@ export function GenerationShowcase() {
                       : { backgroundColor: "rgb(5 150 105)", color: "rgb(255 255 255)" }
                 }
                 transition={{ duration: 0.35 }}
-                className="flex items-center justify-center gap-2 rounded-md px-5 py-3 text-sm font-medium"
+                className="flex items-center justify-center gap-2 rounded-md px-5 py-3 text-body font-medium"
               >
                 {phase === "done" ? (
                   <Check className="h-4 w-4" strokeWidth={3} />
@@ -166,15 +166,15 @@ export function GenerationShowcase() {
                 <motion.div
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.25 }}
-                  className="h-px bg-violet-500"
+                  className="h-px bg-brand"
                 />
               </div>
 
               <div className="mt-2.5 flex items-baseline justify-between">
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
+                <span className="font-mono text-label uppercase text-fg-soft">
                   Готово
                 </span>
-                <span className="font-mono text-sm tabular-nums text-inverse-fg">
+                <span className="font-mono text-body tabular-nums text-inverse-fg">
                   {ready} / {OUTPUT.length}
                 </span>
               </div>
@@ -196,7 +196,7 @@ export function GenerationShowcase() {
           {/* Результат */}
           <Reveal delay={0.1} className="lg:col-span-7">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-soft">
+              <span className="font-mono text-label uppercase text-fg-soft">
                 Готовые документы
               </span>
 
@@ -206,7 +206,7 @@ export function GenerationShowcase() {
                     initial={{ opacity: 0, x: 8 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0 }}
-                    className="inline-flex items-center gap-1.5 rounded border border-inverse-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-ghost"
+                    className="inline-flex items-center gap-1.5 rounded border border-inverse-line px-2.5 py-1 font-mono text-label uppercase text-fg-ghost"
                   >
                     <Download className="h-3 w-3" />
                     Скачать .zip
@@ -240,7 +240,7 @@ export function GenerationShowcase() {
                           transition={{ type: "spring", stiffness: 480, damping: 20 }}
                         >
                           <Check
-                            className="h-3.5 w-3.5 text-emerald-500"
+                            className="h-3.5 w-3.5 text-ok-fg"
                             strokeWidth={3}
                           />
                         </motion.span>
@@ -251,7 +251,7 @@ export function GenerationShowcase() {
 
                     <span
                       className={cn(
-                        "min-w-0 flex-1 truncate text-[11px] transition-colors",
+                        "min-w-0 flex-1 truncate text-label transition-colors",
                         isReady ? "text-fg-ghost" : "text-fg-soft"
                       )}
                     >
@@ -268,7 +268,7 @@ export function GenerationShowcase() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="mt-4 text-[12px] leading-relaxed text-fg-subtle"
+                  className="mt-4 text-caption leading-relaxed text-fg-subtle"
                 >
                   Реквизиты подставлены из карточек объектов. Значения не
                   сочиняются заново — поэтому расхождений между документами

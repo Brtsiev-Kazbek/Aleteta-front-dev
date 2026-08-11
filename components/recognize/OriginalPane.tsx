@@ -127,8 +127,8 @@ export function OriginalPane({
       <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={null} syncScroll={syncScroll} onToggleSync={onToggleSync}>
         <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
           <FileWarning className="h-5 w-5 text-fg-ghost" />
-          <p className="text-[13px] text-fg">Оригинал не открылся</p>
-          <p className="max-w-xs text-[12.5px] leading-relaxed text-fg-subtle">
+          <p className="text-body text-fg">Оригинал не открылся</p>
+          <p className="max-w-xs text-caption leading-relaxed text-fg-subtle">
             {error}
           </p>
         </div>
@@ -139,7 +139,7 @@ export function OriginalPane({
   if (!source) {
     return (
       <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={null} syncScroll={syncScroll} onToggleSync={onToggleSync}>
-        <div className="flex h-full items-center justify-center gap-2 text-[12.5px] text-fg-subtle">
+        <div className="flex h-full items-center justify-center gap-2 text-caption text-fg-subtle">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
           Открываю оригинал
         </div>
@@ -185,7 +185,7 @@ function Frame({
   return (
     <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-line bg-surface">
       <div className="flex shrink-0 items-center gap-2 border-b border-line px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
+        <span className="font-mono text-label uppercase text-fg-subtle">
           Оригинал
         </span>
 
@@ -203,9 +203,9 @@ function Frame({
               : "Листается отдельно — связать с текстом"
           }
           className={cn(
-            "flex items-center gap-1.5 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] transition-colors",
+            "flex items-center gap-1.5 rounded border px-2 py-1 font-mono text-label uppercase transition-colors",
             syncScroll
-              ? "border-amber-200 bg-amber-50 text-amber-700"
+              ? "border-warn-line bg-warn-bg text-warn-fg"
               : "border-line text-fg-faint hover:text-fg"
           )}
         >
@@ -226,7 +226,7 @@ function Frame({
             <ChevronLeft className="h-3.5 w-3.5" />
           </PageStep>
 
-          <span className="min-w-[4.5rem] text-center font-mono text-[10px] uppercase tracking-[0.1em] text-fg-subtle tabular-nums">
+          <span className="min-w-[4.5rem] text-center font-mono text-label uppercase text-fg-subtle tabular-nums">
             {page}
             {pageCount ? ` из ${pageCount}` : ""}
           </span>

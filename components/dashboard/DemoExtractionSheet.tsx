@@ -80,10 +80,10 @@ export function DemoExtractionSheet() {
             {/* Исходный файл */}
             <div className="flex shrink-0 items-center gap-2.5 border-b border-line px-5 py-3.5">
               <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
-              <span className="min-w-0 flex-1 truncate text-[13px] text-fg-muted">
+              <span className="min-w-0 flex-1 truncate text-body text-fg-muted">
                 {extraction.file.name}
               </span>
-              <span className="shrink-0 font-mono text-[10px] text-fg-faint">
+              <span className="shrink-0 font-mono text-label text-fg-faint">
                 {formatFileSize(extraction.file.sizeBytes)}
               </span>
             </div>
@@ -102,7 +102,7 @@ export function DemoExtractionSheet() {
                         className={cn(
                           "flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors",
                           isStepDone
-                            ? "bg-emerald-100 text-emerald-600"
+                            ? "bg-ok-bg text-ok-fg"
                             : isCurrent
                               ? "bg-fg text-inverse-fg"
                               : "bg-surface-2 text-fg-ghost"
@@ -119,7 +119,7 @@ export function DemoExtractionSheet() {
 
                       <span
                         className={cn(
-                          "text-[13px] transition-colors",
+                          "text-body transition-colors",
                           isStepDone
                             ? "text-fg-faint"
                             : isCurrent
@@ -164,19 +164,19 @@ export function DemoExtractionSheet() {
                         className={cn(
                           "flex items-center justify-between gap-3 rounded border px-3 py-2.5",
                           field.uncertain
-                            ? "border-amber-200 bg-amber-50/60"
+                            ? "border-warn-line bg-warn-bg/60"
                             : "border-line bg-surface"
                         )}
                       >
-                        <span className="shrink-0 text-[11px] text-fg-faint">
+                        <span className="shrink-0 text-label text-fg-faint">
                           {field.label}
                         </span>
 
                         <span className="flex min-w-0 items-center gap-1.5">
                           {field.uncertain && (
-                            <AlertTriangle className="h-3 w-3 shrink-0 text-amber-600" />
+                            <AlertTriangle className="h-3 w-3 shrink-0 text-warn-fg" />
                           )}
-                          <span className="min-w-0 truncate text-[13px] text-fg">
+                          <span className="min-w-0 truncate text-body text-fg">
                             {field.value}
                           </span>
                         </span>
@@ -186,7 +186,7 @@ export function DemoExtractionSheet() {
                 </div>
 
                 {isDone && uncertainCount > 0 && (
-                  <p className="mt-3 text-[11px] leading-relaxed text-fg-subtle">
+                  <p className="mt-3 text-label leading-relaxed text-fg-subtle">
                     {uncertainCount}{" "}
                     {plural(
                       uncertainCount,
@@ -232,7 +232,7 @@ export function DemoExtractionSheet() {
                               : "bg-fg-ghost"
                           )}
                         />
-                        <span className="min-w-0 flex-1 truncate text-[13px] text-fg-muted">
+                        <span className="min-w-0 flex-1 truncate text-body text-fg-muted">
                           {item.title}
                         </span>
                       </button>
@@ -250,7 +250,7 @@ export function DemoExtractionSheet() {
                   className="flex flex-1 items-center gap-2.5"
                 >
                   <Check
-                    className="h-3.5 w-3.5 shrink-0 text-emerald-600"
+                    className="h-3.5 w-3.5 shrink-0 text-ok-fg"
                     strokeWidth={3}
                   />
 

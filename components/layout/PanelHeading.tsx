@@ -30,18 +30,18 @@ export function PanelHeading({
     >
       <div className="flex min-w-0 flex-col">
         <span className="flex items-center gap-2.5">
-          <span aria-hidden className="h-px w-6 bg-violet-500" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-fg-faint">
+          <span aria-hidden className="h-px w-6 bg-brand" />
+          <span className="font-mono text-label uppercase text-fg-faint">
             {eyebrow}
           </span>
         </span>
 
-        <h1 className="mt-5 max-w-2xl text-[1.75rem] font-medium leading-[1.12] tracking-[-0.03em] text-fg">
+        <h1 className="mt-5 max-w-2xl text-heading font-medium leading-[1.12] text-fg">
           {title}
         </h1>
 
         {description && (
-          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-fg-subtle">
+          <p className="mt-3 max-w-xl text-body leading-relaxed text-fg-subtle">
             {description}
           </p>
         )}
@@ -63,7 +63,7 @@ export function MetaLabel({
   return (
     <span
       className={cn(
-        "font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint",
+        "font-mono text-label uppercase text-fg-faint",
         className
       )}
     >

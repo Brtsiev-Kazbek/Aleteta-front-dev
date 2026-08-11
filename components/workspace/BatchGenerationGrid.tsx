@@ -148,14 +148,22 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-line bg-surface">
+    /*
+     * Плотная поверхность: строка ниже, чем в читательской части приложения.
+     * Дело на сорок объектов должно помещаться на экран целиком — ради этого
+     * таблица и делалась.
+     */
+    <div
+      data-density="compact"
+      className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-card"
+    >
       {/* Панель над таблицей */}
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div className="flex flex-col">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+          <span className="font-mono text-label uppercase text-fg-faint">
             Объекты дела
           </span>
-          <span className="mt-1 text-[13px] text-fg-subtle">
+          <span className="mt-1 text-body-sm text-fg-subtle">
             Реквизиты подставляются в шаблоны при генерации пакета
           </span>
         </div>
@@ -169,7 +177,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-72">
-            <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+            <DropdownMenuLabel className="font-mono text-label uppercase text-fg-faint">
               Тип объекта
             </DropdownMenuLabel>
 
@@ -188,12 +196,12 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
                         {schema.label}
                       </span>
                       {schema.isCustom && (
-                        <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.1em] text-violet-600">
+                        <span className="shrink-0 font-mono text-label uppercase text-brand">
                           свой
                         </span>
                       )}
                     </span>
-                    <span className="truncate text-xs text-fg-faint">
+                    <span className="truncate text-caption text-fg-faint">
                       {schema.hint}
                     </span>
                   </span>
@@ -207,10 +215,10 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
               onSelect={() => setCustomSchemaOpen(true)}
               className="items-start gap-2.5 py-2.5"
             >
-              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
               <span className="flex min-w-0 flex-col">
                 <span className="font-medium">Создать свой тип</span>
-                <span className="truncate text-xs text-fg-faint">
+                <span className="truncate text-caption text-fg-faint">
                   Появится в списке во всех делах
                 </span>
               </span>
@@ -228,10 +236,10 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
         {entities.length === 0 ? (
           <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-2.5 p-10 text-center">
             <Inbox className="h-5 w-5 text-fg-ghost" />
-            <p className="mt-1 text-sm text-fg">
+            <p className="mt-1 text-body text-fg">
               В деле пока нет объектов
             </p>
-            <p className="max-w-sm text-[13px] leading-relaxed text-fg-subtle">
+            <p className="max-w-sm text-body-sm leading-relaxed text-fg-subtle">
               Добавьте участок, контрагента или сотрудника, опишите свой тип —
               либо загрузите файл во вкладке «Документы», и реквизиты
               перенесутся сюда сами.
@@ -264,7 +272,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
             transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
             className={cn(
               "h-px",
-              stats.allValid ? "bg-emerald-500" : "bg-fg"
+              stats.allValid ? "bg-ok" : "bg-fg"
             )}
           />
         </div>
@@ -272,19 +280,19 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5">
           <div className="flex items-center gap-2.5">
             {stats.allValid ? (
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-ok-fg" />
             ) : (
-              <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+              <AlertTriangle className="h-4 w-4 shrink-0 text-danger-fg" />
             )}
 
             <div className="flex flex-col leading-tight">
-              <span className="font-mono text-[13px] tabular-nums text-fg">
+              <span className="font-mono text-body-sm tabular-nums text-fg">
                 {stats.valid} / {stats.total}
-                <span className="ml-2 font-sans text-[13px] text-fg-subtle">
+                <span className="ml-2 font-sans text-body-sm text-fg-subtle">
                   готово к генерации
                 </span>
               </span>
-              <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+              <span className="mt-0.5 font-mono text-label uppercase text-fg-faint">
                 {stats.allValid
                   ? "Все обязательные реквизиты заполнены"
                   : `${stats.errorFields} ${plural(
@@ -303,7 +311,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
                 variant="outline"
                 size="sm"
                 onClick={jumpToFirstError}
-                className="h-9 gap-1.5 border-red-200 text-red-700 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+                className="h-9 gap-1.5 border-danger-line text-danger-fg hover:border-danger-line hover:bg-danger-bg hover:text-danger-fg"
               >
                 <AlertTriangle className="h-3.5 w-3.5" />
                 К первой ошибке
@@ -393,14 +401,14 @@ function EntityGroupTable({
         const errorCount = Object.keys(validation?.fieldErrors ?? {}).length;
 
         return (
-          <div className="flex h-11 items-center px-3">
+          <div className="flex h-row items-center px-3">
             {validation?.isValid ? (
-              <span className="inline-flex items-center gap-1.5 rounded border border-emerald-200 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-emerald-700">
+              <span className="inline-flex items-center gap-1.5 rounded border border-ok-line px-2 py-1 font-mono text-label uppercase text-ok-fg">
                 <CheckCircle2 className="h-3 w-3" />
                 Готово
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded border border-red-200 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-red-700">
+              <span className="inline-flex items-center gap-1.5 rounded border border-danger-line px-2 py-1 font-mono text-label uppercase text-danger-fg">
                 <AlertTriangle className="h-3 w-3" />
                 {errorCount} {plural(errorCount, "ошибка", "ошибки", "ошибок")}
               </span>
@@ -415,7 +423,7 @@ function EntityGroupTable({
       header: "",
       meta: { width: 56 },
       cell: ({ row }) => (
-        <div className="flex h-11 items-center justify-center">
+        <div className="flex h-row items-center justify-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -438,7 +446,7 @@ function EntityGroupTable({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onSelect={() => deleteEntity(row.original.id)}
-                className="text-red-600 focus:bg-red-50 focus:text-red-700"
+                className="text-danger-fg focus:bg-danger-bg focus:text-danger-fg"
               >
                 <Trash2 className="h-4 w-4" />
                 Удалить
@@ -464,20 +472,20 @@ function EntityGroupTable({
       {/* Заголовок группы */}
       <div className="sticky left-0 flex items-center gap-2 bg-bg px-4 py-2.5">
         <Icon className="h-3 w-3 shrink-0 text-fg-faint" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
+        <span className="font-mono text-label uppercase text-fg-subtle">
           {schema.label}
         </span>
-        <span className="font-mono text-[10px] tabular-nums text-fg-ghost">
+        <span className="font-mono text-label tabular-nums text-fg-ghost">
           {entities.length}
         </span>
         {schema.isCustom && (
-          <span className="rounded border border-violet-200 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-violet-700">
+          <span className="rounded border border-brand-line px-1.5 py-0.5 font-mono text-label uppercase text-brand-strong">
             свой тип
           </span>
         )}
       </div>
 
-      <table className="w-full border-separate border-spacing-0 text-sm">
+      <table className="w-full border-separate border-spacing-0 text-body">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -493,7 +501,7 @@ function EntityGroupTable({
                       left: meta?.stickyLeft,
                     }}
                     className={cn(
-                      "h-9 whitespace-nowrap border-y border-line bg-surface px-3 text-left font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-fg-faint",
+                      "h-9 whitespace-nowrap border-y border-line bg-surface px-3 text-left font-mono text-label font-normal uppercase text-fg-faint",
                       isSticky &&
                         "sticky z-10 shadow-[1px_0_0_0_rgb(231,229,228)]"
                     )}
@@ -594,7 +602,7 @@ function EntityCell({
 
   if (isEditing) {
     return (
-      <div className="h-11 p-1">
+      <div className="h-row p-1">
         <input
           ref={inputRef}
           value={draft}
@@ -610,7 +618,7 @@ function EntityCell({
               setEditingCell(null);
             }
           }}
-          className="h-full w-full rounded border border-fg bg-surface px-2.5 text-sm text-fg shadow-[0_0_0_3px_rgba(28,25,23,0.08)] outline-none placeholder:text-fg-ghost"
+          className="h-full w-full rounded border border-fg bg-surface px-2.5 text-body text-fg shadow-[0_0_0_3px_rgba(28,25,23,0.08)] outline-none placeholder:text-fg-ghost"
         />
       </div>
     );
@@ -626,15 +634,15 @@ function EntityCell({
             onClick={() =>
               setEditingCell({ entityId: entity.id, field: field.key })
             }
-            className="flex h-11 w-full items-center gap-1.5 border border-red-200 bg-red-50 px-3 text-left text-red-900 transition-colors hover:bg-red-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-red-400"
+            className="flex h-row w-full items-center gap-1.5 border border-danger-line bg-danger-bg px-3 text-left text-danger-fg transition-colors hover:bg-danger-bg/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-danger"
           >
-            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-500" />
-            <span className="truncate text-sm">{value || "Не заполнено"}</span>
+            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-danger-fg" />
+            <span className="truncate text-body">{value || "Не заполнено"}</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs">
           <span className="flex items-center gap-1.5">
-            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-500" />
+            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-danger-fg" />
             {error}
           </span>
         </TooltipContent>
@@ -650,10 +658,10 @@ function EntityCell({
         onClick={() =>
           setEditingCell({ entityId: entity.id, field: field.key })
         }
-        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
+        className="group/cell flex h-row w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
       >
         <Plus className="h-3.5 w-3.5 shrink-0 text-inverse-fg transition-colors group-hover/cell:text-fg" />
-        <span className="truncate text-sm text-fg-ghost transition-colors group-hover/cell:text-fg-subtle">
+        <span className="truncate text-body text-fg-ghost transition-colors group-hover/cell:text-fg-subtle">
           Добавить
         </span>
       </button>
@@ -677,15 +685,15 @@ function EntityCell({
             onClick={() =>
               setEditingCell({ entityId: entity.id, field: field.key })
             }
-            className="flex h-11 w-full items-center gap-1.5 border border-amber-200 bg-amber-50/70 px-3 text-left transition-colors hover:bg-amber-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-400"
+            className="flex h-row w-full items-center gap-1.5 border border-warn-line bg-warn-bg/70 px-3 text-left transition-colors hover:bg-warn-bg/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-warn"
           >
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
-            <span className="truncate text-sm text-fg">{value}</span>
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warn-fg" />
+            <span className="truncate text-body text-fg">{value}</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs">
           <span className="flex items-center gap-1.5">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warn-fg" />
             Значение взято из файла, но модель в нём не уверена — сверьте с
             оригиналом. Пометка снимется, как только вы поправите значение.
           </span>
@@ -698,9 +706,9 @@ function EntityCell({
     <button
       type="button"
       onClick={() => setEditingCell({ entityId: entity.id, field: field.key })}
-      className="flex h-11 w-full items-center px-3 text-left transition-colors hover:bg-surface-2/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
+      className="flex h-row w-full items-center px-3 text-left transition-colors hover:bg-surface-2/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
     >
-      <span className="truncate text-sm text-fg">{value}</span>
+      <span className="truncate text-body text-fg">{value}</span>
     </button>
   );
 }

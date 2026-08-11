@@ -33,7 +33,7 @@ export function SyncStatus() {
             className="flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-1.5 shadow-sm"
           >
             <Loader2 className="h-3 w-3 animate-spin text-fg-faint" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
+            <span className="font-mono text-label uppercase text-fg-subtle">
               Сохраняется
             </span>
           </motion.div>
@@ -47,10 +47,10 @@ export function SyncStatus() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.18 }}
-            className="pointer-events-auto flex max-w-lg items-start gap-2.5 rounded-md border border-red-200 bg-surface py-2.5 pl-3 pr-2 shadow-sm"
+            className="pointer-events-auto flex max-w-lg items-start gap-2.5 rounded-md border border-danger-line bg-surface py-2.5 pl-3 pr-2 shadow-sm"
           >
-            <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-500" />
-            <span className="text-[13px] leading-relaxed text-fg-muted">
+            <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-danger-fg" />
+            <span className="text-body leading-relaxed text-fg-muted">
               {error}
             </span>
             <button

@@ -60,7 +60,7 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
               onClick={() => choosePeriod(period.days)}
               disabled={isPending}
               className={cn(
-                "rounded border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
+                "rounded border px-3 py-1.5 font-mono text-label uppercase transition-colors",
                 report.days === period.days
                   ? "border-fg text-fg"
                   : "border-line text-fg-subtle hover:border-fg-faint hover:text-fg",
@@ -72,19 +72,19 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
           ))}
         </div>
 
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+        <span className="font-mono text-label uppercase text-fg-faint">
           Валюта маршрутизатора
         </span>
       </div>
 
       {error && (
-        <p className="rounded border border-red-200 bg-red-50/60 px-4 py-3 text-[13px] text-red-700">
+        <p className="rounded border border-danger-line bg-danger-bg/60 px-4 py-3 text-body-sm text-danger-fg">
           {error}
         </p>
       )}
 
       {isEmpty ? (
-        <p className="rounded-lg border border-dashed border-line-strong px-5 py-8 text-center text-[13px] text-fg-subtle">
+        <p className="rounded-lg border border-dashed border-line-strong px-5 py-8 text-center text-body-sm text-fg-subtle">
           За этот период обращений к модели не было.
         </p>
       ) : (
@@ -113,7 +113,7 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
                 <span key="name" className="flex min-w-0 flex-col">
                   <span className="truncate text-fg">{member.fullName}</span>
                   {member.email && (
-                    <span className="truncate text-[11px] text-fg-faint">
+                    <span className="truncate text-label text-fg-faint">
                       {member.email}
                     </span>
                   )}
@@ -133,7 +133,7 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
               cells: [
                 <span key="title" className="flex min-w-0 flex-col">
                   <span className="truncate text-fg">{item.title}</span>
-                  <span className="truncate text-[11px] text-fg-faint">
+                  <span className="truncate text-label text-fg-faint">
                     {item.documents} {plural(item.documents)}
                   </span>
                 </span>,
@@ -165,8 +165,8 @@ function Total({
       <MetaLabel>{label}</MetaLabel>
       <span
         className={cn(
-          "text-[19px] font-medium tabular-nums tracking-[-0.02em]",
-          alarm ? "text-red-600" : "text-fg"
+          "text-title-sm font-medium tabular-nums ",
+          alarm ? "text-danger-fg" : "text-fg"
         )}
       >
         {value}
@@ -180,7 +180,7 @@ function Requests({ total, failed }: { total: number; failed: number }) {
     <span className="tabular-nums">
       {total}
       {failed > 0 && (
-        <span className="ml-1.5 text-red-600" title="Неудачных заданий">
+        <span className="ml-1.5 text-danger-fg" title="Неудачных заданий">
           −{failed}
         </span>
       )}
@@ -204,14 +204,14 @@ function Table({
       <MetaLabel>{caption}</MetaLabel>
 
       <div className="scrollable-area overflow-x-auto">
-        <table className="w-full border-collapse text-left text-[13px]">
+        <table className="w-full border-collapse text-left text-body-sm">
           <thead>
             <tr className="border-b border-line">
               {head.map((title, index) => (
                 <th
                   key={title}
                   className={cn(
-                    "py-2 pr-6 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-fg-faint",
+                    "py-2 pr-6 font-mono text-label font-normal uppercase text-fg-faint",
                     index > 0 && "text-right"
                   )}
                 >

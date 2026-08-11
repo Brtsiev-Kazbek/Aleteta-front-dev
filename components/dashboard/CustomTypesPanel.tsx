@@ -29,7 +29,7 @@ export function CustomTypesPanel() {
   return (
     <section>
       <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3">
-        <h2 className="text-[15px] font-medium tracking-[-0.01em] text-fg">
+        <h2 className="text-body font-medium text-fg">
           Свои типы объектов
         </h2>
 
@@ -48,7 +48,7 @@ export function CustomTypesPanel() {
       </div>
 
       {ownSchemas.length === 0 ? (
-        <p className="py-6 text-[13px] leading-relaxed text-fg-subtle">
+        <p className="py-6 text-body leading-relaxed text-fg-subtle">
           Пока ни одного своего типа. Опишите то, с чем работаете именно вы —
           транспорт, оборудование, объекты аренды, студенческие работы: набор
           реквизитов станет колонками таблицы и будет проверяться перед
@@ -75,10 +75,10 @@ export function CustomTypesPanel() {
                   className="group flex items-center gap-3 py-3.5"
                 >
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm text-fg">
+                    <span className="truncate text-body text-fg">
                       {schema.label}
                     </span>
-                    <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+                    <span className="mt-0.5 truncate font-mono text-label uppercase text-fg-faint">
                       {schema.fields.length}{" "}
                       {plural(
                         schema.fields.length,
@@ -102,13 +102,13 @@ export function CustomTypesPanel() {
                     {schema.fields.slice(0, 4).map((field) => (
                       <span
                         key={field.key}
-                        className="rounded border border-line px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-fg-subtle"
+                        className="rounded border border-line px-1.5 py-0.5 font-mono text-label uppercase text-fg-subtle"
                       >
                         {field.label}
                       </span>
                     ))}
                     {schema.fields.length > 4 && (
-                      <span className="font-mono text-[9px] text-fg-ghost">
+                      <span className="font-mono text-label text-fg-ghost">
                         +{schema.fields.length - 4}
                       </span>
                     )}
@@ -118,7 +118,7 @@ export function CustomTypesPanel() {
                     variant="ghost"
                     size="icon"
                     onClick={() => deleteCustomSchema(schema.id)}
-                    className="h-8 w-8 shrink-0 opacity-0 transition-opacity hover:text-red-600 focus-visible:opacity-100 group-hover:opacity-100"
+                    className="h-8 w-8 shrink-0 opacity-0 transition-opacity hover:text-danger-fg focus-visible:opacity-100 group-hover:opacity-100"
                   >
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">Удалить тип «{schema.label}»</span>

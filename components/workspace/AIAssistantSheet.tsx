@@ -99,7 +99,7 @@ export function AIAssistantSheet({
                 >
                   <div
                     className={cn(
-                      "max-w-[88%] rounded-lg px-3.5 py-2.5 text-[13px] leading-relaxed",
+                      "max-w-[88%] rounded-lg px-3.5 py-2.5 text-body leading-relaxed",
                       message.role === "assistant"
                         ? "border border-line bg-surface text-fg"
                         : "bg-inverse text-inverse-fg"
@@ -170,7 +170,7 @@ export function AIAssistantSheet({
                 type="button"
                 onClick={() => handleSend(prompt)}
                 disabled={isThinking}
-                className="rounded border border-line px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-fg hover:text-fg disabled:opacity-40"
+                className="rounded border border-line px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-fg hover:text-fg disabled:opacity-40"
               >
                 {prompt}
               </button>
@@ -188,7 +188,7 @@ export function AIAssistantSheet({
                 }
               }}
               placeholder="Спросите Алетейю о деле…"
-              className="h-10 w-full rounded-md border border-line bg-surface pl-3.5 pr-11 text-[13px] text-fg outline-none transition-colors placeholder:text-fg-faint focus:border-fg"
+              className="h-10 w-full rounded-md border border-line bg-surface pl-3.5 pr-11 text-body text-fg outline-none transition-colors placeholder:text-fg-faint focus:border-fg"
             />
             <button
               type="button"
@@ -231,21 +231,21 @@ function FindingCard({
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={cn(
-                "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]",
+                "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
                 meta.badgeClassName
               )}
             >
               {meta.label}
             </span>
-            <span className="font-mono text-[10px] text-fg-faint">
+            <span className="font-mono text-label text-fg-faint">
               {finding.clause}
             </span>
           </div>
 
-          <p className="text-[13px] font-medium text-fg">
+          <p className="text-body font-medium text-fg">
             {finding.title}
           </p>
-          <p className="text-[13px] leading-relaxed text-fg-soft">
+          <p className="text-body leading-relaxed text-fg-soft">
             {finding.description}
           </p>
         </div>
@@ -274,17 +274,17 @@ function CitationCard({
     >
       <div className="flex flex-wrap items-center gap-2">
         <FileText className="h-3 w-3 shrink-0 text-fg-ghost" />
-        <span className="min-w-0 truncate text-[11px] font-medium text-fg">
+        <span className="min-w-0 truncate text-label font-medium text-fg">
           {citation.document}
         </span>
-        <span className="ml-auto shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+        <span className="ml-auto shrink-0 font-mono text-label uppercase text-fg-faint">
           {citation.clause} · стр. {citation.page}
         </span>
       </div>
 
       <div className="mt-2 flex gap-2 border-l border-line pl-2.5">
         <Quote className="mt-0.5 h-2.5 w-2.5 shrink-0 text-fg-ghost" />
-        <p className="text-[11px] leading-relaxed text-fg-soft">
+        <p className="text-label leading-relaxed text-fg-soft">
           {citation.quote}
         </p>
       </div>

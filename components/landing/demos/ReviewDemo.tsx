@@ -76,7 +76,7 @@ export function ReviewDemo() {
       <div className="flex flex-col border-b border-line md:border-b-0 md:border-r">
         <div className="flex items-center gap-2 border-b border-line bg-bg/70 px-3 py-2">
           <FileText className="h-3.5 w-3.5 text-fg-faint" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
+          <span className="font-mono text-label uppercase text-fg-subtle">
             Договор оказания услуг
           </span>
         </div>
@@ -102,20 +102,20 @@ export function ReviewDemo() {
                 className={`rounded-lg border px-2.5 py-2 transition-colors ${
                   isActive
                     ? level === "critical"
-                      ? "border-red-200"
-                      : "border-amber-200"
+                      ? "border-danger-line"
+                      : "border-warn-line"
                     : "border-transparent"
                 }`}
               >
                 <div className="flex gap-2">
                   <span
-                    className={`shrink-0 text-[10px] font-medium tabular-nums ${
+                    className={`shrink-0 text-label font-medium tabular-nums ${
                       isActive ? "text-fg" : "text-fg-faint"
                     }`}
                   >
                     {paragraph.clause}
                   </span>
-                  <p className="text-[11px] leading-relaxed text-fg-soft">
+                  <p className="text-label leading-relaxed text-fg-soft">
                     {paragraph.text}
                   </p>
                 </div>
@@ -128,10 +128,10 @@ export function ReviewDemo() {
       {/* Правая панель — анализ */}
       <div className="flex flex-col bg-bg/40">
         <div className="flex items-center gap-2 border-b border-line bg-bg/70 px-3 py-2">
-          <span className="text-[10px] font-medium uppercase tracking-wide text-fg-subtle">
+          <span className="text-label font-medium uppercase text-fg-subtle">
             Анализ Алетейи
           </span>
-          <span className="ml-auto text-[10px] text-fg-faint">
+          <span className="ml-auto text-label text-fg-faint">
             клик → подсветка абзаца
           </span>
         </div>
@@ -148,34 +148,34 @@ export function ReviewDemo() {
                 transition={{ duration: 0.25 }}
                 className={`rounded-xl border p-2.5 ${
                   isCritical
-                    ? "border-red-200 bg-red-50/70"
-                    : "border-amber-200 bg-amber-50/70"
+                    ? "border-danger-line bg-danger-bg/70"
+                    : "border-warn-line bg-warn-bg/70"
                 } ${isActive ? "ring-2 ring-line-strong" : ""}`}
               >
                 <div className="flex items-start gap-2">
                   {isCritical ? (
-                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-600" />
+                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-danger-fg" />
                   ) : (
-                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn-fg" />
                   )}
 
                   <div className="flex min-w-0 flex-col gap-0.5">
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
-                        className={`rounded border px-1.5 py-0.5 text-[9px] font-medium uppercase ${
+                        className={`rounded border px-1.5 py-0.5 text-label font-medium uppercase ${
                           isCritical
-                            ? "border-red-200 bg-red-100 text-red-700"
-                            : "border-amber-200 bg-amber-100 text-amber-700"
+                            ? "border-danger-line bg-danger-bg text-danger-fg"
+                            : "border-warn-line bg-warn-bg text-warn-fg"
                         }`}
                       >
                         {isCritical ? "Критический" : "Предупреждение"}
                       </span>
-                      <span className="text-[10px] text-fg-subtle">
+                      <span className="text-label text-fg-subtle">
                         пункт {risk.clause}
                       </span>
                     </div>
 
-                    <p className="text-[11px] font-medium text-fg">
+                    <p className="text-label font-medium text-fg">
                       {risk.title}
                     </p>
 
@@ -183,7 +183,7 @@ export function ReviewDemo() {
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="text-[10px] leading-relaxed text-fg-soft"
+                        className="text-label leading-relaxed text-fg-soft"
                       >
                         {risk.text}
                       </motion.p>
@@ -194,7 +194,7 @@ export function ReviewDemo() {
             );
           })}
 
-          <div className="mt-1 rounded-lg bg-violet-600 px-3 py-2 text-center text-[11px] font-medium text-inverse-fg">
+          <div className="mt-1 rounded-lg bg-brand px-3 py-2 text-center text-label font-medium text-inverse-fg">
             Сгенерировать исправленную версию
           </div>
         </div>

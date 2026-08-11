@@ -202,8 +202,8 @@ export function FreeformDemo() {
       {/* Запрос */}
       <div className="border-b border-line p-4">
         <div className="flex min-h-[42px] items-start gap-2 rounded border border-line-strong px-3 py-2.5">
-          <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-600" />
-          <span className="text-xs leading-relaxed text-fg">
+          <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
+          <span className="text-caption leading-relaxed text-fg">
             {typed}
             {typed.length < scenario.prompt.length && (
               <motion.span
@@ -230,19 +230,19 @@ export function FreeformDemo() {
                 )}
               />
               {searching ? (
-                <span className="text-[11px] text-fg-subtle">
+                <span className="text-label text-fg-subtle">
                   Проверяю, есть ли подходящий шаблон…
                 </span>
               ) : scenario.hasTemplate ? (
-                <span className="text-[11px] text-fg-soft">
+                <span className="text-label text-fg-soft">
                   Шаблон найден:{" "}
                   <span className="text-fg">{scenario.templateName}</span>{" "}
                   — реквизиты подставлены
                 </span>
               ) : (
-                <span className="text-[11px] text-fg-soft">
+                <span className="text-label text-fg-soft">
                   Шаблона нет —{" "}
-                  <span className="font-medium text-violet-700">
+                  <span className="font-medium text-brand-strong">
                     составляю документ с нуля
                   </span>
                 </span>
@@ -266,32 +266,32 @@ export function FreeformDemo() {
               transition={{ duration: 0.28 }}
             >
               {block.kind === "title" && (
-                <h4 className="whitespace-pre-line text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-fg">
+                <h4 className="whitespace-pre-line text-center text-label font-bold uppercase leading-relaxed text-fg">
                   {block.text}
                 </h4>
               )}
 
               {block.kind === "meta" && (
-                <div className="mt-5 flex items-baseline justify-between text-[10px] text-fg-soft">
+                <div className="mt-5 flex items-baseline justify-between text-label text-fg-soft">
                   <span>{block.left}</span>
                   <span>{block.right}</span>
                 </div>
               )}
 
               {block.kind === "para" && (
-                <p className="mt-4 text-justify text-[10px] leading-[1.7] text-fg-muted">
+                <p className="mt-4 text-justify text-label leading-[1.7] text-fg-muted">
                   {block.text}
                 </p>
               )}
 
               {block.kind === "heading" && (
-                <h5 className="mt-5 text-[10px] font-bold text-fg">
+                <h5 className="mt-5 text-label font-bold text-fg">
                   {block.text}
                 </h5>
               )}
 
               {block.kind === "clause" && (
-                <p className="mt-2.5 text-justify text-[10px] leading-[1.7] text-fg-muted">
+                <p className="mt-2.5 text-justify text-label leading-[1.7] text-fg-muted">
                   <span className="font-medium text-fg">
                     {block.number}
                   </span>{" "}
@@ -301,10 +301,10 @@ export function FreeformDemo() {
 
               {block.kind === "signatures" && (
                 <div className="mt-8 grid grid-cols-2 gap-6 border-t border-line pt-5">
-                  <span className="whitespace-pre-line text-[9px] leading-[1.8] text-fg-muted">
+                  <span className="whitespace-pre-line text-label leading-[1.8] text-fg-muted">
                     {block.left}
                   </span>
-                  <span className="whitespace-pre-line text-[9px] leading-[1.8] text-fg-muted">
+                  <span className="whitespace-pre-line text-label leading-[1.8] text-fg-muted">
                     {block.right}
                   </span>
                 </div>
@@ -338,11 +338,11 @@ export function FreeformDemo() {
             exit={{ opacity: 0 }}
             className="flex items-center gap-2.5 border-t border-line px-4 py-3"
           >
-            <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" strokeWidth={3} />
-            <span className="min-w-0 flex-1 truncate text-[11px] text-fg-muted">
+            <Check className="h-3.5 w-3.5 shrink-0 text-ok-fg" strokeWidth={3} />
+            <span className="min-w-0 flex-1 truncate text-label text-fg-muted">
               {scenario.fileName}
             </span>
-            <span className="inline-flex shrink-0 items-center gap-1.5 rounded border border-line px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-subtle">
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded border border-line px-2 py-1 font-mono text-label uppercase text-fg-subtle">
               <Download className="h-3 w-3" />
               Скачать
             </span>

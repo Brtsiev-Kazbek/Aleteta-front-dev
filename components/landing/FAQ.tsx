@@ -79,13 +79,13 @@ export function FAQ() {
                   onClick={() => setOpenId(isOpen ? null : item.id)}
                   className="group flex w-full items-start gap-4 py-5 text-left"
                 >
-                  <span className="mt-0.5 shrink-0 font-mono text-[10px] tabular-nums text-fg-ghost">
+                  <span className="mt-0.5 shrink-0 font-mono text-label tabular-nums text-fg-ghost">
                     {String(index + 1).padStart(2, "0")}
                   </span>
 
                   <span
                     className={cn(
-                      "flex-1 text-sm transition-colors",
+                      "flex-1 text-body transition-colors",
                       isOpen
                         ? "font-medium text-fg"
                         : "text-fg-muted group-hover:text-fg"
@@ -116,7 +116,7 @@ export function FAQ() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.25, ease: "easeInOut" }}
                     >
-                      <p className="max-w-2xl pb-6 pl-[2.1rem] text-sm leading-relaxed text-fg-soft">
+                      <p className="max-w-2xl pb-6 pl-[2.1rem] text-body leading-relaxed text-fg-soft">
                         {item.answer}
                       </p>
                     </motion.div>

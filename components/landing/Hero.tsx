@@ -50,7 +50,7 @@ export function Hero() {
 
         {/* Луч по сетке: движение ловится боковым зрением, читать не мешает. */}
         <div className="absolute inset-y-0 left-0 w-[45%] overflow-hidden">
-          <div className="animate-sweep h-full w-1/3 bg-gradient-to-r from-transparent via-violet-500/[0.07] to-transparent blur-2xl" />
+          <div className="animate-sweep h-full w-1/3 bg-gradient-to-r from-transparent via-brand/[0.07] to-transparent blur-2xl" />
         </div>
 
         {/* Встречный слой свечения — пятно перестаёт ходить по одной дуге. */}
@@ -80,14 +80,14 @@ export function Hero() {
           transition={{ duration: 0.5 }}
           className="flex items-center gap-3"
         >
-          <span className="h-px w-8 bg-violet-500" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-faint">
+          <span className="h-px w-8 bg-brand" />
+          <span className="font-mono text-label uppercase text-fg-faint">
             Для юристов, кадровиков, бухгалтеров и вузов
           </span>
         </motion.div>
 
         {/* Заголовок: слова проявляются по очереди */}
-        <h1 className="mt-7 max-w-4xl text-[2.5rem] font-medium leading-[1.06] tracking-[-0.035em] text-inverse-fg sm:text-6xl">
+        <h1 className="mt-7 max-w-4xl text-display-lg font-medium leading-[1.06] text-inverse-fg sm:text-display-lg">
           {HEADLINE.map((chunk, index) => (
             <motion.span
               key={chunk.text}
@@ -112,7 +112,7 @@ export function Hero() {
           initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.55 }}
-          className="mt-7 max-w-2xl text-lg leading-relaxed text-fg-faint"
+          className="mt-7 max-w-2xl text-title-sm leading-relaxed text-fg-faint"
         >
           Алетейя берёт на себя рутину: анализирует файлы, извлекает реквизиты,
           помнит контекст каждой задачи и собирает сотни документов без ошибок
@@ -127,7 +127,7 @@ export function Hero() {
         >
           <MagneticLink
             href="/auth/register"
-            className="group inline-flex h-11 items-center gap-2 rounded-md bg-surface px-6 text-sm font-medium text-fg transition-colors hover:bg-surface-3"
+            className="group inline-flex h-11 items-center gap-2 rounded-md bg-surface px-6 text-body font-medium text-fg transition-colors hover:bg-surface-3"
           >
             Начать работу
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -135,14 +135,14 @@ export function Hero() {
 
           <Link
             href="#features"
-            className="group inline-flex h-11 items-center px-1 text-sm font-medium text-fg-ghost transition-colors hover:text-inverse-fg"
+            className="group inline-flex h-11 items-center px-1 text-body font-medium text-fg-ghost transition-colors hover:text-inverse-fg"
           >
             <span className="border-b border-inverse-line pb-0.5 transition-colors group-hover:border-line-strong">
               Посмотреть, как это работает
             </span>
           </Link>
 
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-soft sm:ml-2">
+          <span className="font-mono text-label uppercase text-fg-soft sm:ml-2">
             Без карты · Настройка не нужна
           </span>
         </motion.div>
@@ -156,11 +156,11 @@ export function Hero() {
           {FACTS.map((fact) => (
             <li
               key={fact}
-              className="group flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-fg-subtle transition-colors hover:text-fg-ghost"
+              className="group flex items-center gap-2 font-mono text-label uppercase text-fg-subtle transition-colors hover:text-fg-ghost"
             >
               <span
                 aria-hidden
-                className="h-1 w-1 rounded-full bg-violet-500/70 transition-colors group-hover:bg-violet-400"
+                className="h-1 w-1 rounded-full bg-brand/70 transition-colors group-hover:bg-brand"
               />
               {fact}
             </li>
@@ -180,7 +180,7 @@ export function Hero() {
             {/* Свечение под продуктом */}
             <div
               aria-hidden
-              className="pointer-events-none absolute -inset-x-10 -bottom-8 top-10 rounded-[2rem] bg-violet-500/20 blur-3xl"
+              className="pointer-events-none absolute -inset-x-10 -bottom-8 top-10 rounded-[2rem] bg-brand/20 blur-3xl"
             />
             <div className="relative">
               <ProductPreview />

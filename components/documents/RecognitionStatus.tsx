@@ -57,7 +57,7 @@ export function RecognitionStatus({
 
   return (
     <Badge tone="quiet">
-      <Check className="h-3 w-3 text-emerald-600" />
+      <Check className="h-3 w-3 text-ok-fg" />
       {describeSource(document)}
     </Badge>
   );
@@ -92,10 +92,10 @@ function Badge({
   title?: string;
 }) {
   const className = cn(
-    "hidden shrink-0 items-center gap-1.5 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] sm:inline-flex",
+    "hidden shrink-0 items-center gap-1.5 rounded border px-2 py-1 font-mono text-label uppercase sm:inline-flex",
     tone === "quiet" && "border-line text-fg-subtle",
-    tone === "active" && "border-violet-200 bg-violet-50/60 text-violet-700",
-    tone === "alarm" && "border-red-200 text-red-600",
+    tone === "active" && "border-brand-line bg-brand-soft/60 text-brand-strong",
+    tone === "alarm" && "border-danger-line text-danger-fg",
     onClick && "transition-colors hover:border-fg-faint hover:text-fg"
   );
 

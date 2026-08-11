@@ -29,8 +29,8 @@ const RISK_ICONS: Record<RiskLevel, LucideIcon> = {
 
 /** Подсветка абзаца под уровень замечания. */
 const HIGHLIGHT: Record<RiskLevel, { background: string; border: string }> = {
-  critical: { background: "rgb(254 242 242)", border: "border-red-200" },
-  warning: { background: "rgb(255 251 235)", border: "border-amber-200" },
+  critical: { background: "rgb(254 242 242)", border: "border-danger-line" },
+  warning: { background: "rgb(255 251 235)", border: "border-warn-line" },
   info: { background: "rgb(245 245 244)", border: "border-line-strong" },
 };
 
@@ -101,16 +101,16 @@ export function ReviewSplitView({
       {/* Шапка результата */}
       <div className="flex shrink-0 flex-wrap items-center gap-4 border-b border-line px-5 py-3.5">
         <div className="flex min-w-0 flex-col leading-tight">
-          <span className="truncate text-[13px] text-fg">
+          <span className="truncate text-body text-fg">
             {file.name}
           </span>
-          <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+          <span className="mt-1 font-mono text-label uppercase text-fg-faint">
             {formatFileSize(file.sizeBytes)} · разобран по пунктам
           </span>
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded border border-red-200 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-red-700">
+          <span className="inline-flex items-center gap-1.5 rounded border border-danger-line px-2 py-1 font-mono text-label uppercase text-danger-fg">
             <AlertCircle className="h-3 w-3" />
             {counts.critical}{" "}
             {plural(
@@ -120,7 +120,7 @@ export function ReviewSplitView({
               "критических"
             )}
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded border border-amber-200 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-amber-700">
+          <span className="inline-flex items-center gap-1.5 rounded border border-warn-line px-2 py-1 font-mono text-label uppercase text-warn-fg">
             <AlertTriangle className="h-3 w-3" />
             {counts.warning}{" "}
             {plural(
@@ -167,7 +167,7 @@ export function ReviewSplitView({
 
           <div className="scrollable-area min-h-0 flex-1 overflow-auto bg-surface-2 px-6 py-6">
             <div className="mx-auto flex max-w-xl flex-col gap-3 bg-surface px-8 py-9 shadow-sm">
-              <h2 className="text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-fg">
+              <h2 className="text-center text-label font-bold uppercase leading-relaxed text-fg">
                 Договор купли-продажи земельного участка
               </h2>
 
@@ -204,9 +204,9 @@ export function ReviewSplitView({
                           className={cn(
                             "h-1 w-1 rounded-full transition-colors",
                             level === "critical"
-                              ? "bg-red-500"
+                              ? "bg-danger"
                               : level === "warning"
-                                ? "bg-amber-500"
+                                ? "bg-warn"
                                 : level
                                   ? "bg-fg-faint"
                                   : "bg-transparent"
@@ -214,7 +214,7 @@ export function ReviewSplitView({
                         />
                         <span
                           className={cn(
-                            "font-mono text-[10px] tabular-nums transition-colors",
+                            "font-mono text-label tabular-nums transition-colors",
                             isHighlighted ? "text-fg" : "text-fg-faint"
                           )}
                         >
@@ -222,7 +222,7 @@ export function ReviewSplitView({
                         </span>
                       </span>
 
-                      <p className="text-justify text-[11px] leading-[1.75] text-fg-muted">
+                      <p className="text-justify text-label leading-[1.75] text-fg-muted">
                         {paragraph.text}
                       </p>
                     </div>
@@ -237,7 +237,7 @@ export function ReviewSplitView({
         <section className="flex min-h-0 flex-col">
           <header className="flex shrink-0 items-center gap-3 border-b border-line px-5 py-2.5">
             <MetaLabel>Разбор Алетейи</MetaLabel>
-            <span className="ml-auto text-[11px] text-fg-faint">
+            <span className="ml-auto text-label text-fg-faint">
               Нажмите на замечание — абзац подсветится слева
             </span>
           </header>
@@ -278,21 +278,21 @@ export function ReviewSplitView({
                         <div className="flex flex-wrap items-center gap-2">
                           <span
                             className={cn(
-                              "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]",
+                              "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
                               meta.badgeClassName
                             )}
                           >
                             {meta.label}
                           </span>
-                          <span className="font-mono text-[10px] text-fg-faint">
+                          <span className="font-mono text-label text-fg-faint">
                             п. {clause}
                           </span>
                         </div>
 
-                        <p className="text-[13px] font-medium text-fg">
+                        <p className="text-body font-medium text-fg">
                           {risk.title}
                         </p>
-                        <p className="text-[13px] leading-relaxed text-fg-soft">
+                        <p className="text-body leading-relaxed text-fg-soft">
                           {risk.description}
                         </p>
 
@@ -306,7 +306,7 @@ export function ReviewSplitView({
                             >
                               <div className="rounded border border-line bg-surface p-3">
                                 <MetaLabel>Формулировка правки</MetaLabel>
-                                <p className="mt-2 text-[11px] leading-relaxed text-fg-soft">
+                                <p className="mt-2 text-label leading-relaxed text-fg-soft">
                                   {risk.recommendation}
                                 </p>
                               </div>
@@ -335,10 +335,10 @@ export function ReviewSplitView({
             {isFixed ? (
               <div className="flex items-center gap-2.5">
                 <Check
-                  className="h-3.5 w-3.5 shrink-0 text-emerald-600"
+                  className="h-3.5 w-3.5 shrink-0 text-ok-fg"
                   strokeWidth={3}
                 />
-                <span className="text-[13px] text-fg-soft">
+                <span className="text-body text-fg-soft">
                   Исправленная редакция готова — учтены все{" "}
                   {REVIEW_RISKS.length}{" "}
                   {plural(
@@ -407,11 +407,11 @@ function CasePractice({
         ) : (
           <Scale className="h-3 w-3 shrink-0 text-fg-faint" />
         )}
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+        <span className="font-mono text-label uppercase text-fg-faint">
           {isSearching ? `Ищу практику по п. ${clause}` : "Судебная практика"}
         </span>
         {!isSearching && (
-          <span className="ml-auto font-mono text-[10px] tabular-nums text-fg-faint">
+          <span className="ml-auto font-mono text-label tabular-nums text-fg-faint">
             {practice.length} акта
           </span>
         )}
@@ -445,18 +445,18 @@ function CasePractice({
               >
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Gavel className="h-3 w-3 shrink-0 text-fg-ghost" />
-                  <span className="text-[11px] font-medium text-fg">
+                  <span className="text-label font-medium text-fg">
                     {item.court}
                   </span>
-                  <span className="font-mono text-[10px] text-fg-faint">
+                  <span className="font-mono text-label text-fg-faint">
                     № {item.number} · {item.year}
                   </span>
                   <span
                     className={cn(
-                      "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em]",
+                      "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
                       item.side === "against"
-                        ? "border-red-200 text-red-700"
-                        : "border-emerald-200 text-emerald-700"
+                        ? "border-danger-line text-danger-fg"
+                        : "border-ok-line text-ok-fg"
                     )}
                   >
                     {item.side === "against"
@@ -464,14 +464,14 @@ function CasePractice({
                       : "в вашу пользу"}
                   </span>
                 </div>
-                <p className="mt-1 text-[11px] leading-relaxed text-fg-soft">
+                <p className="mt-1 text-label leading-relaxed text-fg-soft">
                   {item.holding}
                 </p>
               </motion.li>
             ))}
           </ul>
 
-          <p className="mt-2.5 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-ghost">
+          <p className="mt-2.5 font-mono text-label uppercase text-fg-ghost">
             Демонстрационные данные
           </p>
         </>

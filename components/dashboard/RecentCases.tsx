@@ -26,7 +26,7 @@ export function RecentCases() {
     <>
       {/* Выбор всех дел для массовой генерации */}
       <div className="mb-3 flex items-center gap-3 border-b border-line pb-3">
-        <label className="flex cursor-pointer items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint transition-colors hover:text-fg">
+        <label className="flex cursor-pointer items-center gap-2 font-mono text-label uppercase text-fg-faint transition-colors hover:text-fg">
           <Checkbox
             checked={allSelected}
             onCheckedChange={() => toggleAllCases(allIds)}
@@ -36,7 +36,7 @@ export function RecentCases() {
         </label>
 
         {selectedCaseIds.length > 0 && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg">
+          <span className="font-mono text-label uppercase text-fg">
             Выбрано: {selectedCaseIds.length}
           </span>
         )}
@@ -75,7 +75,7 @@ export function RecentCases() {
 
                 <span
                   className={cn(
-                    "inline-flex items-center gap-2 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em]",
+                    "inline-flex items-center gap-2 rounded border px-2 py-1 font-mono text-label uppercase ",
                     statusMeta.badgeClassName
                   )}
                 >
@@ -90,18 +90,18 @@ export function RecentCases() {
               </div>
 
               {invalidCount > 0 && (
-                <span className="shrink-0 rounded border border-red-200 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] text-red-700">
+                <span className="shrink-0 rounded border border-danger-line px-2 py-1 font-mono text-label uppercase text-danger-fg">
                   {invalidCount}{" "}
                   {plural(invalidCount, "ошибка", "ошибки", "ошибок")}
                 </span>
               )}
             </div>
 
-            <h3 className="mt-4 line-clamp-2 text-[15px] font-medium leading-snug tracking-[-0.015em] text-fg">
+            <h3 className="mt-4 line-clamp-2 text-body font-medium leading-snug text-fg">
               {caseItem.title}
             </h3>
 
-            <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-fg-subtle">
+            <p className="mt-2 line-clamp-2 text-body-sm leading-relaxed text-fg-subtle">
               {caseItem.description}
             </p>
 
@@ -109,14 +109,14 @@ export function RecentCases() {
               {caseItem.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint"
+                  className="font-mono text-label uppercase text-fg-faint"
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            <div className="mt-auto flex items-center gap-4 pt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+            <div className="mt-auto flex items-center gap-4 pt-5 font-mono text-label uppercase text-fg-faint">
               <span className="inline-flex items-center gap-1.5">
                 <CalendarDays className="h-3 w-3" />
                 {formatDate(caseItem.createdAt)}
@@ -130,7 +130,7 @@ export function RecentCases() {
 
             <Link
               href={`/cases/${caseItem.id}`}
-              className="group mt-4 inline-flex w-fit items-center gap-1.5 border-b border-line pb-0.5 text-[13px] text-fg-muted transition-colors hover:border-fg hover:text-fg"
+              className="group mt-4 inline-flex w-fit items-center gap-1.5 border-b border-line pb-0.5 text-body-sm text-fg-muted transition-colors hover:border-fg hover:text-fg"
             >
               Открыть дело
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />

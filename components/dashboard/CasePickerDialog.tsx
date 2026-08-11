@@ -77,10 +77,10 @@ export function CasePickerDialog({
                 />
 
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] text-fg">
+                  <span className="truncate text-body text-fg">
                     {item.title}
                   </span>
-                  <span className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+                  <span className="mt-1 truncate font-mono text-label uppercase text-fg-faint">
                     {entityCount}{" "}
                     {plural(entityCount, "объект", "объекта", "объектов")} ·{" "}
                     {documentCount}{" "}

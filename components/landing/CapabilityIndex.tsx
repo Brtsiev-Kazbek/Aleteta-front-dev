@@ -97,13 +97,13 @@ export function CapabilityIndex() {
                   className="flex h-full flex-col bg-surface p-6"
                 >
                   <div className="flex items-baseline gap-2.5">
-                    <span className="font-mono text-[10px] tabular-nums text-violet-600">
+                    <span className="font-mono text-label tabular-nums text-brand">
                       {String(groupIndex + 1).padStart(2, "0")}
                     </span>
-                    <h3 className="text-sm font-medium text-fg">
+                    <h3 className="text-body font-medium text-fg">
                       {group.title}
                     </h3>
-                    <span className="ml-auto font-mono text-[10px] tabular-nums text-fg-ghost">
+                    <span className="ml-auto font-mono text-label tabular-nums text-fg-ghost">
                       {group.items.length}
                     </span>
                   </div>
@@ -113,13 +113,13 @@ export function CapabilityIndex() {
                       <li key={item.name} className="group/item py-3">
                         <span
                           className={cn(
-                            "block text-[13px] leading-snug transition-colors",
-                            "text-fg group-hover/item:text-violet-700"
+                            "block text-body leading-snug transition-colors",
+                            "text-fg group-hover/item:text-brand-strong"
                           )}
                         >
                           {item.name}
                         </span>
-                        <span className="mt-0.5 block text-[11px] leading-snug text-fg-faint">
+                        <span className="mt-0.5 block text-label leading-snug text-fg-faint">
                           {item.note}
                         </span>
                       </li>

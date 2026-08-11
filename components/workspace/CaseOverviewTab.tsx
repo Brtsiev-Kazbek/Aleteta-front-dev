@@ -85,15 +85,15 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
         <div className="mt-4 flex items-end gap-4">
           <span
             className={cn(
-              "font-mono text-6xl leading-none tabular-nums tracking-tight transition-colors duration-500",
-              isReady ? "text-emerald-600" : "text-fg"
+              "font-mono text-display-lg leading-none tabular-nums transition-colors duration-500",
+              isReady ? "text-ok-fg" : "text-fg"
             )}
           >
             <AnimatedNumber value={Math.round(stats.percent)} />
-            <span className="text-2xl text-fg-ghost">%</span>
+            <span className="text-heading text-fg-ghost">%</span>
           </span>
 
-          <span className="pb-1.5 text-sm text-fg-subtle">
+          <span className="pb-1.5 text-body text-fg-subtle">
             {stats.valid} из {stats.total}{" "}
             {plural(stats.total, "объекта", "объектов", "объектов")} готовы
           </span>
@@ -106,7 +106,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
             transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
             className={cn(
               "h-px",
-              isReady ? "bg-emerald-500" : "bg-fg"
+              isReady ? "bg-ok" : "bg-fg"
             )}
           />
         </div>
@@ -122,10 +122,10 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
               key={tile.label}
               className="bg-surface px-4 py-5 transition-colors hover:bg-bg"
             >
-              <span className="font-mono text-2xl tabular-nums text-fg">
+              <span className="font-mono text-heading tabular-nums text-fg">
                 <AnimatedNumber value={tile.value} />
               </span>
-              <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+              <p className="mt-1.5 font-mono text-label uppercase text-fg-faint">
                 {tile.label}
               </p>
             </div>
@@ -141,7 +141,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
               <button
                 type="button"
                 onClick={() => setActiveTab("entities")}
-                className="border-b border-line pb-0.5 text-xs text-fg-subtle transition-colors hover:border-fg hover:text-fg"
+                className="border-b border-line pb-0.5 text-caption text-fg-subtle transition-colors hover:border-fg hover:text-fg"
               >
                 Открыть матрицу
               </button>
@@ -150,8 +150,8 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
 
           {problems.length === 0 ? (
             <div className="mt-4 flex items-center gap-3 border-t border-line pt-5">
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-              <span className="text-sm text-fg-soft">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-ok-fg" />
+              <span className="text-body text-fg-soft">
                 Все объекты заполнены — пакет можно генерировать
               </span>
             </div>
@@ -166,19 +166,19 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
                   className="group flex cursor-pointer items-center gap-4 py-4 transition-colors hover:bg-bg"
                   onClick={() => setActiveTab("entities")}
                 >
-                  <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-red-500" />
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-danger-fg" />
 
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm text-fg">
+                    <span className="truncate text-body text-fg">
                       {entity.data[schema.fields[0]?.key ?? "name"]?.trim() ||
                         `Без наименования · ${schema.label}`}
                     </span>
-                    <span className="mt-0.5 truncate text-xs text-red-600">
+                    <span className="mt-0.5 truncate text-caption text-danger-fg">
                       {validation.errors[0]}
                     </span>
                   </div>
 
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint transition-colors group-hover:text-fg">
+                  <span className="shrink-0 font-mono text-label uppercase text-fg-faint transition-colors group-hover:text-fg">
                     {validation.errors.length}{" "}
                     {plural(
                       validation.errors.length,
@@ -198,7 +198,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
       <section className="lg:col-span-5">
         <MetaLabel>О деле</MetaLabel>
 
-        <p className="mt-4 text-sm leading-relaxed text-fg-soft">
+        <p className="mt-4 text-body leading-relaxed text-fg-soft">
           {caseItem.description}
         </p>
 
@@ -212,10 +212,10 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
               key={row.label}
               className="flex items-baseline justify-between gap-4 py-3"
             >
-              <dt className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+              <dt className="shrink-0 font-mono text-label uppercase text-fg-faint">
                 {row.label}
               </dt>
-              <dd className="truncate text-sm text-fg">{row.value}</dd>
+              <dd className="truncate text-body text-fg">{row.value}</dd>
             </div>
           ))}
         </dl>
@@ -234,7 +234,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           <MetaLabel>Активность</MetaLabel>
 
           {activity.length === 0 ? (
-            <p className="mt-4 border-t border-line pt-5 text-sm text-fg-faint">
+            <p className="mt-4 border-t border-line pt-5 text-body text-fg-faint">
               Действий по делу пока не было
             </p>
           ) : (
@@ -253,7 +253,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
                       className={cn(
                         "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded border bg-surface",
                         item.kind === "ai"
-                          ? "border-violet-200 text-violet-600"
+                          ? "border-brand-line text-brand"
                           : "border-line text-fg-faint"
                       )}
                     >
@@ -261,10 +261,10 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
                     </div>
 
                     <div className="flex min-w-0 flex-col">
-                      <span className="text-sm leading-snug text-fg">
+                      <span className="text-body leading-snug text-fg">
                         {item.text}
                       </span>
-                      <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                      <span className="mt-1 font-mono text-label uppercase text-fg-faint">
                         {item.actor} · {formatDate(item.at)}
                       </span>
                     </div>

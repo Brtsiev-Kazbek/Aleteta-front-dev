@@ -39,7 +39,7 @@ export function DemoStage({
       {/* Волосяной акцент сверху — тот же, что у выделенного тарифа. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent"
+        className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-brand/50 to-transparent"
       />
 
       <div className="relative [&>*]:shadow-panel">{children}</div>

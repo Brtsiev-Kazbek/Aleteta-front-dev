@@ -62,16 +62,16 @@ export function HowItWorks() {
       <div className="relative z-10 mx-auto max-w-6xl px-6 py-20">
         <Reveal>
           <div className="flex items-center gap-3">
-            <span className="font-mono text-[11px] tabular-nums text-violet-400">
+            <span className="font-mono text-label tabular-nums text-brand">
               10
             </span>
             <span className="h-px w-8 bg-inverse-3" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
+            <span className="font-mono text-label uppercase text-fg-subtle">
               Как это работает
             </span>
           </div>
 
-          <h2 className="mt-5 max-w-2xl text-3xl font-medium leading-[1.15] tracking-[-0.02em] text-inverse-fg sm:text-[2.5rem]">
+          <h2 className="mt-5 max-w-2xl text-display font-medium leading-[1.15] text-inverse-fg sm:text-display-lg">
             От папки со сканами до готового пакета — три шага
           </h2>
         </Reveal>
@@ -84,14 +84,14 @@ export function HowItWorks() {
                 transition={{ duration: 0.25 }}
                 className="flex h-full flex-col bg-inverse p-7 lg:p-8"
               >
-                <span className="font-mono text-[11px] tabular-nums text-violet-400">
+                <span className="font-mono text-label tabular-nums text-brand">
                   {step.number}
                 </span>
 
-                <h3 className="mt-5 text-lg font-medium text-inverse-fg">
+                <h3 className="mt-5 text-title-sm font-medium text-inverse-fg">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-fg-faint">
+                <p className="mt-3 text-body leading-relaxed text-fg-faint">
                   {step.text}
                 </p>
               </motion.div>

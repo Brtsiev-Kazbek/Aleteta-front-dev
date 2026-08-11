@@ -86,10 +86,10 @@ export function FileDropzone({
         />
 
         <div className="flex flex-col gap-1.5">
-          <p className="text-sm text-fg">
+          <p className="text-body text-fg">
             Перетащите файл или нажмите, чтобы выбрать
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+          <p className="font-mono text-label uppercase text-fg-faint">
             {hint}
           </p>
         </div>
@@ -111,7 +111,7 @@ export function FileDropzone({
         <button
           type="button"
           onClick={() => onPick(demoFile)}
-          className="self-center border-b border-line pb-0.5 text-xs text-fg-subtle transition-colors hover:border-fg-faint hover:text-fg"
+          className="self-center border-b border-line pb-0.5 text-caption text-fg-subtle transition-colors hover:border-fg-faint hover:text-fg"
         >
           {demoLabel}
         </button>

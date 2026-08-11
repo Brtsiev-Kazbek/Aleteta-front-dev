@@ -33,7 +33,7 @@ export function SearchFragment({ fragment }: { fragment: string }) {
       {parts.map((part, index) => (
         <Chunk key={index}>
           {part.marked ? (
-            <mark className="rounded-sm bg-amber-100 px-0.5 text-fg">
+            <mark className="rounded-sm bg-warn-bg px-0.5 text-fg">
               {part.text}
             </mark>
           ) : (
@@ -85,8 +85,8 @@ export function HighlightedText({
             className={cn(
               "rounded-sm px-0.5 transition-colors",
               isActive
-                ? "bg-amber-300 text-fg ring-1 ring-amber-500"
-                : "bg-amber-100 text-fg"
+                ? "bg-warn-line text-fg ring-1 ring-warn"
+                : "bg-warn-bg text-fg"
             )}
           >
             {part.text}

@@ -288,7 +288,7 @@ function Dropzone({
         "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed text-center transition-colors",
         compact ? "px-6 py-8" : "px-6 py-20",
         isDragging
-          ? "border-violet-400 bg-violet-50/50"
+          ? "border-brand bg-brand-soft/50"
           : "border-line-strong bg-surface/60 hover:border-fg-faint"
       )}
     >
@@ -296,21 +296,21 @@ function Dropzone({
         className={cn(
           "text-fg-ghost transition-colors",
           compact ? "h-5 w-5" : "h-7 w-7",
-          isDragging && "text-violet-500"
+          isDragging && "text-brand"
         )}
       />
 
       <p
         className={cn(
-          "font-medium tracking-[-0.01em] text-fg",
-          compact ? "text-[14px]" : "text-[17px]"
+          "font-medium text-fg",
+          compact ? "text-body" : "text-title-sm"
         )}
       >
         {isDragging ? "Отпустите — начну читать" : "Перетащите файл сюда"}
       </p>
 
       {!compact && (
-        <p className="max-w-md text-[13px] leading-relaxed text-fg-subtle">
+        <p className="max-w-md text-body-sm leading-relaxed text-fg-subtle">
           Скан, фотография или PDF. Текст появится на этой же странице по мере
           того, как читаются страницы, — уходить и возвращаться не нужно.
         </p>
@@ -328,7 +328,7 @@ function Dropzone({
       </Button>
 
       {disabled && (
-        <p className="text-[12px] text-fg-faint">
+        <p className="text-caption text-fg-faint">
           Загрузка работает только с подключённой базой.
         </p>
       )}
@@ -439,7 +439,7 @@ function SearchPanel({
               ? "Найти в расшифровках: неустойка, срок оплаты, кадастровый номер…"
               : "Поиск заработает, когда появится первая расшифровка"
           }
-          className="h-12 pl-11 pr-44 text-[14px]"
+          className="h-12 pl-11 pr-44 text-body"
           aria-label="Поиск по распознанному тексту"
         />
 
@@ -450,7 +450,7 @@ function SearchPanel({
           )}
 
           {hits !== null && !isSearching && (
-            <span className="mr-1 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+            <span className="mr-1 font-mono text-label uppercase text-fg-faint">
               {found.length === 0
                 ? "нет совпадений"
                 : `${index >= 0 ? index + 1 : "—"} из ${found.length}`}
@@ -500,15 +500,15 @@ function SearchPanel({
                     onClick={() => onOpen(hit, query.trim())}
                     className={cn(
                       "flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors",
-                      isCurrent ? "bg-amber-50/70" : "hover:bg-bg"
+                      isCurrent ? "bg-warn-bg/70" : "hover:bg-bg"
                     )}
                   >
-                    <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+                    <span className="flex items-center gap-2 font-mono text-label uppercase text-fg-faint">
                       <span className="truncate">{hit.documentTitle}</span>
                       <span className="shrink-0 text-fg-ghost">·</span>
                       <span className="shrink-0">стр. {hit.page}</span>
                     </span>
-                    <span className="text-[13px] leading-relaxed text-fg-muted">
+                    <span className="text-body-sm leading-relaxed text-fg-muted">
                       <SearchFragment fragment={hit.fragment} />
                     </span>
                   </button>
@@ -594,10 +594,10 @@ function FileList({
                 <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-ghost" />
 
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] text-fg">
+                  <span className="truncate text-body-sm text-fg">
                     {document.title}
                   </span>
-                  <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+                  <span className="mt-0.5 truncate font-mono text-label uppercase text-fg-faint">
                     {formatDate(document.createdAt)}
                   </span>
                 </span>
@@ -618,7 +618,7 @@ function FileList({
                   <IconButton
                     title="Удалить"
                     onClick={() => onDelete(document.id)}
-                    className="hover:text-red-600"
+                    className="hover:text-danger-fg"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </IconButton>
@@ -629,7 +629,7 @@ function FileList({
                 <Progress
                   value={total > 0 ? (done / total) * 100 : 8}
                   className="mt-2.5"
-                  indicatorClassName="bg-violet-500"
+                  indicatorClassName="bg-brand"
                 />
               )}
             </div>
@@ -675,7 +675,7 @@ function FileStrip({
           >
             <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
 
-            <span className="max-w-[14rem] truncate text-[12.5px] text-fg">
+            <span className="max-w-[14rem] truncate text-caption text-fg">
               {document.title}
             </span>
 
@@ -709,7 +709,7 @@ function StatusText({ document }: { document: Document }) {
       );
     case "failed":
       return (
-        <Meta className="text-red-600">
+        <Meta className="text-danger-fg">
           <AlertTriangle className="h-3 w-3" />
           Не удалось
         </Meta>
@@ -717,7 +717,7 @@ function StatusText({ document }: { document: Document }) {
     default:
       return (
         <Meta>
-          <Check className="h-3 w-3 text-emerald-600" />
+          <Check className="h-3 w-3 text-ok-fg" />
           {total
             ? `${total} ${plural(total, "страница", "страницы", "страниц")}`
             : "Готово"}
@@ -1145,7 +1145,7 @@ function TextPane({
 
   if (!document) {
     return (
-      <div className="flex items-center justify-center rounded-lg border border-line bg-surface/60 p-12 text-[13px] text-fg-subtle">
+      <div className="flex items-center justify-center rounded-lg border border-line bg-surface/60 p-12 text-body-sm text-fg-subtle">
         Выберите файл слева.
       </div>
     );
@@ -1164,7 +1164,7 @@ function TextPane({
     <div className="flex h-full min-w-0 flex-col gap-3">
       {/* Шапка: имя файла, поиск по нему, действия */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-line bg-surface px-4 py-2.5">
-        <h2 className="min-w-0 flex-1 truncate text-[14px] font-medium tracking-[-0.01em] text-fg">
+        <h2 className="min-w-0 flex-1 truncate text-body font-medium text-fg">
           {document.title}
         </h2>
 
@@ -1182,13 +1182,13 @@ function TextPane({
                 if (event.key === "Escape") setQuery("");
               }}
               placeholder="В этом файле"
-              className="h-8 w-52 pl-8 pr-24 text-[12.5px]"
+              className="h-8 w-52 pl-8 pr-24 text-caption"
               aria-label="Найти в этом файле"
             />
 
             <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center">
               {terms.length > 0 && (
-                <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-faint">
+                <span className="mr-1 font-mono text-label uppercase text-fg-faint">
                   {marks.total === 0 ? "нет" : `${at + 1}/${marks.total}`}
                 </span>
               )}
@@ -1227,7 +1227,7 @@ function TextPane({
           <>
             <IconButton title="Скопировать текст" onClick={() => void handleCopy()}>
               {isCopied ? (
-                <Check className="h-3.5 w-3.5 text-emerald-600" />
+                <Check className="h-3.5 w-3.5 text-ok-fg" />
               ) : (
                 <Copy className="h-3.5 w-3.5" />
               )}
@@ -1262,23 +1262,23 @@ function TextPane({
                * ответила отказом. Прочитать её больше негде — исполнитель
                * работает на другой машине.
                */
-              <div className="m-5 flex flex-col gap-2 rounded border border-red-200 bg-red-50/60 p-3.5">
-                <p className="flex items-start gap-2 text-[12.5px] font-medium leading-relaxed text-red-800">
+              <div className="m-5 flex flex-col gap-2 rounded border border-danger-line bg-danger-bg/60 p-3.5">
+                <p className="flex items-start gap-2 text-caption font-medium leading-relaxed text-danger-fg">
                   <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                   Распознать не удалось
                 </p>
 
                 {job?.error ? (
-                  <p className="pl-5 font-mono text-[12px] leading-relaxed text-red-700">
+                  <p className="pl-5 font-mono text-caption leading-relaxed text-danger-fg">
                     {job.error}
                   </p>
                 ) : (
-                  <p className="pl-5 text-[12.5px] leading-relaxed text-red-700">
+                  <p className="pl-5 text-caption leading-relaxed text-danger-fg">
                     Причина не записана. Загляните в журнал заданий.
                   </p>
                 )}
 
-                <p className="pl-5 text-[12px] leading-relaxed text-fg-subtle">
+                <p className="pl-5 text-caption leading-relaxed text-fg-subtle">
                   Исправив причину, нажмите «распознать заново».
                 </p>
               </div>
@@ -1290,7 +1290,7 @@ function TextPane({
                 </Meta>
               </div>
             ) : !hasText ? (
-              <p className="p-5 text-[13px] leading-relaxed text-fg-subtle">
+              <p className="p-5 text-body-sm leading-relaxed text-fg-subtle">
                 {isRunning
                   ? "Страницы дочитываются — текст появится здесь сам, по мере готовности."
                   : "Текста нет: страницы оказались пустыми."}
@@ -1313,7 +1313,7 @@ function TextPane({
                       <button
                         type="button"
                         onClick={() => onOpenPage(page.page)}
-                        className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle transition-colors hover:text-fg"
+                        className="font-mono text-label uppercase text-fg-subtle transition-colors hover:text-fg"
                         title="Показать эту страницу в оригинале"
                       >
                         Страница {page.page}
@@ -1321,10 +1321,10 @@ function TextPane({
 
                       <span
                         className={cn(
-                          "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]",
+                          "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
                           page.source === "embedded"
                             ? "border-line text-fg-faint"
-                            : "border-violet-200 bg-violet-50/60 text-violet-700"
+                            : "border-brand-line bg-brand-soft/60 text-brand-strong"
                         )}
                         title={page.model ?? undefined}
                       >
@@ -1332,13 +1332,13 @@ function TextPane({
                       </span>
 
                       {openPage === page.page && showOriginal && canShowOriginal && (
-                        <span className="ml-auto font-mono text-[9px] uppercase tracking-[0.1em] text-amber-700">
+                        <span className="ml-auto font-mono text-label uppercase text-warn-fg">
                           открыта в оригинале
                         </span>
                       )}
                     </header>
 
-                    <pre className="whitespace-pre-wrap break-words px-5 py-4 font-mono text-[12.5px] leading-[1.7] text-fg-muted">
+                    <pre className="whitespace-pre-wrap break-words px-5 py-4 font-mono text-caption leading-[1.7] text-fg-muted">
                       <HighlightedText
                         text={page.text}
                         terms={terms}
@@ -1401,7 +1401,7 @@ function Meta({
   return (
     <span
       className={cn(
-        "flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle",
+        "flex items-center gap-1.5 font-mono text-label uppercase text-fg-subtle",
         className
       )}
     >
@@ -1412,7 +1412,7 @@ function Meta({
 
 function Notice({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-lg border border-amber-200 bg-amber-50/60 px-4 py-3 text-[12.5px] leading-relaxed text-amber-900">
+    <p className="rounded-lg border border-warn-line bg-warn-bg/60 px-4 py-3 text-caption leading-relaxed text-warn-fg">
       {children}
     </p>
   );

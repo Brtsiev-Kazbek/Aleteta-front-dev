@@ -35,10 +35,10 @@ export function DocsShell({
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-6">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded bg-inverse text-[13px] font-medium text-inverse-fg">
+              <span className="flex h-7 w-7 items-center justify-center rounded bg-inverse text-body font-medium text-inverse-fg">
                 А
               </span>
-              <span className="text-sm font-medium tracking-[-0.01em] text-fg">
+              <span className="text-body font-medium text-fg">
                 Алетейя
               </span>
             </Link>
@@ -48,7 +48,7 @@ export function DocsShell({
               className="hidden h-4 w-px bg-surface-3 sm:block"
             />
 
-            <span className="hidden items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-fg-faint sm:flex">
+            <span className="hidden items-center gap-2 font-mono text-label uppercase text-fg-faint sm:flex">
               <BookOpen className="h-3 w-3" />
               Документация
             </span>
@@ -57,13 +57,13 @@ export function DocsShell({
           <div className="flex items-center gap-5">
             <a
               href={`${REPO}/tree/main/docs/api`}
-              className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:text-fg sm:block"
+              className="hidden font-mono text-label uppercase text-fg-faint transition-colors hover:text-fg sm:block"
             >
               Справочник по коду
             </a>
             <a
               href={REPO}
-              className="group inline-flex items-center gap-1.5 text-[13px] text-fg-soft transition-colors hover:text-fg"
+              className="group inline-flex items-center gap-1.5 text-body text-fg-soft transition-colors hover:text-fg"
             >
               GitHub
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -79,7 +79,7 @@ export function DocsShell({
           className="hidden w-52 shrink-0 lg:block"
         >
           <div className="sticky top-24">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+            <span className="font-mono text-label uppercase text-fg-faint">
               Разделы
             </span>
 
@@ -92,7 +92,7 @@ export function DocsShell({
                     <Link
                       href={page.slug ? `/docs/${page.slug}` : "/docs"}
                       className={cn(
-                        "-ml-px flex items-baseline gap-2.5 border-l py-2 pl-4 text-[13px] transition-colors",
+                        "-ml-px flex items-baseline gap-2.5 border-l py-2 pl-4 text-body transition-colors",
                         isActive
                           ? "border-fg text-fg"
                           : "border-transparent text-fg-subtle hover:border-line-strong hover:text-fg"
@@ -100,8 +100,8 @@ export function DocsShell({
                     >
                       <span
                         className={cn(
-                          "font-mono text-[10px] tabular-nums",
-                          isActive ? "text-violet-600" : "text-fg-ghost"
+                          "font-mono text-label tabular-nums",
+                          isActive ? "text-brand" : "text-fg-ghost"
                         )}
                       >
                         {String(index + 1).padStart(2, "0")}
@@ -116,7 +116,7 @@ export function DocsShell({
             {sourceFile && (
               <a
                 href={`${REPO}/edit/main/docs/${sourceFile}`}
-                className="mt-8 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:text-fg"
+                className="mt-8 inline-flex items-center gap-1.5 font-mono text-label uppercase text-fg-faint transition-colors hover:text-fg"
               >
                 Править страницу
                 <ArrowUpRight className="h-3 w-3" />

@@ -34,7 +34,7 @@ export function WorkspaceSwitcher({
 
   if (workspaces.length <= 1) {
     return (
-      <p className="text-[13px] leading-relaxed text-fg-subtle">
+      <p className="text-body leading-relaxed text-fg-subtle">
         У вас одно пространство. Появятся другие — когда вас пригласят в чужое.
       </p>
     );
@@ -65,23 +65,23 @@ export function WorkspaceSwitcher({
               )}
             >
               <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm text-fg">
+                <span className="truncate text-body text-fg">
                   {workspace.name}
                 </span>
-                <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+                <span className="mt-0.5 font-mono text-label uppercase text-fg-faint">
                   {ROLE_LABELS[workspace.role]}
                 </span>
               </div>
 
               {isCurrent ? (
-                <span className="flex shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
+                <span className="flex shrink-0 items-center gap-1.5 font-mono text-label uppercase text-fg-subtle">
                   <Check className="h-3 w-3" />
                   текущее
                 </span>
               ) : isPending ? (
                 <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-fg-faint" />
               ) : (
-                <span className="shrink-0 border-b border-line-strong pb-0.5 text-[13px] text-fg-soft">
+                <span className="shrink-0 border-b border-line-strong pb-0.5 text-body text-fg-soft">
                   Перейти
                 </span>
               )}

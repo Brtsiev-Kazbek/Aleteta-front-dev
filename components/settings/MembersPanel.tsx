@@ -55,7 +55,7 @@ function RoleSelect({
         onChange={(event) => onChange(event.target.value as WorkspaceRole)}
         aria-label={label}
         className={cn(
-          "w-full appearance-none rounded-md border border-line bg-surface pl-2.5 pr-7 text-[13px] text-fg-muted transition-colors hover:border-line-strong focus-visible:border-fg focus-visible:outline-none disabled:opacity-50",
+          "w-full appearance-none rounded-md border border-line bg-surface pl-2.5 pr-7 text-body-sm text-fg-muted transition-colors hover:border-line-strong focus-visible:border-fg focus-visible:outline-none disabled:opacity-50",
           className
         )}
       >
@@ -161,21 +161,21 @@ export function MembersPanel({
           <li key={member.userId} className="flex items-center gap-3.5 py-3.5">
             <span
               aria-hidden
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface font-mono text-[11px] uppercase text-fg-subtle"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface font-mono text-label uppercase text-fg-subtle"
             >
               {initials(member.fullName)}
             </span>
 
             <div className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-sm text-fg">
+              <span className="truncate text-body text-fg">
                 {member.fullName}
                 {member.isSelf && (
-                  <span className="ml-2 font-mono text-[9px] uppercase tracking-[0.12em] text-fg-faint">
+                  <span className="ml-2 font-mono text-label uppercase text-fg-faint">
                     это вы
                   </span>
                 )}
               </span>
-              <span className="mt-0.5 truncate text-[12px] text-fg-subtle">
+              <span className="mt-0.5 truncate text-caption text-fg-subtle">
                 {member.email}
                 {member.jobTitle ? ` · ${member.jobTitle}` : ""}
               </span>
@@ -194,7 +194,7 @@ export function MembersPanel({
             ) : (
               <span
                 className={cn(
-                  "shrink-0 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em]",
+                  "shrink-0 rounded border px-2 py-1 font-mono text-label uppercase ",
                   member.role === "owner"
                     ? "border-line-strong text-fg-muted"
                     : "border-line text-fg-faint"
@@ -210,7 +210,7 @@ export function MembersPanel({
                 size="icon"
                 disabled={isPending}
                 onClick={() => runAction(removeMemberAction(member.userId))}
-                className="h-8 w-8 shrink-0 hover:text-red-600"
+                className="h-8 w-8 shrink-0 hover:text-danger-fg"
               >
                 <UserMinus className="h-4 w-4" />
                 <span className="sr-only">
@@ -225,7 +225,7 @@ export function MembersPanel({
       {/* Незакрытые приглашения */}
       {invites.length > 0 && (
         <div className="flex flex-col gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+          <span className="font-mono text-label uppercase text-fg-faint">
             Приглашения ждут ответа
           </span>
 
@@ -233,10 +233,10 @@ export function MembersPanel({
             {invites.map((invite) => (
               <li key={invite.id} className="flex items-center gap-3 py-2.5">
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] text-fg-muted">
+                  <span className="truncate text-body-sm text-fg-muted">
                     {invite.email}
                   </span>
-                  <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+                  <span className="mt-0.5 font-mono text-label uppercase text-fg-faint">
                     {ROLE_LABELS[invite.role]} · действует до{" "}
                     {formatDate(invite.expiresAt)}
                   </span>
@@ -248,7 +248,7 @@ export function MembersPanel({
                     size="icon"
                     disabled={isPending}
                     onClick={() => runAction(cancelInviteAction(invite.id))}
-                    className="h-8 w-8 shrink-0 hover:text-red-600"
+                    className="h-8 w-8 shrink-0 hover:text-danger-fg"
                   >
                     <X className="h-4 w-4" />
                     <span className="sr-only">

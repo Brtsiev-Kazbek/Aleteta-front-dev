@@ -98,21 +98,21 @@ export function ExtractionStartDialog({
                         typeId === schema.id ? "bg-fg" : "bg-fg-ghost"
                       )}
                     />
-                    <span className="text-[13px] text-fg">
+                    <span className="text-body text-fg">
                       {schema.label}
                     </span>
                     {schema.isCustom && (
-                      <span className="rounded border border-line px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-fg-faint">
+                      <span className="rounded border border-line px-1.5 py-0.5 font-mono text-label uppercase text-fg-faint">
                         свой
                       </span>
                     )}
                   </span>
 
-                  <span className="pl-3.5 text-[11.5px] leading-relaxed text-fg-subtle">
+                  <span className="pl-3.5 text-label leading-relaxed text-fg-subtle">
                     {schema.hint || "Без пояснения"}
                   </span>
 
-                  <span className="pl-3.5 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-faint">
+                  <span className="pl-3.5 font-mono text-label uppercase text-fg-faint">
                     {schema.fields.length}{" "}
                     {plural(
                       schema.fields.length,

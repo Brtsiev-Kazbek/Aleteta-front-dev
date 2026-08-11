@@ -143,7 +143,7 @@ export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
           <div className="flex flex-col gap-2.5">
             <div className="flex items-baseline justify-between gap-3">
               <MetaLabel>Реквизиты</MetaLabel>
-              <span className="font-mono text-[10px] tabular-nums text-fg-faint">
+              <span className="font-mono text-label tabular-nums text-fg-faint">
                 {filledFields} {plural(filledFields, "поле", "поля", "полей")}
                 {requiredCount > 0 &&
                   ` · ${requiredCount} ${plural(
@@ -166,7 +166,7 @@ export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
                     transition={{ duration: 0.18 }}
                     className="flex items-center gap-2"
                   >
-                    <span className="w-5 shrink-0 font-mono text-[10px] tabular-nums text-fg-ghost">
+                    <span className="w-5 shrink-0 font-mono text-label tabular-nums text-fg-ghost">
                       {String(index + 1).padStart(2, "0")}
                     </span>
 
@@ -179,7 +179,7 @@ export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
                       className="flex-1"
                     />
 
-                    <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-line px-2.5 py-2 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-subtle transition-colors hover:border-line-strong hover:text-fg">
+                    <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-line px-2.5 py-2 font-mono text-label uppercase text-fg-subtle transition-colors hover:border-line-strong hover:text-fg">
                       <Checkbox
                         checked={field.required}
                         onCheckedChange={(checked) =>
@@ -194,7 +194,7 @@ export function CustomSchemaDialog({ caseId }: CustomSchemaDialogProps) {
                       size="icon"
                       onClick={() => removeField(field.id)}
                       disabled={fields.length <= 1}
-                      className="h-9 w-9 shrink-0 hover:text-red-600"
+                      className="h-9 w-9 shrink-0 hover:text-danger-fg"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Удалить реквизит</span>

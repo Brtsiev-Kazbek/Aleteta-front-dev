@@ -110,7 +110,7 @@ export function Sidebar() {
           className="group flex min-w-0 items-center gap-2.5"
           aria-label="На главную"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-inverse text-[13px] font-medium text-inverse-fg">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-inverse text-body font-medium text-inverse-fg">
             А
           </span>
 
@@ -123,10 +123,10 @@ export function Sidebar() {
                 transition={{ duration: 0.16 }}
                 className="flex min-w-0 flex-col leading-none"
               >
-                <span className="truncate text-sm font-medium tracking-[-0.01em] text-fg">
+                <span className="truncate text-body font-medium text-fg">
                   Алетейя
                 </span>
-                <span className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-fg-faint">
+                <span className="mt-1 truncate font-mono text-label uppercase text-fg-faint">
                   {isBackedByDatabase
                     ? (viewer?.workspaceName ?? "Рабочее пространство")
                     : "Демо-режим"}
@@ -163,7 +163,7 @@ export function Sidebar() {
         )}
       >
         {isExpanded && (
-          <p className="px-3 pb-1.5 pt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-fg-faint">
+          <p className="px-3 pb-1.5 pt-2 font-mono text-label uppercase text-fg-faint">
             Рабочая область
           </p>
         )}
@@ -188,14 +188,14 @@ export function Sidebar() {
                 {active && (
                   <span
                     aria-hidden
-                    className="absolute left-0 top-1/2 h-4 w-px -translate-y-1/2 bg-violet-500"
+                    className="absolute left-0 top-1/2 h-4 w-px -translate-y-1/2 bg-brand"
                   />
                 )}
 
                 <item.icon className="h-4 w-4 shrink-0" />
 
                 {isExpanded ? (
-                  <span className="truncate text-[13px]">{item.label}</span>
+                  <span className="truncate text-body">{item.label}</span>
                 ) : (
                   <span className="sr-only">{item.label}</span>
                 )}
@@ -219,7 +219,7 @@ export function Sidebar() {
           {/* Ведёт в настройки: это единственное место, где профиль правится. */}
           <Link
             href="/dashboard/settings"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line text-[11px] font-medium text-fg-soft transition-colors hover:border-line-strong hover:text-fg"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line text-label font-medium text-fg-soft transition-colors hover:border-line-strong hover:text-fg"
           >
             {initials || "А"}
             <span className="sr-only">Профиль пользователя</span>
@@ -228,10 +228,10 @@ export function Sidebar() {
 
         {isExpanded && (
           <div className="flex min-w-0 flex-col leading-tight">
-            <span className="truncate text-[13px] text-fg">
+            <span className="truncate text-body text-fg">
               {viewer?.fullName ?? "Гость"}
             </span>
-            <span className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-fg-faint">
+            <span className="mt-0.5 truncate font-mono text-label uppercase text-fg-faint">
               {viewer?.email ?? "демонстрационный стенд"}
             </span>
           </div>

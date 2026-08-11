@@ -138,7 +138,7 @@ export function ProductPreview() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.25 }}
-            className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
+            className="font-mono text-label uppercase text-fg-faint"
           >
             {data.caseTitle}
           </motion.span>
@@ -176,7 +176,7 @@ export function ProductPreview() {
                 {data.columns.map((column) => (
                   <th
                     key={column}
-                    className="whitespace-nowrap border-b border-line px-4 py-2.5 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-fg-faint"
+                    className="whitespace-nowrap border-b border-line px-4 py-2.5 font-mono text-label font-normal uppercase text-fg-faint"
                   >
                     {column}
                   </th>
@@ -190,9 +190,9 @@ export function ProductPreview() {
                   <td
                     key={index}
                     className={cn(
-                      "whitespace-nowrap border-b border-line-soft px-4 py-3 text-sm text-fg-muted",
+                      "whitespace-nowrap border-b border-line-soft px-4 py-3 text-body text-fg-muted",
                       data.monoColumns.includes(index) &&
-                        "font-mono text-[13px] text-fg-soft"
+                        "font-mono text-body text-fg-soft"
                     )}
                   >
                     {cell}
@@ -207,9 +207,9 @@ export function ProductPreview() {
                       <td
                         key={index}
                         className={cn(
-                          "whitespace-nowrap px-4 py-3 text-sm text-fg-muted",
+                          "whitespace-nowrap px-4 py-3 text-body text-fg-muted",
                           data.monoColumns.includes(index) &&
-                            "font-mono text-[13px] text-fg-soft"
+                            "font-mono text-body text-fg-soft"
                         )}
                       >
                         {cell}
@@ -232,19 +232,19 @@ export function ProductPreview() {
                         className="flex h-9 items-center gap-2 rounded border px-2.5"
                       >
                         {!isFilled && (
-                          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-red-500" />
+                          <AlertCircle className="h-3.5 w-3.5 shrink-0 text-danger-fg" />
                         )}
 
                         <span
                           className={cn(
-                            "text-sm transition-colors duration-300",
+                            "text-body transition-colors duration-300",
                             data.monoColumns.includes(index) &&
-                              "font-mono text-[13px]",
+                              "font-mono text-body",
                             isFilled
                               ? "text-fg-muted"
                               : typed
                                 ? "text-fg"
-                                : "text-red-700"
+                                : "text-danger-fg"
                           )}
                         >
                           {typed || (phase === "empty" ? "Не заполнено" : "")}
@@ -271,7 +271,7 @@ export function ProductPreview() {
       {/* Нижняя панель */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3">
         <div className="flex items-baseline gap-2.5">
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+          <span className="font-mono text-label uppercase text-fg-faint">
             Готово к генерации
           </span>
 
@@ -284,8 +284,8 @@ export function ProductPreview() {
                 exit={{ y: -12, opacity: 0 }}
                 transition={{ duration: 0.25 }}
                 className={cn(
-                  "absolute font-mono text-sm tabular-nums",
-                  isFilled ? "text-emerald-600" : "text-fg"
+                  "absolute font-mono text-body tabular-nums",
+                  isFilled ? "text-ok-fg" : "text-fg"
                 )}
               >
                 {isFilled ? "2 / 2" : "1 / 2"}
@@ -301,7 +301,7 @@ export function ProductPreview() {
                 initial={{ opacity: 0, x: 6 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0 }}
-                className="hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-emerald-600 sm:flex"
+                className="hidden items-center gap-1.5 font-mono text-label uppercase text-ok-fg sm:flex"
               >
                 <Check className="h-3 w-3" strokeWidth={2.5} />
                 Проверено
@@ -319,7 +319,7 @@ export function ProductPreview() {
                   }
             }
             transition={{ duration: 0.35 }}
-            className="rounded px-4 py-2 text-sm font-medium"
+            className="rounded px-4 py-2 text-body font-medium"
           >
             Сгенерировать пакет
           </motion.div>

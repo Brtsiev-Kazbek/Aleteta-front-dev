@@ -73,10 +73,10 @@ export function SocialProof() {
               >
                 <CountUp
                   to={fact.value}
-                  className="font-mono text-4xl tabular-nums tracking-tight text-fg"
+                  className="font-mono text-display-lg tabular-nums text-fg"
                 />
-                <p className="mt-3 text-sm text-fg-muted">{fact.label}</p>
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                <p className="mt-3 text-body text-fg-muted">{fact.label}</p>
+                <p className="mt-1 font-mono text-label uppercase text-fg-faint">
                   {fact.hint}
                 </p>
               </div>
@@ -96,15 +96,15 @@ export function SocialProof() {
           {TESTIMONIALS.map((testimonial, index) => (
             <Reveal key={testimonial.id} delay={index * 0.08}>
               <figure className="flex h-full flex-col bg-bg p-7">
-                <blockquote className="flex-1 text-sm leading-relaxed text-fg-subtle">
+                <blockquote className="flex-1 text-body leading-relaxed text-fg-subtle">
                   {testimonial.quote}
                 </blockquote>
 
                 <figcaption className="mt-6 border-t border-line pt-4">
-                  <span className="block text-sm text-fg-soft">
+                  <span className="block text-body text-fg-soft">
                     {testimonial.name}
                   </span>
-                  <span className="mt-0.5 block font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                  <span className="mt-0.5 block font-mono text-label uppercase text-fg-faint">
                     {testimonial.role}
                   </span>
                 </figcaption>

@@ -150,8 +150,8 @@ export function RecognizedTextSheet({
         {/* Ярус 1: что это за файл */}
         {/* Место справа оставлено крестику: он висит поверх, в правом верхнем углу. */}
         <SheetHeader className="border-b border-line px-6 py-5 pr-14">
-          <SheetTitle className="text-[15px]">{title || "Документ"}</SheetTitle>
-          <SheetDescription className="text-[12.5px] leading-relaxed">
+          <SheetTitle className="text-body">{title || "Документ"}</SheetTitle>
+          <SheetDescription className="text-caption leading-relaxed">
             Текст дословно, как его прочитала модель. Из него потом берутся
             реквизиты и формулировки — проверьте номера и даты.
           </SheetDescription>
@@ -172,7 +172,7 @@ export function RecognizedTextSheet({
                 <>
                   <IconButton title="Скопировать текст" onClick={() => void handleCopy()}>
                     {isCopied ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      <Check className="h-3.5 w-3.5 text-ok-fg" />
                     ) : (
                       <Copy className="h-3.5 w-3.5" />
                     )}
@@ -202,14 +202,14 @@ export function RecognizedTextSheet({
             <Progress
               value={total ? (done / total) * 100 : 8}
               className="mt-3"
-              indicatorClassName="bg-violet-500"
+              indicatorClassName="bg-brand"
             />
           )}
         </div>
 
         {/* Предупреждения — только когда есть о чём предупредить */}
         {!isAvailable && (
-          <div className="shrink-0 border-b border-amber-200 bg-amber-50/60 px-6 py-3 text-[12.5px] leading-relaxed text-amber-900">
+          <div className="shrink-0 border-b border-warn-line bg-warn-bg/60 px-6 py-3 text-caption leading-relaxed text-warn-fg">
             Распознавание не настроено: нет модели, читающей картинки. Задайте
             приложению <code className="font-mono">LLM_BASE_URL</code> и{" "}
             <code className="font-mono">LLM_MODEL_VISION</code>, а ключ — в
@@ -218,7 +218,7 @@ export function RecognizedTextSheet({
         )}
 
         {status === "failed" && job?.error && (
-          <div className="flex shrink-0 items-start gap-2 border-b border-red-200 bg-red-50/60 px-6 py-3 text-[12.5px] leading-relaxed text-red-700">
+          <div className="flex shrink-0 items-start gap-2 border-b border-danger-line bg-danger-bg/60 px-6 py-3 text-caption leading-relaxed text-danger-fg">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             {job.error}
           </div>
@@ -269,7 +269,7 @@ export function RecognizedTextSheet({
         <div className="shrink-0 border-t border-line px-6 py-3">
           <Link
             href="/dashboard/recognize"
-            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle transition-colors hover:text-fg"
+            className="inline-flex items-center gap-1.5 font-mono text-label uppercase text-fg-subtle transition-colors hover:text-fg"
           >
             Все расшифровки и поиск по ним
             <ArrowUpRight className="h-3 w-3" />
@@ -285,15 +285,15 @@ function PageBlock({ page }: { page: RecognizedPage }) {
   return (
     <section>
       <header className="mb-2 flex items-center gap-2 border-b border-line pb-1.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
+        <span className="font-mono text-label uppercase text-fg-subtle">
           Страница {page.page}
         </span>
         <span
           className={cn(
-            "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]",
+            "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
             page.source === "embedded"
               ? "border-line text-fg-faint"
-              : "border-violet-200 bg-violet-50/60 text-violet-700"
+              : "border-brand-line bg-brand-soft/60 text-brand-strong"
           )}
           title={page.model ?? undefined}
         >
@@ -301,7 +301,7 @@ function PageBlock({ page }: { page: RecognizedPage }) {
         </span>
       </header>
 
-      <pre className="whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-fg-muted">
+      <pre className="whitespace-pre-wrap break-words font-mono text-caption leading-relaxed text-fg-muted">
         {page.text}
       </pre>
     </section>
@@ -357,7 +357,7 @@ function StatusLine({
 
   if (status === "failed") {
     return (
-      <Meta className="text-red-600">
+      <Meta className="text-danger-fg">
         <AlertTriangle className="h-3 w-3" />
         Распознать не удалось
       </Meta>
@@ -368,7 +368,7 @@ function StatusLine({
 
   return (
     <Meta>
-      <Check className="h-3 w-3 text-emerald-600" />
+      <Check className="h-3 w-3 text-ok-fg" />
       {recognized} {plural(recognized, "страница", "страницы", "страниц")}
     </Meta>
   );
@@ -394,9 +394,9 @@ function Empty({
       <Icon
         className={cn("h-5 w-5 text-fg-ghost", spinning && "animate-spin")}
       />
-      <p className="text-[13px] text-fg">{title}</p>
+      <p className="text-body text-fg">{title}</p>
       {hint && (
-        <p className="max-w-sm text-[12.5px] leading-relaxed text-fg-subtle">
+        <p className="max-w-sm text-caption leading-relaxed text-fg-subtle">
           {hint}
         </p>
       )}
@@ -414,7 +414,7 @@ function Meta({
   return (
     <span
       className={cn(
-        "flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle",
+        "flex items-center gap-1.5 font-mono text-label uppercase text-fg-subtle",
         className
       )}
     >

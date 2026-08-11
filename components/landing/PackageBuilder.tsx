@@ -96,7 +96,7 @@ export function PackageBuilder() {
         <div className="mt-12 grid grid-cols-1 gap-px border border-line bg-surface-3 lg:grid-cols-2">
           {/* Ввод */}
           <div className="bg-surface p-6 lg:p-8">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+            <span className="font-mono text-label uppercase text-fg-faint">
               Объекты в деле
             </span>
 
@@ -109,7 +109,7 @@ export function PackageBuilder() {
                     <div className="flex min-w-0 flex-1 flex-col">
                       <span
                         className={cn(
-                          "text-sm transition-colors",
+                          "text-body transition-colors",
                           count > 0
                             ? "font-medium text-fg"
                             : "text-fg-subtle"
@@ -117,7 +117,7 @@ export function PackageBuilder() {
                       >
                         {kind.label}
                       </span>
-                      <span className="mt-0.5 truncate text-[11px] text-fg-faint">
+                      <span className="mt-0.5 truncate text-label text-fg-faint">
                         {kind.documents.length}{" "}
                         {plural(
                           kind.documents.length,
@@ -140,7 +140,7 @@ export function PackageBuilder() {
                         <Minus className="h-3.5 w-3.5" />
                       </button>
 
-                      <span className="w-10 text-center font-mono text-sm tabular-nums text-fg">
+                      <span className="w-10 text-center font-mono text-body tabular-nums text-fg">
                         {count}
                       </span>
 
@@ -162,7 +162,7 @@ export function PackageBuilder() {
             <div className="mt-7">
               <label
                 htmlFor="minutes"
-                className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
+                className="font-mono text-label uppercase text-fg-faint"
               >
                 Минут на один документ вручную
               </label>
@@ -180,7 +180,7 @@ export function PackageBuilder() {
                   }
                   className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-surface-3 accent-violet-600"
                 />
-                <span className="w-14 shrink-0 text-right font-mono text-sm tabular-nums text-fg">
+                <span className="w-14 shrink-0 text-right font-mono text-body tabular-nums text-fg">
                   {minutesPerDoc} мин
                 </span>
               </div>
@@ -192,7 +192,7 @@ export function PackageBuilder() {
                     type="button"
                     onClick={() => setMinutesPerDoc(preset)}
                     className={cn(
-                      "rounded border px-2 py-1 font-mono text-[10px] transition-colors",
+                      "rounded border px-2 py-1 font-mono text-label transition-colors",
                       minutesPerDoc === preset
                         ? "border-fg bg-fg text-inverse-fg"
                         : "border-line text-fg-subtle hover:border-line-strong"
@@ -207,7 +207,7 @@ export function PackageBuilder() {
             <div className="mt-6">
               <label
                 htmlFor="rate"
-                className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
+                className="font-mono text-label uppercase text-fg-faint"
               >
                 Стоимость часа работы, ₽
               </label>
@@ -221,19 +221,19 @@ export function PackageBuilder() {
                 onChange={(event) =>
                   setHourlyRate(Math.max(0, Number(event.target.value)))
                 }
-                className="mt-2.5 h-10 w-full rounded border border-line px-3 font-mono text-sm text-fg outline-none transition-colors focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+                className="mt-2.5 h-10 w-full rounded border border-line px-3 font-mono text-body text-fg outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand-line"
               />
             </div>
           </div>
 
           {/* Результат */}
           <div className="flex flex-col bg-inverse p-6 lg:p-8">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
+            <span className="font-mono text-label uppercase text-fg-subtle">
               Соберётся одним действием
             </span>
 
             {totalObjects === 0 ? (
-              <p className="mt-8 text-sm text-fg-subtle">
+              <p className="mt-8 text-body text-fg-subtle">
                 Добавьте хотя бы один объект, чтобы увидеть расчёт.
               </p>
             ) : (
@@ -244,18 +244,18 @@ export function PackageBuilder() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="font-mono text-5xl tabular-nums tracking-tight text-inverse-fg"
+                    className="font-mono text-display-lg tabular-nums text-inverse-fg"
                   >
                     {totalDocuments}
                   </motion.span>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
+                  <span className="font-mono text-label uppercase text-fg-subtle">
                     {plural(totalDocuments, "документ", "документа", "документов")}
                   </span>
                 </div>
 
                 {/* Открытая арифметика — расчёт можно проверить */}
                 <div className="mt-6 flex flex-col gap-2 border-t border-inverse-line pt-4">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
+                  <span className="font-mono text-label uppercase text-fg-soft">
                     Как получилось
                   </span>
 
@@ -269,10 +269,10 @@ export function PackageBuilder() {
                         transition={{ duration: 0.2 }}
                         className="flex items-baseline justify-between gap-3"
                       >
-                        <span className="min-w-0 truncate text-[12px] text-fg-faint">
+                        <span className="min-w-0 truncate text-caption text-fg-faint">
                           {line.kind.label}
                         </span>
-                        <span className="shrink-0 font-mono text-[11px] tabular-nums text-fg-subtle">
+                        <span className="shrink-0 font-mono text-label tabular-nums text-fg-subtle">
                           {line.objects} × {line.templates} ={" "}
                           <span className="text-inverse-fg">{line.documents}</span>
                         </span>
@@ -283,7 +283,7 @@ export function PackageBuilder() {
 
                 {/* Состав пакета */}
                 <div className="mt-5 flex flex-1 flex-col gap-3 border-t border-inverse-line pt-4">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
+                  <span className="font-mono text-label uppercase text-fg-soft">
                     Состав пакета
                   </span>
 
@@ -294,11 +294,11 @@ export function PackageBuilder() {
                           key={document}
                           className="flex items-center gap-2.5"
                         >
-                          <FileText className="h-3 w-3 shrink-0 text-violet-400" />
-                          <span className="min-w-0 flex-1 truncate text-[13px] text-fg-ghost">
+                          <FileText className="h-3 w-3 shrink-0 text-brand" />
+                          <span className="min-w-0 flex-1 truncate text-body text-fg-ghost">
                             {document}
                           </span>
-                          <span className="shrink-0 font-mono text-[10px] tabular-nums text-fg-soft">
+                          <span className="shrink-0 font-mono text-label tabular-nums text-fg-soft">
                             ×{line.objects}
                           </span>
                         </div>
@@ -310,27 +310,27 @@ export function PackageBuilder() {
                 {/* Трудозатраты */}
                 <div className="mt-5 grid grid-cols-2 gap-4 border-t border-inverse-line pt-4">
                   <div>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
+                    <span className="font-mono text-label uppercase text-fg-soft">
                       Вручную
                     </span>
-                    <p className="mt-1.5 font-mono text-xl tabular-nums text-inverse-fg">
+                    <p className="mt-1.5 font-mono text-title tabular-nums text-inverse-fg">
                       {hours > 0 ? `${hours} ч ` : ""}
                       {minutes > 0 || hours === 0 ? `${minutes} мин` : ""}
                     </p>
-                    <p className="mt-1 font-mono text-[10px] text-fg-soft">
+                    <p className="mt-1 font-mono text-label text-fg-soft">
                       {totalDocuments} × {minutesPerDoc} мин
                     </p>
                   </div>
 
                   {hourlyRate > 0 && (
                     <div>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
+                      <span className="font-mono text-label uppercase text-fg-soft">
                         В деньгах
                       </span>
-                      <p className="mt-1.5 font-mono text-xl tabular-nums text-inverse-fg">
+                      <p className="mt-1.5 font-mono text-title tabular-nums text-inverse-fg">
                         {cost.toLocaleString("ru-RU")} ₽
                       </p>
-                      <p className="mt-1 font-mono text-[10px] text-fg-soft">
+                      <p className="mt-1 font-mono text-label text-fg-soft">
                         по {hourlyRate.toLocaleString("ru-RU")} ₽/час
                       </p>
                     </div>
@@ -343,7 +343,7 @@ export function PackageBuilder() {
 
         {/* Честная сноска об источниках */}
         <div className="mt-6 flex flex-col gap-2 border-l-2 border-line pl-4">
-          <p className="max-w-3xl text-[12px] leading-relaxed text-fg-subtle">
+          <p className="max-w-3xl text-caption leading-relaxed text-fg-subtle">
             <span className="font-medium text-fg-muted">
               О цифрах.
             </span>{" "}
@@ -353,7 +353,7 @@ export function PackageBuilder() {
             («The social economy», 2012), сотрудники умственного труда тратят
             около 19% рабочей недели на поиск и сбор информации.
           </p>
-          <p className="max-w-3xl text-[12px] leading-relaxed text-fg-faint">
+          <p className="max-w-3xl text-caption leading-relaxed text-fg-faint">
             Расчёт выше — оценка на ваших допущениях, а не обещание результата.
           </p>
         </div>

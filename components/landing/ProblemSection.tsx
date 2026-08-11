@@ -61,18 +61,18 @@ export function ProblemSection() {
             >
               <div className="flex h-full flex-col p-6 lg:p-8">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-mono text-2xl tabular-nums tracking-tight text-fg">
+                  <span className="font-mono text-heading tabular-nums text-fg">
                     {pain.metric}
                   </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+                  <span className="font-mono text-label uppercase text-fg-faint">
                     {pain.unit}
                   </span>
                 </div>
 
-                <h3 className="mt-4 text-base font-medium leading-snug text-fg">
+                <h3 className="mt-4 text-body-lg font-medium leading-snug text-fg">
                   {pain.title}
                 </h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-fg-soft">
+                <p className="mt-2.5 text-body leading-relaxed text-fg-soft">
                   {pain.text}
                 </p>
               </div>

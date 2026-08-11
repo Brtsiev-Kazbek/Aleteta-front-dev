@@ -102,10 +102,10 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
             {/* Исходный файл */}
             <div className="flex shrink-0 items-center gap-2.5 border-b border-line px-5 py-3.5">
               <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
-              <span className="min-w-0 flex-1 truncate text-[13px] text-fg-muted">
+              <span className="min-w-0 flex-1 truncate text-body text-fg-muted">
                 {extraction.file.name}
               </span>
-              <span className="shrink-0 font-mono text-[10px] text-fg-faint">
+              <span className="shrink-0 font-mono text-label text-fg-faint">
                 {formatFileSize(extraction.file.sizeBytes)}
               </span>
             </div>
@@ -119,10 +119,10 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
 
               {/* Причина неудачи — дословно, как её записал исполнитель */}
               {isFailed && extraction.error && (
-                <div className="mt-5 rounded border border-red-200 bg-red-50/70 px-3.5 py-3">
+                <div className="mt-5 rounded border border-danger-line bg-danger-bg/70 px-3.5 py-3">
                   <div className="flex items-start gap-2">
-                    <XCircle className="mt-px h-3.5 w-3.5 shrink-0 text-red-500" />
-                    <p className="text-[12.5px] leading-relaxed text-red-900">
+                    <XCircle className="mt-px h-3.5 w-3.5 shrink-0 text-danger-fg" />
+                    <p className="text-caption leading-relaxed text-danger-fg">
                       {extraction.error}
                     </p>
                   </div>
@@ -147,7 +147,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                   </MetaLabel>
 
                   {extraction.fields.length === 0 ? (
-                    <p className="mt-3 text-[12.5px] leading-relaxed text-fg-subtle">
+                    <p className="mt-3 text-caption leading-relaxed text-fg-subtle">
                       Ни одного реквизита в документе не нашлось. Карточка
                       создана пустой — заполните её руками или попробуйте
                       другой тип объекта.
@@ -163,16 +163,16 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                           className={cn(
                             "flex items-center justify-between gap-3 rounded border px-3 py-2.5",
                             field.uncertain
-                              ? "border-amber-200 bg-amber-50/60"
+                              ? "border-warn-line bg-warn-bg/60"
                               : "border-line bg-surface"
                           )}
                         >
                           <span className="flex shrink-0 flex-col">
-                            <span className="text-[11px] text-fg-faint">
+                            <span className="text-label text-fg-faint">
                               {field.label}
                             </span>
                             {field.page != null && (
-                              <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-fg-ghost">
+                              <span className="font-mono text-label uppercase text-fg-ghost">
                                 стр. {field.page}
                               </span>
                             )}
@@ -180,9 +180,9 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
 
                           <span className="flex min-w-0 items-center gap-1.5">
                             {field.uncertain && (
-                              <AlertTriangle className="h-3 w-3 shrink-0 text-amber-600" />
+                              <AlertTriangle className="h-3 w-3 shrink-0 text-warn-fg" />
                             )}
-                            <span className="min-w-0 truncate text-right text-[13px] text-fg">
+                            <span className="min-w-0 truncate text-right text-body text-fg">
                               {field.value}
                             </span>
                           </span>
@@ -192,7 +192,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                   )}
 
                   {uncertainCount > 0 && (
-                    <p className="mt-3 text-[11px] leading-relaxed text-fg-subtle">
+                    <p className="mt-3 text-label leading-relaxed text-fg-subtle">
                       {uncertainCount}{" "}
                       {plural(
                         uncertainCount,
@@ -222,14 +222,14 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                     {extraction.missing.map((key) => (
                       <span
                         key={key}
-                        className="rounded border border-line px-2 py-1 text-[11px] text-fg-subtle"
+                        className="rounded border border-line px-2 py-1 text-label text-fg-subtle"
                       >
                         {schema?.fields.find((field) => field.key === key)
                           ?.label ?? key}
                       </span>
                     ))}
                   </div>
-                  <p className="mt-2.5 text-[11px] leading-relaxed text-fg-subtle">
+                  <p className="mt-2.5 text-label leading-relaxed text-fg-subtle">
                     Эти поля остались пустыми: модель их в тексте не увидела и
                     не стала додумывать.
                   </p>
@@ -256,7 +256,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <span className="flex flex-1 items-center gap-2 text-[12.5px] text-fg-subtle">
+                <span className="flex flex-1 items-center gap-2 text-caption text-fg-subtle">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   Можно закрыть — работа продолжится
                 </span>
@@ -313,7 +313,7 @@ function Progress({
               className={cn(
                 "flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors",
                 isStepDone
-                  ? "bg-emerald-100 text-emerald-600"
+                  ? "bg-ok-bg text-ok-fg"
                   : isCurrent
                     ? "bg-fg text-inverse-fg"
                     : "bg-surface-2 text-fg-ghost"
@@ -330,7 +330,7 @@ function Progress({
 
             <span
               className={cn(
-                "text-[13px] transition-colors",
+                "text-body transition-colors",
                 isStepDone
                   ? "text-fg-faint"
                   : isCurrent
@@ -342,7 +342,7 @@ function Progress({
             </span>
 
             {isCurrent && progress > 0 && progress < 100 && (
-              <span className="ml-auto font-mono text-[10px] tabular-nums text-fg-faint">
+              <span className="ml-auto font-mono text-label tabular-nums text-fg-faint">
                 {progress}%
               </span>
             )}
@@ -368,16 +368,16 @@ function PagesNote({ looked, total }: { looked: number; total: number }) {
     <div
       className={cn(
         "mt-5 flex items-start gap-2 rounded border px-3.5 py-2.5",
-        full ? "border-line bg-bg" : "border-amber-200 bg-amber-50/60"
+        full ? "border-line bg-bg" : "border-warn-line bg-warn-bg/60"
       )}
     >
       <ScanLine
         className={cn(
           "mt-px h-3.5 w-3.5 shrink-0",
-          full ? "text-fg-faint" : "text-amber-600"
+          full ? "text-fg-faint" : "text-warn-fg"
         )}
       />
-      <p className="text-[12px] leading-relaxed text-fg-soft">
+      <p className="text-caption leading-relaxed text-fg-soft">
         {full ? (
           <>
             Просмотрен весь документ — {total}{" "}

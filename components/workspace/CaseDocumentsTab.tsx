@@ -157,7 +157,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
           isDragging ? "border-fg" : "border-line"
         )}
       >
-        <label className="flex cursor-pointer items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint transition-colors hover:text-fg">
+        <label className="flex cursor-pointer items-center gap-2 font-mono text-label uppercase text-fg-faint transition-colors hover:text-fg">
           <Checkbox
             checked={allSelected}
             onCheckedChange={() =>
@@ -180,7 +180,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
         <div className="ml-auto flex items-center gap-2">
           {selectedIds.length > 0 ? (
             <>
-              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg">
+              <span className="font-mono text-label uppercase text-fg">
                 Выбрано: {selectedIds.length}
               </span>
               <Button
@@ -242,8 +242,8 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
       {documents.length === 0 ? (
         <div className="flex flex-col items-center gap-2 border border-dashed border-line-strong px-6 py-16 text-center">
           <FileText className="h-5 w-5 text-fg-ghost" />
-          <p className="mt-1 text-sm text-fg">Документов пока нет</p>
-          <p className="max-w-sm text-[13px] leading-relaxed text-fg-subtle">
+          <p className="mt-1 text-body text-fg">Документов пока нет</p>
+          <p className="max-w-sm text-body-sm leading-relaxed text-fg-subtle">
             Перетащите файл сюда — он распознается сам. Дальше из него можно
             извлечь реквизиты в карточку объекта: пункт «Извлечь реквизиты» в
             меню файла.
@@ -281,10 +281,10 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                   onClick={() => openDocumentReview(document.id)}
                   className="flex min-w-0 flex-1 flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-focus"
                 >
-                  <span className="truncate text-[13px] text-fg underline-offset-4 group-hover:underline">
+                  <span className="truncate text-body-sm text-fg underline-offset-4 group-hover:underline">
                     {document.title}
                   </span>
-                  <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+                  <span className="mt-0.5 truncate font-mono text-label uppercase text-fg-faint">
                     {document.type} · {formatDate(document.createdAt)}
                   </span>
                 </button>
@@ -296,7 +296,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
 
                 <span
                   className={cn(
-                    "hidden shrink-0 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] sm:inline-flex",
+                    "hidden shrink-0 rounded border px-2 py-1 font-mono text-label uppercase sm:inline-flex",
                     status.className
                   )}
                 >
@@ -373,7 +373,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onSelect={() => deleteDocument(document.id)}
-                      className="text-red-600 focus:bg-red-50 focus:text-red-700"
+                      className="text-danger-fg focus:bg-danger-bg focus:text-danger-fg"
                     >
                       <Trash2 className="h-4 w-4" />
                       Удалить

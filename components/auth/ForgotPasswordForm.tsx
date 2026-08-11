@@ -49,8 +49,8 @@ export function ForgotPasswordForm() {
         <FormHeading eyebrow="Восстановление" title="Проверьте почту" />
 
         <div className="mt-6 flex items-start gap-3 border-t border-line pt-5">
-          <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-          <p className="text-sm leading-relaxed text-fg-soft">
+          <MailCheck className="mt-0.5 h-4 w-4 shrink-0 text-ok-fg" />
+          <p className="text-body leading-relaxed text-fg-soft">
             Если аккаунт с адресом{" "}
             <span className="text-fg">{email.trim()}</span> существует, на
             него отправлена ссылка для смены пароля. Ссылка действует час.
@@ -59,7 +59,7 @@ export function ForgotPasswordForm() {
 
         <Link
           href="/auth/login"
-          className="mt-6 w-fit border-b border-line-strong pb-0.5 text-sm text-fg-soft transition-colors hover:border-fg hover:text-fg"
+          className="mt-6 w-fit border-b border-line-strong pb-0.5 text-body text-fg-soft transition-colors hover:border-fg hover:text-fg"
         >
           Вернуться ко входу
         </Link>
@@ -110,7 +110,7 @@ export function ForgotPasswordForm() {
 
       <Link
         href="/auth/login"
-        className="mt-6 w-fit text-sm text-fg-subtle transition-colors hover:text-fg"
+        className="mt-6 w-fit text-body text-fg-subtle transition-colors hover:text-fg"
       >
         Вспомнили пароль?{" "}
         <span className="border-b border-line-strong pb-0.5 text-fg">

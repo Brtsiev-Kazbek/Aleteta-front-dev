@@ -98,7 +98,7 @@ export default async function SettingsPage() {
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="-ml-px block border-l border-transparent py-2 pl-4 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:border-fg hover:text-fg"
+                      className="-ml-px block border-l border-transparent py-2 pl-4 font-mono text-label uppercase text-fg-faint transition-colors hover:border-fg hover:text-fg"
                     >
                       {link.label}
                     </a>
@@ -115,7 +115,7 @@ export default async function SettingsPage() {
                 description="Данные пользователя, отображаемые в делах и документах."
                 aside={
                   settings.profile.isPlatformAdmin ? (
-                    <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-violet-600">
+                    <span className="shrink-0 font-mono text-label uppercase text-brand">
                       администратор установки
                     </span>
                   ) : null
@@ -134,7 +134,7 @@ export default async function SettingsPage() {
                 title="Организация"
                 description="Реквизиты, которые подставляются в шаблоны документов."
                 aside={
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                  <span className="shrink-0 font-mono text-label uppercase text-fg-faint">
                     тариф: {settings.workspace.plan}
                   </span>
                 }
@@ -151,7 +151,7 @@ export default async function SettingsPage() {
                 title="Участники"
                 description="Кто работает с делами этого пространства."
                 aside={
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                  <span className="shrink-0 font-mono text-label uppercase text-fg-faint">
                     вы — {ROLE_LABELS[settings.myRole] ?? settings.myRole}
                   </span>
                 }
@@ -197,12 +197,12 @@ export default async function SettingsPage() {
                   method="post"
                   className="mt-8 flex items-center justify-between gap-4 border-t border-line pt-5"
                 >
-                  <span className="text-[13px] text-fg-subtle">
+                  <span className="text-body text-fg-subtle">
                     Выйти из аккаунта на этом устройстве.
                   </span>
                   <button
                     type="submit"
-                    className="shrink-0 border-b border-line-strong pb-0.5 text-[13px] text-fg-muted transition-colors hover:border-fg hover:text-fg"
+                    className="shrink-0 border-b border-line-strong pb-0.5 text-body text-fg-muted transition-colors hover:border-fg hover:text-fg"
                   >
                     Выйти
                   </button>
@@ -230,7 +230,7 @@ function NotConfigured() {
             description="Приложение открыто на встроенном наборе данных — сохранять настройки некуда."
           />
 
-          <p className="mt-8 text-sm leading-relaxed text-fg-soft">
+          <p className="mt-8 text-body leading-relaxed text-fg-soft">
             Скопируйте <code className="text-fg">.env.example</code> в{" "}
             <code className="text-fg">.env.local</code>, заполните адрес
             проекта и ключи Supabase и примените миграции — порядок описан в{" "}

@@ -41,7 +41,7 @@ export function LandingHeader() {
         <Link href="/" className="flex items-center gap-2.5">
           <span
             className={cn(
-              "flex h-7 w-7 items-center justify-center rounded text-[13px] font-medium transition-colors",
+              "flex h-7 w-7 items-center justify-center rounded text-body font-medium transition-colors",
               isScrolled ? "bg-inverse text-inverse-fg" : "bg-surface text-fg"
             )}
           >
@@ -49,7 +49,7 @@ export function LandingHeader() {
           </span>
           <span
             className={cn(
-              "text-sm font-medium tracking-[-0.01em] transition-colors",
+              "text-body font-medium transition-colors",
               isScrolled ? "text-fg" : "text-inverse-fg"
             )}
           >
@@ -63,7 +63,7 @@ export function LandingHeader() {
               key={link.href}
               href={link.href}
               className={cn(
-                "text-[13px] transition-colors",
+                "text-body transition-colors",
                 isScrolled
                   ? "text-fg-subtle hover:text-fg"
                   : "text-fg-faint hover:text-inverse-fg"
@@ -78,7 +78,7 @@ export function LandingHeader() {
           <Link
             href="/auth/login"
             className={cn(
-              "hidden text-[13px] transition-colors sm:block",
+              "hidden text-body transition-colors sm:block",
               isScrolled
                 ? "text-fg-subtle hover:text-fg"
                 : "text-fg-faint hover:text-inverse-fg"
@@ -90,7 +90,7 @@ export function LandingHeader() {
           <Link
             href="/auth/register"
             className={cn(
-              "inline-flex h-9 items-center rounded-md px-4 text-[13px] font-medium transition-colors",
+              "inline-flex h-9 items-center rounded-md px-4 text-body font-medium transition-colors",
               isScrolled
                 ? "bg-inverse text-inverse-fg hover:bg-fg"
                 : "bg-surface text-fg hover:bg-surface-3"

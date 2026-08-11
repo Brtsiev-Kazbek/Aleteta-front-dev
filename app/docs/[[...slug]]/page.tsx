@@ -47,8 +47,8 @@ export default function DocsPage({ params }: { params: { slug?: string[] } }) {
     <DocsShell activeSlug={page.slug} sourceFile={page.file}>
       <article className="max-w-[46rem]">
         <div className="flex items-center gap-2.5">
-          <span aria-hidden className="h-px w-6 bg-violet-500" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-faint">
+          <span aria-hidden className="h-px w-6 bg-brand" />
+          <span className="font-mono text-label uppercase text-fg-faint">
             {page.summary}
           </span>
         </div>
@@ -64,10 +64,10 @@ export default function DocsPage({ params }: { params: { slug?: string[] } }) {
             className="group mt-16 flex items-center justify-between gap-6 border-t border-line pt-6"
           >
             <span className="flex min-w-0 flex-col">
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+              <span className="font-mono text-label uppercase text-fg-faint">
                 Дальше
               </span>
-              <span className="mt-1 truncate text-[15px] text-fg">
+              <span className="mt-1 truncate text-body text-fg">
                 {next.title}
               </span>
             </span>

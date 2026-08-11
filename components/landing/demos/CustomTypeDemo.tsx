@@ -96,7 +96,7 @@ export function CustomTypeDemo() {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-surface">
       <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+        <span className="font-mono text-label uppercase text-fg-faint">
           Свой тип объекта
         </span>
 
@@ -115,10 +115,10 @@ export function CustomTypeDemo() {
 
       <div className="flex flex-1 flex-col p-4">
         {/* Название типа */}
-        <span className="text-[11px] text-fg-faint">Название типа</span>
+        <span className="text-label text-fg-faint">Название типа</span>
 
         <div className="mt-1.5 flex h-10 items-center rounded border border-line-strong px-3">
-          <span className="text-sm text-fg">{typedName}</span>
+          <span className="text-body text-fg">{typedName}</span>
           {typedName.length < preset.name.length && (
             <motion.span
               aria-hidden
@@ -131,8 +131,8 @@ export function CustomTypeDemo() {
 
         {/* Реквизиты */}
         <div className="mt-5 flex items-center justify-between">
-          <span className="text-[11px] text-fg-faint">Реквизиты</span>
-          <span className="font-mono text-[10px] text-fg-ghost">
+          <span className="text-label text-fg-faint">Реквизиты</span>
+          <span className="font-mono text-label text-fg-ghost">
             {visibleFields} / {preset.fields.length}
           </span>
         </div>
@@ -148,13 +148,13 @@ export function CustomTypeDemo() {
                 transition={{ duration: 0.25 }}
                 className="flex items-center gap-2.5 rounded border border-line px-3 py-2.5"
               >
-                <span className="min-w-0 flex-1 truncate text-xs text-fg">
+                <span className="min-w-0 flex-1 truncate text-caption text-fg">
                   {field.label}
                 </span>
 
                 <span
                   className={cn(
-                    "shrink-0 rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]",
+                    "shrink-0 rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
                     field.required
                       ? "border-line-strong bg-surface-2 text-fg-soft"
                       : "border-line text-fg-ghost"
@@ -169,7 +169,7 @@ export function CustomTypeDemo() {
           {visibleFields < preset.fields.length && (
             <div className="flex items-center gap-2 rounded border border-dashed border-line px-3 py-2.5">
               <Plus className="h-3 w-3 text-fg-ghost" />
-              <span className="text-xs text-fg-ghost">Добавить реквизит</span>
+              <span className="text-caption text-fg-ghost">Добавить реквизит</span>
             </div>
           )}
         </div>
@@ -183,8 +183,8 @@ export function CustomTypeDemo() {
               exit={{ opacity: 0 }}
               className="mt-auto flex items-start gap-2 border-t border-line pt-3"
             >
-              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
-              <span className="text-[11px] leading-relaxed text-fg-soft">
+              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ok-fg" />
+              <span className="text-label leading-relaxed text-fg-soft">
                 Реквизиты стали колонками таблицы и проверяются перед генерацией
                 наравне со встроенными
               </span>

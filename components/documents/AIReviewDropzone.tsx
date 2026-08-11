@@ -97,10 +97,10 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
           className="rounded-lg border border-line bg-surface p-5"
         >
           <div className="flex items-baseline justify-between gap-3">
-            <span className="min-w-0 truncate text-[13px] text-fg">
+            <span className="min-w-0 truncate text-body text-fg">
               {file.name}
             </span>
-            <span className="shrink-0 font-mono text-[10px] text-fg-faint">
+            <span className="shrink-0 font-mono text-label text-fg-faint">
               {formatFileSize(file.sizeBytes)}
             </span>
           </div>
@@ -118,7 +118,7 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
                     className={cn(
                       "flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors",
                       isDone
-                        ? "bg-emerald-100 text-emerald-600"
+                        ? "bg-ok-bg text-ok-fg"
                         : isCurrent
                           ? "bg-fg text-inverse-fg"
                           : "bg-surface-2 text-fg-ghost"
@@ -135,7 +135,7 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
 
                   <span
                     className={cn(
-                      "text-[13px] transition-colors",
+                      "text-body transition-colors",
                       isDone
                         ? "text-fg-faint"
                         : isCurrent

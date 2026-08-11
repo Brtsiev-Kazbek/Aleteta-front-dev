@@ -15,32 +15,32 @@ export function Markdown({ content }: { content: string }) {
       remarkPlugins={[remarkGfm]}
       components={{
         h1: ({ children }) => (
-          <h1 className="mt-0 text-[2rem] font-medium leading-[1.15] tracking-[-0.03em] text-fg">
+          <h1 className="mt-0 text-display font-medium leading-[1.15] text-fg">
             {children}
           </h1>
         ),
         h2: ({ children }) => (
-          <h2 className="mt-14 border-b border-line pb-2.5 text-[1.35rem] font-medium tracking-[-0.02em] text-fg">
+          <h2 className="mt-14 border-b border-line pb-2.5 text-title font-medium text-fg">
             {children}
           </h2>
         ),
         h3: ({ children }) => (
-          <h3 className="mt-10 text-[15px] font-medium tracking-[-0.01em] text-fg">
+          <h3 className="mt-10 text-body font-medium text-fg">
             {children}
           </h3>
         ),
         p: ({ children }) => (
-          <p className="mt-5 text-[15px] leading-relaxed text-fg-soft">
+          <p className="mt-5 text-body leading-relaxed text-fg-soft">
             {children}
           </p>
         ),
         ul: ({ children }) => (
-          <ul className="mt-5 flex flex-col gap-2.5 text-[15px] leading-relaxed text-fg-soft">
+          <ul className="mt-5 flex flex-col gap-2.5 text-body leading-relaxed text-fg-soft">
             {children}
           </ul>
         ),
         ol: ({ children }) => (
-          <ol className="mt-5 flex list-decimal flex-col gap-2.5 pl-5 text-[15px] leading-relaxed text-fg-soft marker:font-mono marker:text-[12px] marker:text-fg-faint">
+          <ol className="mt-5 flex list-decimal flex-col gap-2.5 pl-5 text-body leading-relaxed text-fg-soft marker:font-mono marker:text-caption marker:text-fg-faint">
             {children}
           </ol>
         ),
@@ -70,13 +70,13 @@ export function Markdown({ content }: { content: string }) {
           const isBlock = Boolean(className);
           if (isBlock) {
             return (
-              <code className="font-mono text-[13px] leading-relaxed text-inverse-fg">
+              <code className="font-mono text-body leading-relaxed text-inverse-fg">
                 {children}
               </code>
             );
           }
           return (
-            <code className="rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-[12.5px] text-fg">
+            <code className="rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-caption text-fg">
               {children}
             </code>
           );
@@ -88,7 +88,7 @@ export function Markdown({ content }: { content: string }) {
         ),
         table: ({ children }) => (
           <div className="scrollable-area mt-6 overflow-x-auto">
-            <table className="w-full border-collapse text-left text-[14px]">
+            <table className="w-full border-collapse text-left text-body">
               {children}
             </table>
           </div>
@@ -97,7 +97,7 @@ export function Markdown({ content }: { content: string }) {
           <thead className="border-b border-line">{children}</thead>
         ),
         th: ({ children }) => (
-          <th className="py-2.5 pr-6 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-fg-faint">
+          <th className="py-2.5 pr-6 font-mono text-label font-normal uppercase text-fg-faint">
             {children}
           </th>
         ),
@@ -107,7 +107,7 @@ export function Markdown({ content }: { content: string }) {
           </td>
         ),
         blockquote: ({ children }) => (
-          <blockquote className="mt-5 border-l-2 border-violet-300 pl-4 text-[15px] leading-relaxed text-fg-subtle">
+          <blockquote className="mt-5 border-l-2 border-brand-line pl-4 text-body leading-relaxed text-fg-subtle">
             {children}
           </blockquote>
         ),

@@ -102,7 +102,7 @@ export function ExtractDemo() {
       {/* Слева — исходный файл и обработка */}
       <div className="flex flex-col border-b border-line p-4 md:border-b-0 md:border-r">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+          <span className="font-mono text-label uppercase text-fg-faint">
             Исходный файл
           </span>
 
@@ -129,10 +129,10 @@ export function ExtractDemo() {
             className="mt-3 flex items-center gap-2.5 rounded border border-line px-3 py-2.5"
           >
             <FileText className="h-4 w-4 shrink-0 text-fg-faint" />
-            <span className="min-w-0 flex-1 truncate text-xs text-fg-muted">
+            <span className="min-w-0 flex-1 truncate text-caption text-fg-muted">
               {source.file}
             </span>
-            <span className="shrink-0 font-mono text-[10px] text-fg-faint">
+            <span className="shrink-0 font-mono text-label text-fg-faint">
               {source.size}
             </span>
           </motion.div>
@@ -149,7 +149,7 @@ export function ExtractDemo() {
                   className={cn(
                     "flex h-4 w-4 shrink-0 items-center justify-center rounded-full transition-colors",
                     isDone
-                      ? "bg-emerald-100 text-emerald-600"
+                      ? "bg-ok-bg text-ok-fg"
                       : isCurrent
                         ? "bg-fg text-inverse-fg"
                         : "bg-surface-2 text-fg-ghost"
@@ -166,7 +166,7 @@ export function ExtractDemo() {
 
                 <span
                   className={cn(
-                    "text-xs transition-colors",
+                    "text-caption transition-colors",
                     isDone
                       ? "text-fg-faint"
                       : isCurrent
@@ -190,7 +190,7 @@ export function ExtractDemo() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
+            className="font-mono text-label uppercase text-fg-faint"
           >
             → {source.target}
           </motion.span>
@@ -223,13 +223,13 @@ export function ExtractDemo() {
                 transition={{ duration: 0.28 }}
                 className="flex items-center justify-between gap-3 rounded border border-line bg-surface px-3 py-2.5"
               >
-                <span className="shrink-0 text-[11px] text-fg-faint">
+                <span className="shrink-0 text-label text-fg-faint">
                   {field.label}
                 </span>
                 <span
                   className={cn(
-                    "min-w-0 truncate text-xs text-fg",
-                    field.mono && "font-mono text-[11px]"
+                    "min-w-0 truncate text-caption text-fg",
+                    field.mono && "font-mono text-label"
                   )}
                 >
                   {field.value}
@@ -247,8 +247,8 @@ export function ExtractDemo() {
               exit={{ opacity: 0 }}
               className="mt-auto flex items-center gap-2 border-t border-line pt-3"
             >
-              <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
-              <span className="text-[11px] text-fg-soft">
+              <Check className="h-3.5 w-3.5 shrink-0 text-ok-fg" />
+              <span className="text-label text-fg-soft">
                 Реквизиты подставлены, форматы проверены
               </span>
             </motion.div>

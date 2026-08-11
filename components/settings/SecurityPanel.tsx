@@ -175,7 +175,7 @@ export function SecurityPanel({ email }: { email: string }) {
           placeholder={email}
           autoComplete="email"
           hint={
-            <span className="text-[12px] text-fg-faint">
+            <span className="text-caption text-fg-faint">
               сейчас: {email}
             </span>
           }

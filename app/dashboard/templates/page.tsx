@@ -56,10 +56,10 @@ export default async function TemplatesPage() {
             {BUILTIN_SCHEMAS.map((schema) => (
               <section key={schema.id}>
                 <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3">
-                  <h2 className="text-[15px] font-medium tracking-[-0.01em] text-fg">
+                  <h2 className="text-body font-medium text-fg">
                     {schema.label}
                   </h2>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                  <span className="font-mono text-label uppercase text-fg-faint">
                     {schema.templates.length}{" "}
                     {plural(
                       schema.templates.length,
@@ -78,10 +78,10 @@ export default async function TemplatesPage() {
                       className="flex items-center gap-3 py-3.5"
                     >
                       <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
-                      <span className="min-w-0 flex-1 truncate text-sm text-fg">
+                      <span className="min-w-0 flex-1 truncate text-body text-fg">
                         {template}
                       </span>
-                      <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                      <span className="shrink-0 font-mono text-label uppercase text-fg-faint">
                         docx
                       </span>
                     </li>

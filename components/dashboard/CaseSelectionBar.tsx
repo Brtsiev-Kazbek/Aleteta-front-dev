@@ -71,7 +71,7 @@ export function CaseSelectionBar() {
             <div className="shadow-panel flex items-center gap-3 rounded-lg border border-line bg-surface/95 px-4 py-3 backdrop-blur">
               <FolderKanban className="h-3.5 w-3.5 shrink-0 text-fg-faint" />
 
-              <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
+              <span className="whitespace-nowrap font-mono text-label uppercase text-fg-subtle">
                 <span className="tabular-nums text-fg">{count}</span>{" "}
                 {plural(count, "дело", "дела", "дел")} выбрано
               </span>
@@ -136,7 +136,7 @@ export function CaseSelectionBar() {
           {status === "running" && (
             <div className="px-5 py-6">
               <Progress value={progress} />
-              <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+              <p className="mt-3 font-mono text-label uppercase text-fg-faint">
                 Подставляем реквизиты · {Math.round(progress)}%
               </p>
             </div>
@@ -158,16 +158,16 @@ export function CaseSelectionBar() {
                         <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
 
                         <div className="flex min-w-0 flex-1 flex-col leading-tight">
-                          <span className="truncate text-[13px] text-fg">
+                          <span className="truncate text-body text-fg">
                             {result.name}
                           </span>
-                          <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
+                          <span className="mt-0.5 truncate font-mono text-label uppercase text-fg-faint">
                             {result.caseTitle}
                           </span>
                         </div>
 
                         <Check
-                          className="h-3.5 w-3.5 shrink-0 text-emerald-600"
+                          className="h-3.5 w-3.5 shrink-0 text-ok-fg"
                           strokeWidth={3}
                         />
                       </motion.div>
@@ -197,7 +197,7 @@ export function CaseSelectionBar() {
                     <div className="flex flex-col gap-2">
                       <div className="flex items-baseline justify-between gap-3">
                         <MetaLabel>Дела для этого документа</MetaLabel>
-                        <span className="font-mono text-[10px] tabular-nums text-fg-faint">
+                        <span className="font-mono text-label tabular-nums text-fg-faint">
                           {count} из {cases.length}
                         </span>
                       </div>
@@ -225,7 +225,7 @@ export function CaseSelectionBar() {
                               />
                               <span
                                 className={cn(
-                                  "truncate text-[13px] transition-colors",
+                                  "truncate text-body transition-colors",
                                   isPicked ? "text-fg" : "text-fg-subtle"
                                 )}
                               >
@@ -267,7 +267,7 @@ export function CaseSelectionBar() {
                             key={item}
                             type="button"
                             onClick={() => setPrompt(item)}
-                            className="rounded border border-line px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-fg hover:text-fg"
+                            className="rounded border border-line px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-fg hover:text-fg"
                           >
                             {item}
                           </button>

@@ -40,7 +40,7 @@ export function SolutionIntro() {
             <Reveal delay={0.2} className="mt-8">
               <Link
                 href="#features"
-                className="group inline-flex items-center gap-2 text-sm font-medium text-fg"
+                className="group inline-flex items-center gap-2 text-body font-medium text-fg"
               >
                 <span className="border-b border-line-strong pb-0.5 transition-colors group-hover:border-fg">
                   Посмотреть возможности
@@ -55,15 +55,15 @@ export function SolutionIntro() {
               {PILLARS.map((pillar, index) => (
                 <Reveal key={pillar.id} delay={index * 0.09}>
                   <div className="group flex gap-6 py-7 transition-colors">
-                    <span className="shrink-0 font-mono text-[11px] tabular-nums text-fg-ghost transition-colors group-hover:text-violet-600">
+                    <span className="shrink-0 font-mono text-label tabular-nums text-fg-ghost transition-colors group-hover:text-brand">
                       {String(index + 1).padStart(2, "0")}
                     </span>
 
                     <div className="flex flex-col">
-                      <h3 className="text-base font-medium text-fg">
+                      <h3 className="text-body-lg font-medium text-fg">
                         {pillar.title}
                       </h3>
-                      <p className="mt-2 max-w-lg text-sm leading-relaxed text-fg-soft">
+                      <p className="mt-2 max-w-lg text-body leading-relaxed text-fg-soft">
                         {pillar.text}
                       </p>
                     </div>

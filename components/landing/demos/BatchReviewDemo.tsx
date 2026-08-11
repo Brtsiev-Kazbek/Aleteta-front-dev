@@ -69,10 +69,10 @@ export function BatchReviewDemo() {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-surface">
       <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+        <span className="font-mono text-label uppercase text-fg-faint">
           Проверка пачкой
         </span>
-        <span className="font-mono text-[10px] tabular-nums text-fg-faint">
+        <span className="font-mono text-label tabular-nums text-fg-faint">
           {checked} / {DOCS.length}
         </span>
       </div>
@@ -98,9 +98,9 @@ export function BatchReviewDemo() {
               <span className="flex h-5 w-5 shrink-0 items-center justify-center">
                 {isChecked ? (
                   hasCritical ? (
-                    <AlertCircle className="h-3.5 w-3.5 text-red-500" />
+                    <AlertCircle className="h-3.5 w-3.5 text-danger-fg" />
                   ) : (
-                    <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={3} />
+                    <Check className="h-3.5 w-3.5 text-ok-fg" strokeWidth={3} />
                   )
                 ) : isChecking ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-fg" />
@@ -111,7 +111,7 @@ export function BatchReviewDemo() {
 
               <span
                 className={cn(
-                  "min-w-0 flex-1 truncate text-xs transition-colors",
+                  "min-w-0 flex-1 truncate text-caption transition-colors",
                   isChecked ? "text-fg" : "text-fg-faint"
                 )}
               >
@@ -126,12 +126,12 @@ export function BatchReviewDemo() {
                     className="flex shrink-0 items-center gap-1.5"
                   >
                     {doc.critical > 0 && (
-                      <span className="rounded border border-red-200 bg-red-50 px-1.5 py-0.5 font-mono text-[9px] text-red-700">
+                      <span className="rounded border border-danger-line bg-danger-bg px-1.5 py-0.5 font-mono text-label text-danger-fg">
                         {doc.critical} крит.
                       </span>
                     )}
                     {doc.warning > 0 && (
-                      <span className="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[9px] text-amber-700">
+                      <span className="rounded border border-warn-line bg-warn-bg px-1.5 py-0.5 font-mono text-label text-warn-fg">
                         {doc.warning} предупр.
                       </span>
                     )}
@@ -152,26 +152,26 @@ export function BatchReviewDemo() {
               className="mt-auto rounded border border-line bg-bg p-3.5"
             >
               <div className="flex items-baseline gap-2">
-                <span className="font-mono text-2xl tabular-nums text-fg">
+                <span className="font-mono text-heading tabular-nums text-fg">
                   {totalCritical + totalWarning}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
+                <span className="font-mono text-label uppercase text-fg-subtle">
                   замечаний в {DOCS.length} документах
                 </span>
               </div>
 
               <div className="mt-2.5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded border border-red-200 bg-red-50 px-2 py-1 font-mono text-[10px] text-red-700">
+                <span className="inline-flex items-center gap-1.5 rounded border border-danger-line bg-danger-bg px-2 py-1 font-mono text-label text-danger-fg">
                   <AlertCircle className="h-3 w-3" />
                   {totalCritical} критических
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded border border-amber-200 bg-amber-50 px-2 py-1 font-mono text-[10px] text-amber-700">
+                <span className="inline-flex items-center gap-1.5 rounded border border-warn-line bg-warn-bg px-2 py-1 font-mono text-label text-warn-fg">
                   <AlertTriangle className="h-3 w-3" />
                   {totalWarning} предупреждений
                 </span>
               </div>
 
-              <p className="mt-2.5 text-[11px] leading-relaxed text-fg-soft">
+              <p className="mt-2.5 text-label leading-relaxed text-fg-soft">
                 Сначала открываются документы с критическими замечаниями —
                 разбирать всю пачку подряд не нужно.
               </p>

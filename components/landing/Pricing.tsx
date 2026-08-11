@@ -105,13 +105,13 @@ export function Pricing() {
                 {plan.highlighted && (
                   <span
                     aria-hidden
-                    className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent"
+                    className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent"
                   />
                 )}
                 <div className="flex items-baseline justify-between gap-3">
                   <h3
                     className={cn(
-                      "text-sm font-medium",
+                      "text-body font-medium",
                       plan.highlighted ? "text-inverse-fg" : "text-fg"
                     )}
                   >
@@ -119,7 +119,7 @@ export function Pricing() {
                   </h3>
 
                   {plan.highlighted && (
-                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-violet-400">
+                    <span className="font-mono text-label uppercase text-brand">
                       Рекомендуем
                     </span>
                   )}
@@ -127,7 +127,7 @@ export function Pricing() {
 
                 <p
                   className={cn(
-                    "mt-1.5 text-xs",
+                    "mt-1.5 text-caption",
                     plan.highlighted ? "text-fg-faint" : "text-fg-subtle"
                   )}
                 >
@@ -137,7 +137,7 @@ export function Pricing() {
                 <div className="mt-7 flex items-baseline gap-2">
                   <span
                     className={cn(
-                      "font-mono text-3xl tracking-tight",
+                      "font-mono text-display ",
                       plan.highlighted ? "text-inverse-fg" : "text-fg"
                     )}
                   >
@@ -146,7 +146,7 @@ export function Pricing() {
                   {plan.period && (
                     <span
                       className={cn(
-                        "text-xs",
+                        "text-caption",
                         plan.highlighted ? "text-fg-subtle" : "text-fg-faint"
                       )}
                     >
@@ -167,7 +167,7 @@ export function Pricing() {
                     <li
                       key={feature}
                       className={cn(
-                        "py-2.5 text-sm",
+                        "py-2.5 text-body",
                         plan.highlighted ? "text-fg-ghost" : "text-fg-muted"
                       )}
                     >
@@ -179,7 +179,7 @@ export function Pricing() {
                 <Link
                   href="/auth/register"
                   className={cn(
-                    "mt-7 inline-flex h-11 items-center justify-center rounded-md text-sm font-medium transition-colors",
+                    "mt-7 inline-flex h-11 items-center justify-center rounded-md text-body font-medium transition-colors",
                     plan.highlighted
                       ? "bg-surface text-fg hover:bg-surface-2"
                       : "border border-line text-fg hover:bg-bg"
@@ -193,7 +193,7 @@ export function Pricing() {
         </div>
 
         <Reveal delay={0.25}>
-          <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+          <p className="mt-6 font-mono text-label uppercase text-fg-faint">
             Данные дела можно выгрузить и удалить в любой момент
           </p>
         </Reveal>

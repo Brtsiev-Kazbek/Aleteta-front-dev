@@ -100,7 +100,7 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
         {status === "running" && (
           <div className="px-5 py-6">
             <Progress value={progress} />
-            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+            <p className="mt-3 font-mono text-label uppercase text-fg-faint">
               {Math.round(progress)}%
             </p>
           </div>
@@ -128,11 +128,11 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                           className="flex items-center gap-3 rounded border border-line px-3 py-2.5 transition-colors hover:border-line-strong"
                         >
                           <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
-                          <span className="min-w-0 flex-1 truncate text-[13px] text-fg">
+                          <span className="min-w-0 flex-1 truncate text-body text-fg">
                             {doc.name}
                           </span>
                           <Check
-                            className="h-3.5 w-3.5 shrink-0 text-emerald-600"
+                            className="h-3.5 w-3.5 shrink-0 text-ok-fg"
                             strokeWidth={3}
                           />
                         </motion.div>
@@ -168,14 +168,14 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                 />
 
                 <div className="mt-2 flex items-center justify-between gap-2 border-t border-line-soft pt-2">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                  <span className="font-mono text-label uppercase text-fg-faint">
                     Enter — сгенерировать
                   </span>
                   <Button
                     size="sm"
                     onClick={handleCustomGenerate}
                     disabled={!prompt.trim() || isCustomGenerating}
-                    className="h-7 gap-1.5 px-2.5 text-xs"
+                    className="h-7 gap-1.5 px-2.5 text-caption"
                   >
                     {isCustomGenerating ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -206,11 +206,11 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                     />
 
                     {freeformStage === "searching" ? (
-                      <span className="text-[11px] text-fg-subtle">
+                      <span className="text-label text-fg-subtle">
                         Проверяю, есть ли подходящий шаблон…
                       </span>
                     ) : templateMatch?.found ? (
-                      <span className="text-[11px] text-fg-soft">
+                      <span className="text-label text-fg-soft">
                         Шаблон найден:{" "}
                         <span className="text-fg">
                           {templateMatch.name}
@@ -218,9 +218,9 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                         — реквизиты подставлены
                       </span>
                     ) : (
-                      <span className="text-[11px] text-fg-soft">
+                      <span className="text-label text-fg-soft">
                         Шаблона нет —{" "}
-                        <span className="font-medium text-violet-700">
+                        <span className="font-medium text-brand-strong">
                           документ составлен с нуля
                         </span>
                       </span>

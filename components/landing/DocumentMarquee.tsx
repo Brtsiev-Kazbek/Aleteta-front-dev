@@ -43,7 +43,7 @@ function Row({
       {doubled.map((item, index) => (
         <span
           key={`${item}-${index}`}
-          className="whitespace-nowrap rounded-md border border-inverse-line bg-fg/60 px-4 py-2.5 text-sm text-fg-faint transition-colors hover:border-inverse-line hover:text-inverse-fg"
+          className="whitespace-nowrap rounded-md border border-inverse-line bg-fg/60 px-4 py-2.5 text-body text-fg-faint transition-colors hover:border-inverse-line hover:text-inverse-fg"
         >
           {item}
         </span>
@@ -61,7 +61,7 @@ export function DocumentMarquee() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex items-center gap-3">
           <span className="h-px w-8 bg-inverse-3" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
+          <span className="font-mono text-label uppercase text-fg-subtle">
             Что собирается автоматически
           </span>
         </div>
@@ -74,7 +74,7 @@ export function DocumentMarquee() {
       </div>
 
       <div className="mx-auto mt-7 max-w-6xl px-6">
-        <p className="max-w-xl text-sm leading-relaxed text-fg-subtle">
+        <p className="max-w-xl text-body leading-relaxed text-fg-subtle">
           Список не закрытый: свои шаблоны и свои типы объектов добавляются без
           участия разработчиков.
         </p>

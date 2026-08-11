@@ -171,7 +171,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
           />
 
           <div className="mt-3 flex items-center justify-between gap-3 border-t border-line-soft pt-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+            <span className="font-mono text-label uppercase text-fg-faint">
               Enter — сгенерировать
             </span>
             <Button
@@ -194,7 +194,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                 key={item}
                 type="button"
                 onClick={() => setPrompt(item)}
-                className="rounded border border-line bg-surface px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-fg hover:text-fg"
+                className="rounded border border-line bg-surface px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-fg hover:text-fg"
               >
                 {item}
               </button>
@@ -220,19 +220,19 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
               />
 
               {stage === "searching" ? (
-                <span className="text-[11px] text-fg-subtle">
+                <span className="text-label text-fg-subtle">
                   Проверяю, есть ли подходящий шаблон…
                 </span>
               ) : match?.found ? (
-                <span className="text-[11px] text-fg-soft">
+                <span className="text-label text-fg-soft">
                   Шаблон найден:{" "}
                   <span className="text-fg">{match.name}</span> —
                   реквизиты подставлены
                 </span>
               ) : (
-                <span className="text-[11px] text-fg-soft">
+                <span className="text-label text-fg-soft">
                   Шаблона нет —{" "}
-                  <span className="font-medium text-violet-700">
+                  <span className="font-medium text-brand-strong">
                     документ составлен с нуля
                   </span>
                 </span>
@@ -251,7 +251,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
             <div className="flex items-center gap-3 border-b border-line px-5 py-2.5">
               <MetaLabel>Документ</MetaLabel>
               {stage === "typing" && (
-                <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
+                <span className="ml-auto font-mono text-label uppercase text-fg-faint">
                   составляется
                 </span>
               )}
@@ -279,7 +279,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                   className="gap-1.5"
                 >
                   {copied ? (
-                    <Check className="h-3.5 w-3.5 text-emerald-600" />
+                    <Check className="h-3.5 w-3.5 text-ok-fg" />
                   ) : (
                     <Copy className="h-3.5 w-3.5" />
                   )}
@@ -345,7 +345,7 @@ function MarkdownDocument({
           return (
             <h3
               key={index}
-              className="mt-5 text-[10px] font-bold text-fg"
+              className="mt-5 text-label font-bold text-fg"
             >
               {line.slice(3)}
               {caret}
@@ -357,7 +357,7 @@ function MarkdownDocument({
           return (
             <h2
               key={index}
-              className="text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-fg"
+              className="text-center text-label font-bold uppercase leading-relaxed text-fg"
             >
               {line.slice(2)}
               {caret}
@@ -376,7 +376,7 @@ function MarkdownDocument({
         return (
           <p
             key={index}
-            className="mt-2.5 text-justify text-[10px] leading-[1.75] text-fg-muted"
+            className="mt-2.5 text-justify text-label leading-[1.75] text-fg-muted"
           >
             {line}
             {caret}

@@ -63,12 +63,12 @@ export function ChatDemo() {
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface">
       {/* Шапка шторки */}
       <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-violet-500">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-brand">
           <Sparkles className="h-3.5 w-3.5 text-inverse-fg" />
         </div>
         <div className="flex flex-col leading-none">
-          <span className="text-sm font-semibold text-fg">Алетейя AI</span>
-          <span className="mt-0.5 font-mono text-[10px] text-fg-faint">
+          <span className="text-body font-semibold text-fg">Алетейя AI</span>
+          <span className="mt-0.5 font-mono text-label text-fg-faint">
             Договор_оказания_услуг_Вектор.pdf
           </span>
         </div>
@@ -84,7 +84,7 @@ export function ChatDemo() {
               animate={{ opacity: 1, y: 0 }}
               className="flex justify-end"
             >
-              <span className="rounded-2xl rounded-tr-sm bg-violet-600 px-3.5 py-2 text-sm text-inverse-fg">
+              <span className="rounded-2xl rounded-tr-sm bg-brand px-3.5 py-2 text-body text-inverse-fg">
                 Проверить риски
               </span>
             </motion.div>
@@ -114,7 +114,7 @@ export function ChatDemo() {
               key="answer"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="max-w-[85%] self-start rounded-2xl rounded-tl-sm bg-surface-2 px-3.5 py-2 text-sm text-fg"
+              className="max-w-[85%] self-start rounded-2xl rounded-tl-sm bg-surface-2 px-3.5 py-2 text-body text-fg"
             >
               Разобрал договор по пунктам. Нашёл 2 проблемы:
             </motion.div>
@@ -134,37 +134,37 @@ export function ChatDemo() {
                 transition={{ duration: 0.3 }}
                 className={`rounded-xl border p-3 ${
                   isCritical
-                    ? "border-red-200 bg-red-50/70"
-                    : "border-amber-200 bg-amber-50/70"
+                    ? "border-danger-line bg-danger-bg/70"
+                    : "border-warn-line bg-warn-bg/70"
                 }`}
               >
                 <div className="flex items-start gap-2">
                   {isCritical ? (
-                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-600" />
+                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-danger-fg" />
                   ) : (
-                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warn-fg" />
                   )}
 
                   <div className="flex min-w-0 flex-col gap-1">
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
-                        className={`rounded border px-1.5 py-0.5 text-[9px] font-medium uppercase ${
+                        className={`rounded border px-1.5 py-0.5 text-label font-medium uppercase ${
                           isCritical
-                            ? "border-red-200 bg-red-100 text-red-700"
-                            : "border-amber-200 bg-amber-100 text-amber-700"
+                            ? "border-danger-line bg-danger-bg text-danger-fg"
+                            : "border-warn-line bg-warn-bg text-warn-fg"
                         }`}
                       >
                         {isCritical ? "Критический риск" : "Предупреждение"}
                       </span>
-                      <span className="text-[10px] text-fg-subtle">
+                      <span className="text-label text-fg-subtle">
                         {risk.clause}
                       </span>
                     </div>
 
-                    <p className="text-xs font-medium text-fg">
+                    <p className="text-caption font-medium text-fg">
                       {risk.title}
                     </p>
-                    <p className="text-[11px] leading-relaxed text-fg-soft">
+                    <p className="text-label leading-relaxed text-fg-soft">
                       {risk.text}
                     </p>
                   </div>
@@ -178,10 +178,10 @@ export function ChatDemo() {
       {/* Поле ввода */}
       <div className="border-t border-line p-3">
         <div className="flex items-center gap-2 rounded-lg border border-line px-3 py-2">
-          <span className="flex-1 text-xs text-fg-ghost">
+          <span className="flex-1 text-caption text-fg-ghost">
             Спросите Алетейю о деле…
           </span>
-          <span className="flex h-6 w-6 items-center justify-center rounded bg-violet-600 text-[10px] text-inverse-fg">
+          <span className="flex h-6 w-6 items-center justify-center rounded bg-brand text-label text-inverse-fg">
             ↑
           </span>
         </div>

@@ -136,15 +136,15 @@ export function Audience() {
                     <span className="flex items-baseline gap-3">
                       <span
                         className={cn(
-                          "font-mono text-[10px] tabular-nums transition-colors",
-                          isActive ? "text-violet-600" : "text-fg-ghost"
+                          "font-mono text-label tabular-nums transition-colors",
+                          isActive ? "text-brand" : "text-fg-ghost"
                         )}
                       >
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span
                         className={cn(
-                          "text-sm transition-colors",
+                          "text-body transition-colors",
                           isActive
                             ? "font-medium text-fg"
                             : "text-fg-subtle hover:text-fg-muted"
@@ -169,21 +169,21 @@ export function Audience() {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.25 }}
               >
-                <h3 className="text-xl font-medium leading-snug tracking-[-0.01em] text-fg">
+                <h3 className="text-title font-medium leading-snug text-fg">
                   {active.headline}
                 </h3>
 
                 <div className="mt-6 border-l-2 border-line pl-5">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
+                  <span className="font-mono text-label uppercase text-fg-faint">
                     Как сейчас
                   </span>
-                  <p className="mt-2 text-sm leading-relaxed text-fg-soft">
+                  <p className="mt-2 text-body leading-relaxed text-fg-soft">
                     {active.today}
                   </p>
                 </div>
 
                 <div className="mt-8">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-violet-600">
+                  <span className="font-mono text-label uppercase text-brand">
                     Что делает Алетейя
                   </span>
 
@@ -194,7 +194,7 @@ export function Audience() {
                         className="flex items-start gap-3 py-3 sm:py-3.5"
                       >
                         <span className="mt-2 h-px w-3 shrink-0 bg-fg-ghost" />
-                        <span className="text-sm leading-snug text-fg-muted">
+                        <span className="text-body leading-snug text-fg-muted">
                           {task}
                         </span>
                       </li>

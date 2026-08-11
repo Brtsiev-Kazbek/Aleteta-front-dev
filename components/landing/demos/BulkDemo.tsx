@@ -53,8 +53,8 @@ export function BulkDemo() {
   return (
     <div className="relative flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface">
       <div className="border-b border-line px-4 py-3">
-        <span className="text-sm font-semibold text-fg">Все дела</span>
-        <span className="ml-2 text-xs text-fg-faint">
+        <span className="text-body font-semibold text-fg">Все дела</span>
+        <span className="ml-2 text-caption text-fg-faint">
           выделите галочками нужные
         </span>
       </div>
@@ -99,11 +99,11 @@ export function BulkDemo() {
 
               <FolderKanban className="h-3.5 w-3.5 shrink-0 text-fg-faint" />
 
-              <span className="min-w-0 flex-1 truncate text-xs text-fg">
+              <span className="min-w-0 flex-1 truncate text-caption text-fg">
                 {item.title}
               </span>
 
-              <span className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-[9px] text-fg-subtle">
+              <span className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-label text-fg-subtle">
                 {item.status}
               </span>
 
@@ -114,7 +114,7 @@ export function BulkDemo() {
                     initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.12 }}
-                    className="flex shrink-0 items-center gap-1 rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-medium text-emerald-700"
+                    className="flex shrink-0 items-center gap-1 rounded border border-ok-line bg-ok-bg px-1.5 py-0.5 text-label font-medium text-ok-fg"
                   >
                     <FileText className="h-2.5 w-2.5" />
                     +1
@@ -137,7 +137,7 @@ export function BulkDemo() {
             className="absolute bottom-3 left-1/2 -translate-x-1/2"
           >
             <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3 py-2 shadow-xl">
-              <span className="whitespace-nowrap text-xs">
+              <span className="whitespace-nowrap text-caption">
                 <span className="font-semibold text-fg">
                   {selectedCount}
                 </span>
@@ -147,8 +147,8 @@ export function BulkDemo() {
               <span className="h-4 w-px bg-surface-3" />
 
               <span
-                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium text-inverse-fg transition-colors ${
-                  stage === 4 ? "bg-violet-700" : "bg-violet-600"
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-label font-medium text-inverse-fg transition-colors ${
+                  stage === 4 ? "bg-brand-strong" : "bg-brand"
                 }`}
               >
                 <Sparkles className="h-3 w-3" />
@@ -164,9 +164,9 @@ export function BulkDemo() {
             animate={{ opacity: 1, y: 0 }}
             className="absolute bottom-3 left-1/2 -translate-x-1/2"
           >
-            <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 shadow-lg">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-              <span className="whitespace-nowrap text-xs font-medium text-emerald-800">
+            <div className="flex items-center gap-2 rounded-xl border border-ok-line bg-ok-bg px-3 py-2 shadow-lg">
+              <CheckCircle2 className="h-3.5 w-3.5 text-ok-fg" />
+              <span className="whitespace-nowrap text-caption font-medium text-ok-fg">
                 Документ создан в 3 делах
               </span>
             </div>

@@ -24,7 +24,7 @@ const FIELD_CLASSES =
   "h-11 rounded-md transition-shadow focus-visible:border-fg focus-visible:ring-4 focus-visible:ring-fg/5";
 
 const FIELD_ERROR_CLASSES =
-  "border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/10";
+  "border-danger-line focus-visible:border-danger focus-visible:ring-danger/10";
 
 export function Field({
   label,
@@ -49,7 +49,7 @@ export function Field({
       <div className="flex items-baseline justify-between gap-3">
         <label
           htmlFor={htmlFor}
-          className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
+          className="font-mono text-label uppercase text-fg-faint"
         >
           {label}
         </label>
@@ -59,8 +59,8 @@ export function Field({
       {children}
 
       {error && (
-        <span className="flex items-start gap-1.5 text-[12px] leading-relaxed text-red-700">
-          <span aria-hidden className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-red-500" />
+        <span className="flex items-start gap-1.5 text-caption leading-relaxed text-danger-fg">
+          <span aria-hidden className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-danger" />
           {error}
         </span>
       )}
@@ -157,16 +157,16 @@ export function PasswordField({
                   "h-full flex-1 rounded-full transition-colors",
                   measured.score >= step
                     ? measured.score === 1
-                      ? "bg-red-400"
+                      ? "bg-danger"
                       : measured.score === 2
-                        ? "bg-amber-400"
-                        : "bg-emerald-500"
+                        ? "bg-warn"
+                        : "bg-ok"
                     : "bg-surface-3"
                 )}
               />
             ))}
           </div>
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-fg-faint">
+          <span className="font-mono text-label uppercase text-fg-faint">
             {measured.label}
           </span>
         </div>
@@ -182,10 +182,10 @@ export function FormError({ children }: { children: ReactNode }) {
   return (
     <div
       role="alert"
-      className="flex items-start gap-2.5 border-l-2 border-red-300 bg-red-50/60 py-2.5 pl-3 pr-3"
+      className="flex items-start gap-2.5 border-l-2 border-danger-line bg-danger-bg/60 py-2.5 pl-3 pr-3"
     >
-      <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-500" />
-      <span className="text-[13px] leading-relaxed text-red-800">{children}</span>
+      <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-danger-fg" />
+      <span className="text-body leading-relaxed text-danger-fg">{children}</span>
     </div>
   );
 }
@@ -195,9 +195,9 @@ export function FormSuccess({ children }: { children: ReactNode }) {
   if (!children) return null;
 
   return (
-    <div className="flex items-start gap-2.5 border-l-2 border-emerald-300 bg-emerald-50/60 py-2.5 pl-3 pr-3">
-      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
-      <span className="text-[13px] leading-relaxed text-emerald-900">
+    <div className="flex items-start gap-2.5 border-l-2 border-ok-line bg-ok-bg/60 py-2.5 pl-3 pr-3">
+      <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ok-fg" />
+      <span className="text-body leading-relaxed text-ok-fg">
         {children}
       </span>
     </div>
@@ -217,18 +217,18 @@ export function FormHeading({
   return (
     <div className="flex flex-col">
       <span className="flex items-center gap-2.5">
-        <span aria-hidden className="h-px w-6 bg-violet-500" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-fg-faint">
+        <span aria-hidden className="h-px w-6 bg-brand" />
+        <span className="font-mono text-label uppercase text-fg-faint">
           {eyebrow}
         </span>
       </span>
 
-      <h1 className="mt-5 text-[1.75rem] font-medium leading-[1.12] tracking-[-0.03em] text-fg">
+      <h1 className="mt-5 text-heading font-medium leading-[1.12] text-fg">
         {title}
       </h1>
 
       {description && (
-        <p className="mt-3 text-sm leading-relaxed text-fg-subtle">
+        <p className="mt-3 text-body leading-relaxed text-fg-subtle">
           {description}
         </p>
       )}

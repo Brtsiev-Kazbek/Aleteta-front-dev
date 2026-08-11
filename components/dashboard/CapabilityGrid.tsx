@@ -261,7 +261,7 @@ export function CapabilityGrid() {
             <section key={group.title}>
               <div className="flex items-baseline justify-between gap-3">
                 <MetaLabel>{group.title}</MetaLabel>
-                <span className="font-mono text-[10px] tabular-nums text-fg-ghost">
+                <span className="font-mono text-label tabular-nums text-fg-ghost">
                   {group.items.length}
                 </span>
               </div>
@@ -288,24 +288,24 @@ export function CapabilityGrid() {
                     {/* Волосяная линия сверху — появляется при наведении */}
                     <span
                       aria-hidden
-                      className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-violet-500 transition-transform duration-300 ease-out group-hover:scale-x-100"
+                      className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-brand transition-transform duration-300 ease-out group-hover:scale-x-100"
                     />
 
                     <div className="flex w-full items-baseline gap-2.5">
-                      <span className="font-mono text-[10px] tabular-nums text-fg-ghost transition-colors duration-300 group-hover:text-violet-600">
+                      <span className="font-mono text-label tabular-nums text-fg-ghost transition-colors duration-300 group-hover:text-brand">
                         {String(offset + index + 1).padStart(2, "0")}
                       </span>
-                      <span className="text-[15px] font-medium tracking-[-0.015em] text-fg">
+                      <span className="text-body font-medium text-fg">
                         {item.title}
                       </span>
                       <ArrowUpRight className="ml-auto h-3.5 w-3.5 shrink-0 text-fg-ghost transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg" />
                     </div>
 
-                    <p className="mt-2.5 text-[13px] leading-relaxed text-fg-subtle">
+                    <p className="mt-2.5 text-body leading-relaxed text-fg-subtle">
                       {item.note}
                     </p>
 
-                    <span className="relative mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint transition-colors duration-300 group-hover:text-fg">
+                    <span className="relative mt-5 font-mono text-label uppercase text-fg-faint transition-colors duration-300 group-hover:text-fg">
                       {item.action}
                       <span
                         aria-hidden

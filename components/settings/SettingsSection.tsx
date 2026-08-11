@@ -34,10 +34,10 @@ export function SettingsSection({
         <div className="flex items-start gap-2.5">
           <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-faint" />
           <div className="flex min-w-0 flex-col">
-            <h2 className="text-[15px] font-medium tracking-[-0.01em] text-fg">
+            <h2 className="text-body font-medium text-fg">
               {title}
             </h2>
-            <span className="mt-1 text-[13px] text-fg-subtle">
+            <span className="mt-1 text-body text-fg-subtle">
               {description}
             </span>
           </div>

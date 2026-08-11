@@ -86,7 +86,7 @@ export function LoginForm({
       />
 
       {notice === "password-changed" && (
-        <p className="mt-6 border-l-2 border-emerald-300 bg-emerald-50/60 py-2.5 pl-3 pr-3 text-[13px] leading-relaxed text-emerald-900">
+        <p className="mt-6 border-l-2 border-ok-line bg-ok-bg/60 py-2.5 pl-3 pr-3 text-body leading-relaxed text-ok-fg">
           Пароль изменён. Войдите с новым паролем.
         </p>
       )}
@@ -118,7 +118,7 @@ export function LoginForm({
           hint={
             <Link
               href="/auth/forgot-password"
-              className="text-[12px] text-fg-subtle transition-colors hover:text-fg"
+              className="text-caption text-fg-subtle transition-colors hover:text-fg"
             >
               Забыли пароль?
             </Link>
@@ -141,7 +141,7 @@ export function LoginForm({
         Войти
       </Button>
 
-      <p className="mt-6 text-sm text-fg-subtle">
+      <p className="mt-6 text-body text-fg-subtle">
         Нет аккаунта?{" "}
         <Link
           href={`/auth/register?next=${encodeURIComponent(nextPath)}`}
