@@ -211,6 +211,41 @@ report(
 );
 
 /*
+ * Замыкание не уезжает из серверного компонента в клиентский.
+ *
+ * Из-за чего страж. `<ActionButton action={() => someAction()} />` выглядит
+ * безобидно и в клиентском компоненте таковым и является. В серверном это
+ * пятисотая на первом же открытии: через границу проходят простые значения и
+ * серверные действия, но не произвольные функции — «Functions cannot be passed
+ * directly to Client Components».
+ *
+ * Ни сборка, ни типы этого не видят: ошибка возникает при отрисовке. Раздел
+ * администрирования лёг ровно на этом, и заметить получилось только открыв
+ * страницу под настоящей учётной записью — чего съёмка не делает.
+ *
+ * Правило простое: файл, передающий замыкание в `action`, обязан быть
+ * клиентским.
+ */
+const actionUsers = [
+  "components/admin/QueuePanel.tsx",
+  "components/admin/JobsTable.tsx",
+  "components/admin/UsersTable.tsx",
+  "components/admin/WorkspacesTable.tsx",
+];
+const leaking = [];
+for (const file of actionUsers) {
+  const text = await source(file);
+  if (/action=\{\s*\(\)\s*=>/.test(text) && !text.startsWith('"use client"')) {
+    leaking.push(file);
+  }
+}
+report(
+  leaking.length === 0,
+  "замыкания в action не уезжают за границу сервер → клиент",
+  `без "use client" страница ляжет при отрисовке: ${leaking.join(", ")}`
+);
+
+/*
  * Раздел администрирования не ходит в базу служебным ключом.
  *
  * Из-за чего страж. Первая версия раздела читала данные клиентом со служебным
