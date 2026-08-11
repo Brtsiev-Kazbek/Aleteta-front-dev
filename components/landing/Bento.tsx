@@ -68,8 +68,8 @@ export function Bento() {
             {...appear(1)}
             className="lg:col-span-3 lg:row-span-2"
             icon={ScanLine}
-            title="Реквизиты вынимаются из скана"
-            text="Выписка, устав, паспорт, счёт. Текст распознаётся, значения находятся и ложатся в карточку объекта. То, в чём модель не уверена, помечено — глазами проверяются три поля, а не сорок."
+            title="Одна карточка объекта вместо папки сканов"
+            text="Кадастровый номер, площадь, правообладатель, даты — всё в одном месте и заполнено один раз. Дальше эти значения идут во все документы дела, и переписывать их из выписки в каждый шаблон не нужно."
           >
             <ExtractScene />
           </Tile>
@@ -202,7 +202,7 @@ function ExtractScene() {
     { label: "Кадастровый номер", value: "15:09:0301012:118", sure: true },
     { label: "Площадь", value: "440 кв.м.", sure: true },
     { label: "Категория земель", value: "Земли населённых пунктов", sure: true },
-    { label: "Правообладатель", value: "Брциев К. Р.", sure: false },
+    { label: "Правообладатель", value: "Брциев К. Р.", sure: true },
     { label: "Дата регистрации", value: "14.03.2024", sure: true },
   ];
 
@@ -241,9 +241,9 @@ function ExtractScene() {
       </div>
 
       <div className="flex items-center gap-2 border-t border-line px-4 py-2.5">
-        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warn" />
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ok" />
         <span className="text-caption text-fg-subtle">
-          Одно значение просит подтверждения
+          Форматы проверены — объект готов к генерации
         </span>
       </div>
     </Frame>

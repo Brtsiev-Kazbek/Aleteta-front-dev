@@ -86,6 +86,13 @@ export function CabinetHeader() {
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="mesh-dark absolute inset-0 opacity-90" />
         <div className="bg-grid-dark absolute inset-0 opacity-50" />
+        {/*
+          Нижняя кромка растворяется. Резкая граница под карточками бенто
+          читалась как обрыв: карточки будто стояли на ступеньке. Растворение
+          делает переход к светлой части плавным, и предметы выглядят
+          положенными на поле, а не приклеенными к его краю.
+        */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-inverse" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-8 pb-16 pt-10">

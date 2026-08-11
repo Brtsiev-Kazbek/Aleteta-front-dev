@@ -69,6 +69,8 @@ export interface Viewer {
   fullName: string;
   email: string;
   workspaceName: string;
+  /** Администратор установки — ему виден раздел администрирования. */
+  isPlatformAdmin?: boolean;
 }
 
 /** Срез данных, приходящий с сервера. Отсутствующие части остаются как есть. */

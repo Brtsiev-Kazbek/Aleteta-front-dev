@@ -90,7 +90,7 @@ export function CabinetBento() {
             </p>
             <p className="max-w-sm text-body-sm leading-relaxed text-fg-subtle">
               {health.total === 0
-                ? "Заведите дело, загрузите документы — реквизиты появятся здесь."
+                ? "Заведите дело и добавьте объекты — их состояние появится здесь."
                 : "Ничего чинить не нужно: пакет документов можно собирать."}
             </p>
           </div>
@@ -132,12 +132,12 @@ export function CabinetBento() {
                     >
                       {isError
                         ? item.errors[0]
-                        : `Проверьте значение: ${item.uncertain.length} ${plural(
+                        : `${item.uncertain.length} ${plural(
                             item.uncertain.length,
-                            "поле",
-                            "поля",
-                            "полей"
-                          )} после разбора файла`}
+                            "поле ждёт",
+                            "поля ждут",
+                            "полей ждут"
+                          )} подтверждения`}
                     </span>
                   </span>
 

@@ -7,7 +7,6 @@ import {
   FileSearch,
   FileText,
   MoreHorizontal,
-  ScanLine,
   ScanText,
   ShieldCheck,
   Sparkles,
@@ -38,10 +37,9 @@ import { RecognizedTextSheet } from "@/components/documents/RecognizedTextSheet"
 import { ReviewSplitView } from "@/components/documents/ReviewSplitView";
 import { MetaLabel } from "@/components/layout/PanelHeading";
 import { BatchReviewSheet } from "@/components/workspace/BatchReviewSheet";
-import { ExtractionStartDialog } from "@/components/workspace/ExtractionStartDialog";
 import { cn, formatDate, plural } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
-import { DOCUMENT_STATUS_META, type Document } from "@/types";
+import { DOCUMENT_STATUS_META } from "@/types";
 
 export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const allDocuments = useAppStore((state) => state.documents);
@@ -57,15 +55,8 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   const isRecognitionAvailable = useAppStore(
     (state) => state.isRecognitionAvailable
   );
-  const isExtractionAvailable = useAppStore(
-    (state) => state.isExtractionAvailable
-  );
-
   /* Какой документ показываем распознанным текстом. */
   const [textDocumentId, setTextDocumentId] = useState<string | null>(null);
-
-  /* Какой документ разбираем на реквизиты: сначала спрашиваем тип карточки. */
-  const [extractTarget, setExtractTarget] = useState<Document | null>(null);
 
   const selectedIds = useAppStore((state) => state.selectedDocumentIds);
   const toggleSelection = useAppStore((state) => state.toggleDocumentSelection);
@@ -244,9 +235,8 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
           <FileText className="h-5 w-5 text-fg-ghost" />
           <p className="mt-1 text-body text-fg">Документов пока нет</p>
           <p className="max-w-sm text-body-sm leading-relaxed text-fg-subtle">
-            Перетащите файл сюда — он распознается сам. Дальше из него можно
-            извлечь реквизиты в карточку объекта: пункт «Извлечь реквизиты» в
-            меню файла.
+            Перетащите файл сюда — текст будет распознан и попадёт в поиск по
+            делу. Разобрать документ по пунктам можно из меню файла.
           </p>
         </div>
       ) : (
@@ -322,28 +312,6 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                       <ShieldCheck className="h-4 w-4 text-fg-faint" />
                       Разобрать по пунктам
                     </DropdownMenuItem>
-                    {/*
-                      Два условия, и оба честнее показать до нажатия, а не
-                      после. Разбор читает распознанный текст, а не картинки:
-                      пока текста нет, разбирать нечего. И ему нужна своя
-                      модель — `LLM_MODEL_FAST`; распознаванию она не нужна, и
-                      настроена бывает не всегда. В обоих случаях исполнитель
-                      всё равно откажет, но отказ, пришедший после ожидания,
-                      читается как поломка.
-                    */}
-                    <DropdownMenuItem
-                      onSelect={() => setExtractTarget(document)}
-                      disabled={
-                        document.ocrStatus !== "done" || !isExtractionAvailable
-                      }
-                    >
-                      <ScanLine className="h-4 w-4 text-fg-faint" />
-                      {document.ocrStatus !== "done"
-                        ? "Извлечь реквизиты — нужен текст"
-                        : isExtractionAvailable
-                          ? "Извлечь реквизиты"
-                          : "Извлечь реквизиты — не задана модель"}
-                    </DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={() => setTextDocumentId(document.id)}
                     >
@@ -416,13 +384,6 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Во что переносить реквизиты — спрашиваем до запуска */}
-      <ExtractionStartDialog
-        document={extractTarget}
-        caseId={caseId}
-        onClose={() => setExtractTarget(null)}
-      />
 
       {/* Результаты пакетной проверки */}
       <BatchReviewSheet />

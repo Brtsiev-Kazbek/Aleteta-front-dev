@@ -13,6 +13,7 @@ import {
   PanelLeftOpen,
   Plus,
   Settings,
+  ShieldCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -54,6 +55,20 @@ const NAV_ITEMS: NavItem[] = [
   { icon: Settings, label: "Настройки", href: "/dashboard/settings" },
 ];
 
+/**
+ * Пункт для администратора установки.
+ *
+ * Отдельно от остальных, потому что появляется не у всех, и мешать его с общей
+ * навигацией нельзя: список, который у разных людей разной длины, читается как
+ * сбой, если непонятно, откуда взялась лишняя строка. Здесь она отбита чертой
+ * и стоит последней.
+ */
+const ADMIN_ITEM: NavItem = {
+  icon: ShieldCheck,
+  label: "Администрирование",
+  href: "/admin",
+};
+
 export function Sidebar() {
   const pathname = usePathname();
   const isExpanded = useAppStore((state) => state.isSidebarExpanded);
@@ -61,6 +76,9 @@ export function Sidebar() {
   const setCreateCaseOpen = useAppStore((state) => state.setCreateCaseOpen);
   const viewer = useAppStore((state) => state.viewer);
   const isBackedByDatabase = useAppStore((state) => state.isBackedByDatabase);
+  const items = viewer?.isPlatformAdmin
+    ? [...NAV_ITEMS, ADMIN_ITEM]
+    : NAV_ITEMS;
 
   // Инициалы: имя приходит одной строкой, разбираем на слова.
   const initials = (viewer?.fullName ?? "")
@@ -168,7 +186,7 @@ export function Sidebar() {
           </p>
         )}
 
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const active = isActive(item);
 
           return (

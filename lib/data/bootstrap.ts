@@ -93,6 +93,7 @@ export async function loadWorkspaceSnapshot(): Promise<StoreSnapshot | null> {
         fullName: session.fullName,
         email: session.email,
         workspaceName: session.workspaceName,
+        isPlatformAdmin: session.isPlatformAdmin,
       },
       cases,
       entities,

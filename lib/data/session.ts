@@ -10,6 +10,14 @@ export interface SessionContext {
   fullName: string;
   workspaceId: string;
   workspaceName: string;
+  /**
+   * Администратор установки, а не пространства.
+   *
+   * Нужен здесь, а не только на странице раздела: без него сайдбар не знает,
+   * показывать ли пункт «Администрирование», и либо показывает его всем, либо
+   * не показывает никому.
+   */
+  isPlatformAdmin: boolean;
 }
 
 /**
@@ -30,7 +38,7 @@ export async function requireSession(): Promise<SessionContext> {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("id, email, full_name, last_workspace_id")
+    .select("id, email, full_name, last_workspace_id, platform_role")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -68,6 +76,7 @@ export async function requireSession(): Promise<SessionContext> {
     fullName: profile.full_name ?? profile.email,
     workspaceId,
     workspaceName: workspace?.name ?? "Рабочее пространство",
+    isPlatformAdmin: profile.platform_role === "admin",
   };
 }
 

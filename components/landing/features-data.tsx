@@ -7,7 +7,7 @@ import { BulkDemo } from "@/components/landing/demos/BulkDemo";
 import { CaseLawDemo } from "@/components/landing/demos/CaseLawDemo";
 import { ChatDemo } from "@/components/landing/demos/ChatDemo";
 import { CustomTypeDemo } from "@/components/landing/demos/CustomTypeDemo";
-import { ExtractDemo } from "@/components/landing/demos/ExtractDemo";
+import { RecognizeDemo } from "@/components/landing/demos/RecognizeDemo";
 import { FreeformDemo } from "@/components/landing/demos/FreeformDemo";
 import { ReviewDemo } from "@/components/landing/demos/ReviewDemo";
 
@@ -40,17 +40,17 @@ export const PRODUCTION_FEATURES: Feature[] = [
     demo: <FreeformDemo />,
   },
   {
-    id: "extract",
-    tab: "Разбор документов",
-    title: "Реквизиты не переписываются из файла руками",
+    id: "recognize",
+    tab: "Распознавание",
+    title: "Скан становится текстом, по которому можно искать",
     description:
-      "Устав, паспорт, выписка, счёт. Система распознаёт текст, находит нужные значения и заполняет ими карточку объекта — с проверкой формата каждого реквизита.",
+      "PDF на сто девятнадцать страниц читается волнами и целиком остаётся в деле. Дальше по нему ищут — не по названиям файлов, а по тому, что внутри.",
     bullets: [
-      "PDF, DOCX и сканы с распознаванием текста",
-      "Проверка форматов: ИНН, КПП, СНИЛС, паспорт",
-      "Значения с низкой уверенностью помечаются на проверку",
+      "PDF, DOCX и фотографии документов",
+      "Постраничный текст рядом с оригиналом",
+      "Поиск по материалам дела с переходом к месту",
     ],
-    demo: <ExtractDemo />,
+    demo: <RecognizeDemo />,
   },
   {
     id: "custom",

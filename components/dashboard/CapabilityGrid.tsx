@@ -10,7 +10,6 @@ import {
   Gavel,
   Layers,
   MessageSquareText,
-  ScanText,
   ShieldCheck,
   Table2,
   Wand2,
@@ -33,18 +32,15 @@ import {
 } from "@/components/ui/sheet";
 import { AIGenerator } from "@/components/documents/AIGenerator";
 import { AIReviewDropzone } from "@/components/documents/AIReviewDropzone";
-import { FileDropzone } from "@/components/documents/FileDropzone";
 import { ReviewSplitView } from "@/components/documents/ReviewSplitView";
 import { CasePickerDialog } from "@/components/dashboard/CasePickerDialog";
 import { MetaLabel } from "@/components/layout/PanelHeading";
-import { DemoExtractionSheet } from "@/components/dashboard/DemoExtractionSheet";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
 
 type CapabilityId =
   | "matrix"
   | "freeform"
-  | "extract"
   | "custom"
   | "bulk"
   | "review"
@@ -92,13 +88,6 @@ const GROUPS: CapabilityGroup[] = [
         title: "Любой документ",
         note: "Опишите словами — форма подберётся или документ напишется с нуля",
         action: "Описать документ",
-      },
-      {
-        id: "extract",
-        icon: ScanText,
-        title: "Разбор документов",
-        note: "Реквизиты из PDF, DOCX и сканов переносятся в карточку объекта",
-        action: "Загрузить файл",
       },
       {
         id: "custom",
@@ -196,10 +185,8 @@ export function CapabilityGrid() {
   const setBulkSheetOpen = useAppStore((state) => state.setBulkSheetOpen);
   const selectDocuments = useAppStore((state) => state.selectDocuments);
   const startBatchReview = useAppStore((state) => state.startBatchReview);
-  const startDemoExtraction = useAppStore((state) => state.startDemoExtraction);
 
   const [isGeneratorOpen, setGeneratorOpen] = useState(false);
-  const [isExtractPickerOpen, setExtractPickerOpen] = useState(false);
   const [isReviewOpen, setReviewOpen] = useState(false);
   const [caseAction, setCaseAction] = useState<CaseAction | null>(null);
   const [reviewedFile, setReviewedFile] = useState<{
@@ -219,10 +206,6 @@ export function CapabilityGrid() {
 
       case "freeform":
         setGeneratorOpen(true);
-        return;
-
-      case "extract":
-        setExtractPickerOpen(true);
         return;
 
       case "custom":
@@ -293,7 +276,7 @@ export function CapabilityGrid() {
                 </span>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {group.items.map((item, index) => (
                   <motion.button
                     key={item.id}
@@ -379,36 +362,6 @@ export function CapabilityGrid() {
         </SheetContent>
       </Sheet>
 
-      {/* Разбор файла: выбор документа, из которого достаются реквизиты */}
-      <Dialog open={isExtractPickerOpen} onOpenChange={setExtractPickerOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <MetaLabel>Разбор документов</MetaLabel>
-            <DialogTitle className="mt-1">
-              Перенести реквизиты из файла
-            </DialogTitle>
-            <DialogDescription>
-              Устав, паспорт, выписка или счёт. Значения попадут в карточку
-              объекта с проверкой формата каждого реквизита.
-            </DialogDescription>
-          </DialogHeader>
-
-          <FileDropzone
-            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.tif,.tiff"
-            hint="PDF, DOCX и сканы с распознаванием текста"
-            demoFile={{
-              name: "Выписка_ЕГРН_718квм.pdf",
-              sizeBytes: 1_246_000,
-            }}
-            demoLabel="Или разберите демонстрационную выписку"
-            onPick={(file) => {
-              setExtractPickerOpen(false);
-              startDemoExtraction(file);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-
       {/* Разбор договора по пунктам и судебная практика */}
       <Dialog open={isReviewOpen} onOpenChange={setReviewOpen}>
         <DialogContent
@@ -455,8 +408,6 @@ export function CapabilityGrid() {
         сразу виден результат создания, поэтому здесь он не дублируется.
       */}
 
-      {/* Показ разбора: настоящий запускается из дела, где есть загруженный файл */}
-      <DemoExtractionSheet />
     </>
   );
 }

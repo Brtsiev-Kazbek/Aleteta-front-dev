@@ -13,7 +13,6 @@ import { AIAssistantSheet } from "@/components/workspace/AIAssistantSheet";
 import { BatchGenerationGrid } from "@/components/workspace/BatchGenerationGrid";
 import { CaseDocumentsTab } from "@/components/workspace/CaseDocumentsTab";
 import { CaseOverviewTab } from "@/components/workspace/CaseOverviewTab";
-import { ExtractionSheet } from "@/components/workspace/ExtractionSheet";
 import { GenerationSheet } from "@/components/workspace/GenerationSheet";
 import { useHotkey } from "@/lib/hooks/use-hotkey";
 import { cn } from "@/lib/utils";
@@ -220,8 +219,6 @@ export default function CaseWorkspacePage() {
 
       <AIAssistantSheet caseId={caseId} contextFile={caseItem.contextFile} />
       <GenerationSheet caseId={caseId} />
-      {/* Разбор файла запущен внутри дела — реквизиты идут в это же дело */}
-      <ExtractionSheet caseId={caseId} />
     </div>
   );
 }

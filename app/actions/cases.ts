@@ -43,7 +43,7 @@ export async function createCaseAction(
         workspace_id: session.workspaceId,
         title: trimmed.slice(0, 300),
         description:
-          "Новое рабочее пространство. Загрузите документы — Алетейя извлечёт реквизиты.",
+          "Новое рабочее пространство. Загрузите документы и заведите объекты дела.",
         created_by: session.userId,
       })
       .select("*")
