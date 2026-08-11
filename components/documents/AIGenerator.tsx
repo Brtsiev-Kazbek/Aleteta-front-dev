@@ -194,7 +194,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                 key={item}
                 type="button"
                 onClick={() => setPrompt(item)}
-                className="rounded border border-line bg-surface px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-fg hover:text-fg"
+                className="rounded-xl border border-line bg-surface px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-fg hover:text-fg"
               >
                 {item}
               </button>

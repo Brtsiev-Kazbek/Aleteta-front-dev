@@ -240,7 +240,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
 
       {/* Список документов */}
       {documents.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 border border-dashed border-line-strong px-6 py-16 text-center">
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-16 text-center">
           <FileText className="h-5 w-5 text-fg-ghost" />
           <p className="mt-1 text-body text-fg">Документов пока нет</p>
           <p className="max-w-sm text-body-sm leading-relaxed text-fg-subtle">
@@ -250,7 +250,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
           </p>
         </div>
       ) : (
-        <ul className="flex flex-col divide-y divide-line border-y border-line">
+        <ul className="flex flex-col gap-2">
           {documents.map((document, index) => {
             const status = DOCUMENT_STATUS_META[document.status];
             const isSelected = selectedIds.includes(document.id);
@@ -262,8 +262,10 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: Math.min(index * 0.04, 0.2) }}
                 className={cn(
-                  "group flex items-center gap-3.5 px-1 py-3.5 transition-colors",
-                  isSelected ? "bg-bg" : "hover:bg-bg/60"
+                  "group flex items-center gap-3.5 rounded-2xl border bg-surface px-4 py-3 transition-all",
+                  isSelected
+                    ? "border-brand-line ring-1 ring-brand-line"
+                    : "border-line hover:border-line-strong hover:shadow-card"
                 )}
               >
                 <Checkbox
@@ -273,7 +275,9 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                   className="shrink-0"
                 />
 
-                <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg text-fg-faint">
+                  <FileText className="h-3.5 w-3.5" />
+                </span>
 
                 {/* Клик по строке открывает разбор — это основное действие */}
                 <button
@@ -296,7 +300,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
 
                 <span
                   className={cn(
-                    "hidden shrink-0 rounded border px-2 py-1 font-mono text-label uppercase sm:inline-flex",
+                    "hidden shrink-0 rounded-full border px-2.5 py-1 font-mono text-label uppercase sm:inline-flex",
                     status.className
                   )}
                 >

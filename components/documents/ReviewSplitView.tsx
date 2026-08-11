@@ -110,7 +110,7 @@ export function ReviewSplitView({
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded border border-danger-line px-2 py-1 font-mono text-label uppercase text-danger-fg">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-line px-2 py-1 font-mono text-label uppercase text-danger-fg">
             <AlertCircle className="h-3 w-3" />
             {counts.critical}{" "}
             {plural(
@@ -120,7 +120,7 @@ export function ReviewSplitView({
               "критических"
             )}
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded border border-warn-line px-2 py-1 font-mono text-label uppercase text-warn-fg">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-warn-line px-2 py-1 font-mono text-label uppercase text-warn-fg">
             <AlertTriangle className="h-3 w-3" />
             {counts.warning}{" "}
             {plural(
@@ -190,7 +190,7 @@ export function ReviewSplitView({
                     }}
                     transition={{ duration: 0.25 }}
                     className={cn(
-                      "scroll-mt-6 rounded border px-3 py-2.5 transition-colors",
+                      "scroll-mt-6 rounded-xl border px-3 py-2.5 transition-colors",
                       isHighlighted && highlight
                         ? highlight.border
                         : "border-transparent"
@@ -261,7 +261,7 @@ export function ReviewSplitView({
                     transition={{ duration: 0.22, delay: index * 0.06 }}
                     onClick={() => setActiveRiskId(isActive ? null : risk.id)}
                     className={cn(
-                      "w-full rounded border p-4 text-left transition-colors",
+                      "w-full rounded-xl border p-4 text-left transition-colors",
                       meta.cardClassName,
                       isActive && "border-fg"
                     )}
@@ -278,7 +278,7 @@ export function ReviewSplitView({
                         <div className="flex flex-wrap items-center gap-2">
                           <span
                             className={cn(
-                              "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
+                              "rounded-full border px-1.5 py-0.5 font-mono text-label uppercase ",
                               meta.badgeClassName
                             )}
                           >
@@ -304,7 +304,7 @@ export function ReviewSplitView({
                               exit={{ opacity: 0, height: 0 }}
                               className="mt-1.5 flex flex-col gap-2 overflow-hidden"
                             >
-                              <div className="rounded border border-line bg-surface p-3">
+                              <div className="rounded-xl border border-line bg-surface p-3">
                                 <MetaLabel>Формулировка правки</MetaLabel>
                                 <p className="mt-2 text-label leading-relaxed text-fg-soft">
                                   {risk.recommendation}
@@ -400,7 +400,7 @@ function CasePractice({
   }, [riskId]);
 
   return (
-    <div className="rounded border border-line bg-surface p-3">
+    <div className="rounded-xl border border-line bg-surface p-3">
       <div className="flex items-center gap-1.5">
         {isSearching ? (
           <Loader2 className="h-3 w-3 shrink-0 animate-spin text-fg" />
@@ -428,7 +428,7 @@ function CasePractice({
                 repeat: Infinity,
                 delay: index * 0.15,
               }}
-              className="h-9 rounded border border-line"
+              className="h-9 rounded-xl border border-line"
             />
           ))}
         </div>
@@ -453,7 +453,7 @@ function CasePractice({
                   </span>
                   <span
                     className={cn(
-                      "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
+                      "rounded-full border px-1.5 py-0.5 font-mono text-label uppercase ",
                       item.side === "against"
                         ? "border-danger-line text-danger-fg"
                         : "border-ok-line text-ok-fg"

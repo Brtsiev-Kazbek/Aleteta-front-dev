@@ -170,7 +170,7 @@ export function AIAssistantSheet({
                 type="button"
                 onClick={() => handleSend(prompt)}
                 disabled={isThinking}
-                className="rounded border border-line px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-fg hover:text-fg disabled:opacity-40"
+                className="rounded-xl border border-line px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-fg hover:text-fg disabled:opacity-40"
               >
                 {prompt}
               </button>
@@ -188,13 +188,13 @@ export function AIAssistantSheet({
                 }
               }}
               placeholder="Спросите Алетейю о деле…"
-              className="h-10 w-full rounded-md border border-line bg-surface pl-3.5 pr-11 text-body text-fg outline-none transition-colors placeholder:text-fg-faint focus:border-fg"
+              className="h-10 w-full rounded-lg border border-line bg-surface pl-3.5 pr-11 text-body text-fg outline-none transition-colors placeholder:text-fg-faint focus:border-fg"
             />
             <button
               type="button"
               onClick={() => handleSend(draft)}
               disabled={!draft.trim() || isThinking}
-              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded bg-inverse text-inverse-fg transition-colors hover:bg-inverse-3 disabled:bg-surface-2 disabled:text-fg-faint"
+              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-xl bg-inverse text-inverse-fg transition-colors hover:bg-inverse-3 disabled:bg-surface-2 disabled:text-fg-faint"
               aria-label="Отправить сообщение"
             >
               <ArrowUp className="h-3.5 w-3.5" />
@@ -222,7 +222,7 @@ function FindingCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.26, delay }}
-      className={cn("w-full rounded border p-3.5", meta.cardClassName)}
+      className={cn("w-full rounded-xl border p-3.5", meta.cardClassName)}
     >
       <div className="flex items-start gap-2.5">
         <Icon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", meta.iconClassName)} />
@@ -231,7 +231,7 @@ function FindingCard({
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={cn(
-                "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
+                "rounded-full border px-1.5 py-0.5 font-mono text-label uppercase ",
                 meta.badgeClassName
               )}
             >
@@ -270,7 +270,7 @@ function CitationCard({
       initial={{ opacity: 0, x: 8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.26, delay }}
-      className="rounded border border-line bg-surface p-3 transition-colors hover:border-line-strong"
+      className="rounded-xl border border-line bg-surface p-3 transition-colors hover:border-line-strong"
     >
       <div className="flex flex-wrap items-center gap-2">
         <FileText className="h-3 w-3 shrink-0 text-fg-ghost" />

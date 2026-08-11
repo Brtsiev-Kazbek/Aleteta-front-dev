@@ -92,7 +92,7 @@ function Badge({
   title?: string;
 }) {
   const className = cn(
-    "hidden shrink-0 items-center gap-1.5 rounded border px-2 py-1 font-mono text-label uppercase sm:inline-flex",
+    "hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-1 font-mono text-label uppercase sm:inline-flex",
     tone === "quiet" && "border-line text-fg-subtle",
     tone === "active" && "border-brand-line bg-brand-soft/60 text-brand-strong",
     tone === "alarm" && "border-danger-line text-danger-fg",

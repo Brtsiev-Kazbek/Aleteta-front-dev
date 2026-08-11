@@ -83,7 +83,7 @@ export default function CaseWorkspacePage() {
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Шапка дела */}
-        <header className="shrink-0 border-b border-line bg-surface px-8 pt-6">
+        <header className="shrink-0 border-b border-line bg-surface px-8 pb-4 pt-6">
           <div className="flex items-start justify-between gap-6">
             <div className="flex min-w-0 flex-col">
               {/* Статус в виде метки — как рубрики на лендинге */}
@@ -100,7 +100,7 @@ export default function CaseWorkspacePage() {
 
                 <span
                   className={cn(
-                    "inline-flex shrink-0 items-center gap-2 rounded border px-2 py-1 font-mono text-label uppercase ",
+                    "inline-flex shrink-0 items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-label uppercase ",
                     statusMeta.badgeClassName
                   )}
                 >
@@ -131,10 +131,10 @@ export default function CaseWorkspacePage() {
               </div>
             </div>
 
-            <Button onClick={handleToggleAssistant} className="shrink-0 gap-2">
+            <Button onClick={handleToggleAssistant} className="h-10 shrink-0 gap-2 rounded-full px-5">
               <Sparkles className="h-4 w-4" />
               Ассистент
-              <kbd className="ml-0.5 rounded border border-white/20 bg-surface/10 px-1.5 py-0.5 font-mono text-label text-inverse-fg/70">
+              <kbd className="ml-0.5 rounded-lg border border-inverse-fg/20 bg-inverse-fg/10 px-1.5 py-0.5 font-mono text-label text-inverse-fg/70">
                 ⌘J
               </kbd>
             </Button>
@@ -146,7 +146,13 @@ export default function CaseWorkspacePage() {
             onValueChange={(value) => setActiveTab(value as CaseTab)}
             className="mt-4"
           >
-            <TabsList className="h-auto gap-6 rounded-none border-0 bg-transparent p-0">
+            {/*
+              Вкладки-капсулы — те же, что на лендинге. Подчёркивание заменено
+              заливкой не ради единообразия: у вкладки со счётчиком линия снизу
+              подчёркивала и счётчик тоже, отчего он читался как часть названия.
+              Заливка обводит вкладку целиком и такой двусмысленности не даёт.
+            */}
+            <TabsList className="h-auto w-max gap-1 rounded-full border border-line bg-bg p-1">
               {TABS.map((tab) => {
                 const isActive = activeTab === tab.value;
                 const count = tabCounts[tab.value];
@@ -155,30 +161,31 @@ export default function CaseWorkspacePage() {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="relative gap-2 rounded-none border-b border-transparent bg-transparent px-0 pb-3 pt-0 text-body font-normal text-fg-faint shadow-none transition-colors hover:text-fg data-[state=active]:bg-transparent data-[state=active]:text-fg data-[state=active]:shadow-none"
+                    className="relative h-8 gap-2 rounded-full bg-transparent px-4 text-body font-normal text-fg-subtle shadow-none transition-colors hover:text-fg data-[state=active]:bg-transparent data-[state=active]:text-inverse-fg data-[state=active]:shadow-none"
                   >
-                    {tab.label}
-                    {count !== null && (
-                      <span
-                        className={cn(
-                          "font-mono text-label tabular-nums transition-colors",
-                          isActive ? "text-fg" : "text-fg-ghost"
-                        )}
-                      >
-                        {count}
-                      </span>
-                    )}
-
-                    {/* Подчёркивание переезжает между вкладками */}
+                    {/* Капсула переезжает между вкладками */}
                     {isActive && (
                       <motion.span
-                        layoutId="case-tab-underline"
-                        className="absolute inset-x-0 -bottom-px h-px bg-fg"
+                        layoutId="case-tab-pill"
+                        data-underline
+                        className="absolute inset-0 rounded-full bg-inverse"
                         transition={{
                           duration: 0.28,
                           ease: [0.22, 0.61, 0.36, 1],
                         }}
                       />
+                    )}
+
+                    <span className="relative">{tab.label}</span>
+                    {count !== null && (
+                      <span
+                        className={cn(
+                          "relative font-mono text-label tabular-nums transition-colors",
+                          isActive ? "text-inverse-fg/60" : "text-fg-ghost"
+                        )}
+                      >
+                        {count}
+                      </span>
                     )}
                   </TabsTrigger>
                 );

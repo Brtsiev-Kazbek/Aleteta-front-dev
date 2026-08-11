@@ -101,8 +101,8 @@ export function Pricing() {
         {PLANS.map((plan, index) => (
           <motion.div
             key={plan.id}
-            initial={reduceMotion ? undefined : { opacity: 0, y: 24 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{
               duration: 0.55,

@@ -93,7 +93,7 @@ export function BatchReviewDemo() {
                     : "rgb(231 229 228)"
                   : "rgb(231 229 228)",
               }}
-              className="flex items-center gap-2.5 rounded border px-3 py-2.5"
+              className="flex items-center gap-2.5 rounded-xl border px-3 py-2.5"
             >
               <span className="flex h-5 w-5 shrink-0 items-center justify-center">
                 {isChecked ? (
@@ -126,12 +126,12 @@ export function BatchReviewDemo() {
                     className="flex shrink-0 items-center gap-1.5"
                   >
                     {doc.critical > 0 && (
-                      <span className="rounded border border-danger-line bg-danger-bg px-1.5 py-0.5 font-mono text-label text-danger-fg">
+                      <span className="rounded-full border border-danger-line bg-danger-bg px-1.5 py-0.5 font-mono text-label text-danger-fg">
                         {doc.critical} крит.
                       </span>
                     )}
                     {doc.warning > 0 && (
-                      <span className="rounded border border-warn-line bg-warn-bg px-1.5 py-0.5 font-mono text-label text-warn-fg">
+                      <span className="rounded-full border border-warn-line bg-warn-bg px-1.5 py-0.5 font-mono text-label text-warn-fg">
                         {doc.warning} предупр.
                       </span>
                     )}
@@ -149,7 +149,7 @@ export function BatchReviewDemo() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-auto rounded border border-line bg-bg p-3.5"
+              className="mt-auto rounded-xl border border-line bg-bg p-3.5"
             >
               <div className="flex items-baseline gap-2">
                 <span className="font-mono text-heading tabular-nums text-fg">
@@ -161,11 +161,11 @@ export function BatchReviewDemo() {
               </div>
 
               <div className="mt-2.5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded border border-danger-line bg-danger-bg px-2 py-1 font-mono text-label text-danger-fg">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-line bg-danger-bg px-2 py-1 font-mono text-label text-danger-fg">
                   <AlertCircle className="h-3 w-3" />
                   {totalCritical} критических
                 </span>
-                <span className="inline-flex items-center gap-1.5 rounded border border-warn-line bg-warn-bg px-2 py-1 font-mono text-label text-warn-fg">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-warn-line bg-warn-bg px-2 py-1 font-mono text-label text-warn-fg">
                   <AlertTriangle className="h-3 w-3" />
                   {totalWarning} предупреждений
                 </span>

@@ -30,10 +30,10 @@ export function AuthShell({
       <div className="flex w-full flex-col px-6 py-8 sm:px-10 lg:w-[46%] lg:px-14 lg:py-10">
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="group flex w-fit items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded bg-inverse text-body font-medium text-inverse-fg">
+            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-inverse text-body font-medium text-inverse-fg">
               А
             </span>
-            <span className="text-body font-medium text-fg">
+            <span className="text-body-lg font-medium tracking-tight text-fg">
               Алетейя
             </span>
           </Link>
@@ -59,17 +59,18 @@ export function AuthShell({
 
       {/* Смысловая часть — зачем этот экран */}
       <div className="relative hidden overflow-hidden bg-inverse lg:flex lg:w-[54%]">
+        {/*
+          Свечение берётся из общей заготовки, а не собирается здесь стилем в
+          разметке: своё пятно не совпадало с лендингом ни радиусом, ни
+          оттенком, и вход выглядел похожим, но чужим.
+        */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-grid-dark opacity-60"
+          className="mesh-dark pointer-events-none absolute inset-0 opacity-90"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(38rem 22rem at 30% 10%, rgba(139,92,246,0.18), transparent 62%)",
-          }}
+          className="pointer-events-none absolute inset-0 bg-grid-dark opacity-50"
         />
         {/* Мягкое затемнение к низу: список не «висит» в пустоте. */}
         <div
@@ -78,27 +79,24 @@ export function AuthShell({
         />
 
         <div className="relative flex w-full flex-col justify-center px-14 xl:px-20">
-          <span className="flex items-center gap-2.5">
-            <span aria-hidden className="h-px w-6 bg-brand" />
-            <span className="font-mono text-label uppercase text-fg-subtle">
-              {eyebrow}
-            </span>
+          <span className="font-mono text-label uppercase text-brand-line/70">
+            {eyebrow}
           </span>
 
-          <h2 className="mt-6 max-w-lg text-display font-medium leading-[1.15] text-inverse-fg xl:text-display">
+          <h2 className="mt-5 max-w-lg text-display font-medium leading-[1.15] text-inverse-fg">
             {heading}
           </h2>
 
-          <ul className="mt-12 flex max-w-lg flex-col divide-y divide-inverse-line/80 border-y border-inverse-line/80">
+          <ul className="mt-10 flex max-w-lg flex-col gap-2">
             {points.map((item, index) => (
               <li
                 key={item}
-                className="group flex items-baseline gap-5 py-4 transition-colors"
+                className="glass flex items-baseline gap-4 rounded-2xl px-5 py-3.5"
               >
-                <span className="shrink-0 font-mono text-label tabular-nums text-fg-soft transition-colors group-hover:text-brand">
+                <span className="shrink-0 font-mono text-label tabular-nums text-brand-line/70">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="text-body leading-relaxed text-fg-faint transition-colors group-hover:text-inverse-fg">
+                <span className="text-body leading-relaxed text-inverse-fg/70">
                   {item}
                 </span>
               </li>
@@ -106,7 +104,7 @@ export function AuthShell({
           </ul>
 
           {footnote && (
-            <p className="mt-8 max-w-md text-body leading-relaxed text-fg-subtle">
+            <p className="mt-8 max-w-md text-body leading-relaxed text-inverse-fg/40">
               {footnote}
             </p>
           )}

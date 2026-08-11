@@ -190,8 +190,9 @@ report(
 
 const casePage = await source("app/cases/[id]/page.tsx");
 report(
-  casePage.includes('layoutId="case-tab-underline"'),
-  "подчёркивание вкладок дела на месте",
+  casePage.includes('layoutId="case-tab-pill"') &&
+    casePage.includes("data-underline"),
+  "капсула вкладок дела на месте",
   "единственная анимация общего макета во всём проекте"
 );
 
@@ -207,6 +208,30 @@ report(
   textarea.includes("style.height"),
   "автовысота поля ввода на месте",
   "правка style.height — единственное, что растит его под текст"
+);
+
+/*
+ * Уважение к «уменьшить движение» не оставляет экран пустым.
+ *
+ * Из-за чего страж. Приём `initial={reduceMotion ? undefined : { opacity: 0 }}`
+ * выглядит правильным и им не является. Первый клиентский рендер проходит,
+ * когда хук ещё не ответил, — прозрачность выставляется в ноль; на втором
+ * рендере пропсов уже нет, анимировать нечего, и элемент навсегда остаётся
+ * невидимым. У человека с включённым «уменьшить движение» шапка рабочего стола
+ * была пустым тёмным полем.
+ *
+ * Правильно — `initial={reduceMotion ? false : …}`: `false` означает «начать
+ * сразу с конечных значений». Движения нет, содержимое на месте.
+ */
+const motionFiles = await Promise.all(
+  ["components/dashboard/DashboardHero.tsx", "components/landing/Pricing.tsx"].map(
+    (file) => source(file)
+  )
+);
+report(
+  motionFiles.every((file) => !file.includes("initial={reduceMotion ? undefined")),
+  "«уменьшить движение» не прячет содержимое",
+  "initial={reduceMotion ? undefined} оставляет прозрачность в нуле навсегда — нужен false"
 );
 
 /*

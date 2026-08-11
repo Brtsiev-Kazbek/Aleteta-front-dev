@@ -117,7 +117,7 @@ export function CustomTypeDemo() {
         {/* Название типа */}
         <span className="text-label text-fg-faint">Название типа</span>
 
-        <div className="mt-1.5 flex h-10 items-center rounded border border-line-strong px-3">
+        <div className="mt-1.5 flex h-10 items-center rounded-xl border border-line-strong px-3">
           <span className="text-body text-fg">{typedName}</span>
           {typedName.length < preset.name.length && (
             <motion.span
@@ -146,7 +146,7 @@ export function CustomTypeDemo() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="flex items-center gap-2.5 rounded border border-line px-3 py-2.5"
+                className="flex items-center gap-2.5 rounded-xl border border-line px-3 py-2.5"
               >
                 <span className="min-w-0 flex-1 truncate text-caption text-fg">
                   {field.label}
@@ -154,7 +154,7 @@ export function CustomTypeDemo() {
 
                 <span
                   className={cn(
-                    "shrink-0 rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
+                    "shrink-0 rounded-full border px-1.5 py-0.5 font-mono text-label uppercase ",
                     field.required
                       ? "border-line-strong bg-surface-2 text-fg-soft"
                       : "border-line text-fg-ghost"
@@ -167,7 +167,7 @@ export function CustomTypeDemo() {
           </AnimatePresence>
 
           {visibleFields < preset.fields.length && (
-            <div className="flex items-center gap-2 rounded border border-dashed border-line px-3 py-2.5">
+            <div className="flex items-center gap-2 rounded-xl border border-dashed border-line px-3 py-2.5">
               <Plus className="h-3 w-3 text-fg-ghost" />
               <span className="text-caption text-fg-ghost">Добавить реквизит</span>
             </div>

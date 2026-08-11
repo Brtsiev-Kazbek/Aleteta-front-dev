@@ -12,10 +12,17 @@ interface PanelHeadingProps {
 }
 
 /**
- * Рубрика экрана приложения набирается тем же приёмом, что и первый экран
- * лендинга: волосяная линия, моноширинная метка, крупный заголовок с плотным
- * трекингом. Плашка с заливкой уместна в маркетинге, но на рабочем экране
- * она перетягивает внимание с содержимого.
+ * Рубрика экрана приложения — та же, что над разделами лендинга: моноширинная
+ * метка фирменным цветом, под ней крупный заголовок с плотным трекингом.
+ *
+ * Волосяная линия перед меткой убрана. На лендинге её нет, и держалась она на
+ * одном соображении — «чтобы метка не висела в воздухе»; на деле метка,
+ * набранная цветом, стоит сама, а линия добавляла экрану ещё одну горизонталь
+ * там, где их и так хватает.
+ *
+ * Заголовок остаётся выключенным влево и того же кегля: рабочий экран человек
+ * открывает по сорок раз в день, и заголовок во весь кадр здесь был бы
+ * издевательством. Одинаковый язык — не одинаковый размер.
  */
 export function PanelHeading({
   eyebrow,
@@ -29,14 +36,11 @@ export function PanelHeading({
       className={cn("flex flex-wrap items-end justify-between gap-4", className)}
     >
       <div className="flex min-w-0 flex-col">
-        <span className="flex items-center gap-2.5">
-          <span aria-hidden className="h-px w-6 bg-brand" />
-          <span className="font-mono text-label uppercase text-fg-faint">
-            {eyebrow}
-          </span>
+        <span className="font-mono text-label uppercase text-brand">
+          {eyebrow}
         </span>
 
-        <h1 className="mt-5 max-w-2xl text-heading font-medium leading-[1.12] text-fg">
+        <h1 className="mt-4 max-w-2xl text-heading font-medium leading-[1.12] text-fg">
           {title}
         </h1>
 

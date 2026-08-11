@@ -94,7 +94,7 @@ export function BatchReviewSheet() {
                 <div
                   key={item.id}
                   className={cn(
-                    "flex items-center gap-2.5 rounded border px-3 py-2.5 transition-colors",
+                    "flex items-center gap-2.5 rounded-xl border px-3 py-2.5 transition-colors",
                     hasCritical ? "border-danger-line" : "border-line"
                   )}
                 >
@@ -132,12 +132,12 @@ export function BatchReviewSheet() {
                         className="flex shrink-0 items-center gap-1.5"
                       >
                         {result.critical > 0 && (
-                          <span className="rounded border border-danger-line px-1.5 py-0.5 font-mono text-label text-danger-fg">
+                          <span className="rounded-full border border-danger-line px-1.5 py-0.5 font-mono text-label text-danger-fg">
                             {result.critical} крит.
                           </span>
                         )}
                         {result.warning > 0 && (
-                          <span className="rounded border border-warn-line px-1.5 py-0.5 font-mono text-label text-warn-fg">
+                          <span className="rounded-full border border-warn-line px-1.5 py-0.5 font-mono text-label text-warn-fg">
                             {result.warning} предупр.
                           </span>
                         )}
@@ -173,7 +173,7 @@ export function BatchReviewSheet() {
                 </div>
 
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded border border-danger-line px-2 py-1 font-mono text-label text-danger-fg">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-line px-2 py-1 font-mono text-label text-danger-fg">
                     <AlertCircle className="h-3 w-3" />
                     {totals.critical}{" "}
                     {plural(
@@ -183,7 +183,7 @@ export function BatchReviewSheet() {
                       "критических"
                     )}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded border border-warn-line px-2 py-1 font-mono text-label text-warn-fg">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-warn-line px-2 py-1 font-mono text-label text-warn-fg">
                     <AlertTriangle className="h-3 w-3" />
                     {totals.warning}{" "}
                     {plural(

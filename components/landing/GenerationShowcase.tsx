@@ -107,7 +107,7 @@ export function GenerationShowcase() {
                         : "rgb(109 40 217)",
                   }}
                   transition={{ duration: 0.4, delay: index * 0.08 }}
-                  className="flex items-center gap-2.5 rounded border bg-fg/60 px-3 py-2.5"
+                  className="flex items-center gap-2.5 rounded-xl border bg-fg/60 px-3 py-2.5"
                 >
                   <FileText className="h-3.5 w-3.5 shrink-0 text-fg-soft" />
                   <span className="min-w-0 flex-1 truncate text-caption text-fg-ghost">
@@ -131,7 +131,7 @@ export function GenerationShowcase() {
                       : { backgroundColor: "rgb(5 150 105)", color: "rgb(255 255 255)" }
                 }
                 transition={{ duration: 0.35 }}
-                className="flex items-center justify-center gap-2 rounded-md px-5 py-3 text-body font-medium"
+                className="flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-body font-medium"
               >
                 {phase === "done" ? (
                   <Check className="h-4 w-4" strokeWidth={3} />
@@ -151,7 +151,7 @@ export function GenerationShowcase() {
                   initial={{ opacity: 0.6, scale: 1 }}
                   animate={{ opacity: 0, scale: 1.15 }}
                   transition={{ duration: 1.4, repeat: Infinity }}
-                  className="absolute inset-0 rounded-md bg-surface"
+                  className="absolute inset-0 rounded-lg bg-surface"
                 />
               )}
             </div>
@@ -202,7 +202,7 @@ export function GenerationShowcase() {
                     initial={{ opacity: 0, x: 8 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0 }}
-                    className="inline-flex items-center gap-1.5 rounded border border-inverse-line px-2.5 py-1 font-mono text-label uppercase text-fg-ghost"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-inverse-line px-2.5 py-1 font-mono text-label uppercase text-fg-ghost"
                   >
                     <Download className="h-3 w-3" />
                     Скачать .zip
@@ -226,7 +226,7 @@ export function GenerationShowcase() {
                         : "rgb(28 25 23)",
                     }}
                     transition={{ duration: 0.3 }}
-                    className="flex items-center gap-2.5 rounded border bg-fg/50 px-3 py-2.5"
+                    className="flex items-center gap-2.5 rounded-xl border bg-fg/50 px-3 py-2.5"
                   >
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center">
                       {isReady ? (

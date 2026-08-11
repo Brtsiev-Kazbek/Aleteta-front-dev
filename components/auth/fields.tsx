@@ -21,7 +21,7 @@ import { measurePassword } from "@/lib/auth/validation";
  * ходить по форме надо не глядя.
  */
 const FIELD_CLASSES =
-  "h-11 rounded-md transition-shadow focus-visible:border-fg focus-visible:ring-4 focus-visible:ring-fg/5";
+  "h-11 rounded-xl transition-shadow focus-visible:border-fg focus-visible:ring-4 focus-visible:ring-fg/5";
 
 const FIELD_ERROR_CLASSES =
   "border-danger-line focus-visible:border-danger focus-visible:ring-danger/10";
@@ -136,7 +136,7 @@ export function PasswordField({
         <button
           type="button"
           onClick={() => setVisible((current) => !current)}
-          className="absolute inset-y-1 right-1 flex w-9 items-center justify-center rounded text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
+          className="absolute inset-y-1 right-1 flex w-9 items-center justify-center rounded-lg text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
           aria-label={isVisible ? "Скрыть пароль" : "Показать пароль"}
         >
           {isVisible ? (
@@ -216,14 +216,11 @@ export function FormHeading({
 }) {
   return (
     <div className="flex flex-col">
-      <span className="flex items-center gap-2.5">
-        <span aria-hidden className="h-px w-6 bg-brand" />
-        <span className="font-mono text-label uppercase text-fg-faint">
-          {eyebrow}
-        </span>
+      <span className="font-mono text-label uppercase text-brand">
+        {eyebrow}
       </span>
 
-      <h1 className="mt-5 text-heading font-medium leading-[1.12] text-fg">
+      <h1 className="mt-4 text-heading font-medium leading-[1.12] text-fg">
         {title}
       </h1>
 

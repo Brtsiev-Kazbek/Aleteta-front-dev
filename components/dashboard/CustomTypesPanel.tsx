@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { MetaLabel } from "@/components/layout/PanelHeading";
+import { Panel } from "@/components/layout/Panel";
 import { CustomSchemaDialog } from "@/components/workspace/CustomSchemaDialog";
 import { plural } from "@/lib/utils";
 import { useAppStore } from "@/store/useAppStore";
@@ -27,35 +27,31 @@ export function CustomTypesPanel() {
   const ownSchemas = allSchemas.filter((schema) => schema.isCustom);
 
   return (
-    <section>
-      <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3">
-        <h2 className="text-body font-medium text-fg">
-          Свои типы объектов
-        </h2>
-
-        <div className="flex items-center gap-4">
-          <MetaLabel>Доступны во всех делах</MetaLabel>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5"
-            onClick={() => setCustomSchemaOpen(true)}
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Создать тип
-          </Button>
-        </div>
-      </div>
-
+    <Panel
+      title="Свои типы объектов"
+      meta="Доступны во всех делах"
+      bodyClassName="px-5 py-2"
+      action={
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          onClick={() => setCustomSchemaOpen(true)}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Создать тип
+        </Button>
+      }
+    >
       {ownSchemas.length === 0 ? (
-        <p className="py-6 text-body leading-relaxed text-fg-subtle">
+        <p className="py-4 text-body leading-relaxed text-fg-subtle">
           Пока ни одного своего типа. Опишите то, с чем работаете именно вы —
           транспорт, оборудование, объекты аренды, студенческие работы: набор
           реквизитов станет колонками таблицы и будет проверяться перед
           генерацией.
         </p>
       ) : (
-        <ul className="flex flex-col divide-y divide-line">
+        <ul className="flex flex-col divide-y divide-line-soft">
           <AnimatePresence initial={false}>
             {ownSchemas.map((schema) => {
               const usage = entities.filter(
@@ -102,7 +98,7 @@ export function CustomTypesPanel() {
                     {schema.fields.slice(0, 4).map((field) => (
                       <span
                         key={field.key}
-                        className="rounded border border-line px-1.5 py-0.5 font-mono text-label uppercase text-fg-subtle"
+                        className="rounded-full border border-line bg-bg px-2 py-0.5 font-mono text-label uppercase text-fg-subtle"
                       >
                         {field.label}
                       </span>
@@ -131,6 +127,6 @@ export function CustomTypesPanel() {
       )}
 
       <CustomSchemaDialog />
-    </section>
+    </Panel>
   );
 }

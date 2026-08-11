@@ -142,7 +142,7 @@ export function CaseLawDemo() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.22 }}
-            className="rounded border-l-2 border-brand bg-bg py-2.5 pl-3 pr-3"
+            className="rounded-xl border-l-2 border-brand bg-bg py-2.5 pl-3 pr-3"
           >
             <span className="font-mono text-label text-fg-faint">
               п. {scenario.clause}
@@ -182,7 +182,7 @@ export function CaseLawDemo() {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.28 }}
-                  className="rounded border border-line p-3"
+                  className="rounded-xl border border-line p-3"
                 >
                   <div className="flex items-start gap-2">
                     <Gavel className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-faint" />
@@ -197,7 +197,7 @@ export function CaseLawDemo() {
                         </span>
                         <span
                           className={cn(
-                            "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
+                            "rounded-full border px-1.5 py-0.5 font-mono text-label uppercase ",
                             precedent.side === "против"
                               ? "border-danger-line bg-danger-bg text-danger-fg"
                               : "border-ok-line bg-ok-bg text-ok-fg"

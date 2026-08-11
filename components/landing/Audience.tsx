@@ -171,8 +171,8 @@ export function Audience() {
       <AnimatePresence mode="wait">
         <motion.div
           key={active.id}
-          initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
           exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
           transition={{ duration: 0.28 }}
           className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-12"

@@ -96,7 +96,7 @@ export function Sidebar() {
       initial={false}
       animate={{ width: isExpanded ? 232 : 68 }}
       transition={{ duration: 0.24, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className="flex h-screen shrink-0 flex-col overflow-hidden border-r border-line bg-surface"
+      className="flex h-screen shrink-0 flex-col overflow-hidden border-r border-line bg-bg"
     >
       {/* Логотип */}
       <div
@@ -110,7 +110,7 @@ export function Sidebar() {
           className="group flex min-w-0 items-center gap-2.5"
           aria-label="На главную"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-inverse text-body font-medium text-inverse-fg">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-inverse text-body font-medium text-inverse-fg">
             А
           </span>
 
@@ -177,22 +177,25 @@ export function Sidebar() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex h-9 items-center rounded-md transition-colors",
+                  /*
+                   * Выбранный пункт — залитая плашка со своим краем, а не
+                   * волосок у левой кромки. Волосок читался только когда меню
+                   * развёрнуто: в свёрнутом виде он упирался в границу панели и
+                   * пропадал, и понять, где ты находишься, было нельзя.
+                   */
+                  "relative flex h-9 items-center rounded-xl transition-colors",
                   isExpanded ? "w-full gap-3 px-3" : "w-9 justify-center",
                   active
-                    ? "bg-surface-2 text-fg"
-                    : "text-fg-faint hover:bg-bg hover:text-fg"
+                    ? "bg-surface text-fg shadow-[0_1px_2px_rgb(var(--fg)/0.06)] ring-1 ring-line"
+                    : "text-fg-faint hover:bg-surface hover:text-fg"
                 )}
               >
-                {/* Активный пункт помечен волосяной линией, а не заливкой цветом */}
-                {active && (
-                  <span
-                    aria-hidden
-                    className="absolute left-0 top-1/2 h-4 w-px -translate-y-1/2 bg-brand"
-                  />
-                )}
-
-                <item.icon className="h-4 w-4 shrink-0" />
+                <item.icon
+                  className={cn(
+                    "h-4 w-4 shrink-0",
+                    active && "text-brand"
+                  )}
+                />
 
                 {isExpanded ? (
                   <span className="truncate text-body">{item.label}</span>
@@ -219,7 +222,7 @@ export function Sidebar() {
           {/* Ведёт в настройки: это единственное место, где профиль правится. */}
           <Link
             href="/dashboard/settings"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line text-label font-medium text-fg-soft transition-colors hover:border-line-strong hover:text-fg"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-label font-medium text-fg-soft transition-colors hover:border-line-strong hover:text-fg"
           >
             {initials || "А"}
             <span className="sr-only">Профиль пользователя</span>

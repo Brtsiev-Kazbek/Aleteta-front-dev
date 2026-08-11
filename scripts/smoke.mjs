@@ -119,15 +119,17 @@ check("ячейка открывается на правку и сохраняе
 });
 
 /**
- * Подчёркивание вкладок дела.
+ * Капсула вкладок дела.
  *
  * Единственный элемент во всём проекте, анимируемый через `layoutId`. Он
- * зависит от `relative` у кнопки вкладки и `absolute inset-x-0 -bottom-px` у
- * самой полоски; потеря любого из двух отправляет подчёркивание в угол экрана,
- * и это ровно тот случай, когда вёрстка «выглядит нормально» на статичном
- * снимке.
+ * зависит от `relative` у кнопки вкладки и `absolute inset-0` у самой капсулы;
+ * потеря любого из двух отправляет её в угол экрана, и это ровно тот случай,
+ * когда вёрстка «выглядит нормально» на статичном снимке.
+ *
+ * Ищем по `data-underline`: имя осталось прежним нарочно — привязка проверки к
+ * классу оформления ломала бы её при каждой смене вида.
  */
-check("подчёркивание переезжает к выбранной вкладке", async (page) => {
+check("капсула переезжает к выбранной вкладке", async (page) => {
   await page.goto(`${BASE}/cases/case-1`, { waitUntil: "networkidle" });
 
   const tabs = page.getByRole("tab");
@@ -136,20 +138,20 @@ check("подчёркивание переезжает к выбранной в�
 
   await first.click();
   await page.waitForTimeout(400);
-  const underline = page.locator('[data-underline], [class*="bottom-px"]').first();
+  const underline = page.locator("[data-underline]").first();
 
   await last.click();
   await page.waitForTimeout(500);
 
   const tabBox = await last.boundingBox();
   const lineBox = await underline.boundingBox().catch(() => null);
-  assert(lineBox, "полоска подчёркивания не нашлась");
+  assert(lineBox, "капсула вкладки не нашлась");
   assert(tabBox, "вкладка не нашлась");
 
   const offset = Math.abs(lineBox.x - tabBox.x);
   assert(
     offset < 24,
-    `подчёркивание в ${Math.round(offset)}px от вкладки — layoutId сломан`
+    `капсула в ${Math.round(offset)}px от вкладки — layoutId сломан`
   );
 });
 

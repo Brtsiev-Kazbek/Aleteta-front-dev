@@ -68,7 +68,7 @@ export function CaseSelectionBar() {
             transition={{ duration: 0.22, ease: "easeOut" }}
             className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2"
           >
-            <div className="shadow-panel flex items-center gap-3 rounded-lg border border-line bg-surface/95 px-4 py-3 backdrop-blur">
+            <div className="shadow-panel flex items-center gap-3 rounded-full border border-line bg-surface/95 px-3 py-2 backdrop-blur">
               <FolderKanban className="h-3.5 w-3.5 shrink-0 text-fg-faint" />
 
               <span className="whitespace-nowrap font-mono text-label uppercase text-fg-subtle">
@@ -153,7 +153,7 @@ export function CaseSelectionBar() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.24, delay: index * 0.06 }}
-                        className="flex items-center gap-3 rounded border border-line px-3 py-2.5"
+                        className="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5"
                       >
                         <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
 
@@ -210,7 +210,7 @@ export function CaseSelectionBar() {
                             <label
                               key={item.id}
                               className={cn(
-                                "flex cursor-pointer items-center gap-2.5 rounded border px-3 py-2 transition-colors",
+                                "flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 transition-colors",
                                 isPicked
                                   ? "border-fg bg-bg"
                                   : "border-line hover:border-line-strong"
@@ -243,7 +243,7 @@ export function CaseSelectionBar() {
 
                       <div
                         className={cn(
-                          "rounded-md border bg-surface p-3 transition-colors",
+                          "rounded-xl border bg-surface p-3 transition-colors",
                           prompt.trim() ? "border-fg" : "border-line"
                         )}
                       >
@@ -267,7 +267,7 @@ export function CaseSelectionBar() {
                             key={item}
                             type="button"
                             onClick={() => setPrompt(item)}
-                            className="rounded border border-line px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-fg hover:text-fg"
+                            className="rounded-lg border border-line px-2.5 py-1.5 text-caption text-fg-soft transition-colors hover:border-line-strong hover:text-fg"
                           >
                             {item}
                           </button>

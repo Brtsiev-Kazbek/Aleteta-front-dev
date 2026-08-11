@@ -84,7 +84,7 @@ export function BulkDemo() {
                     ? "rgb(79 70 229)"
                     : "rgb(212 212 216)",
                 }}
-                className="flex h-4 w-4 shrink-0 items-center justify-center rounded border"
+                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-md border"
               >
                 {isChecked && (
                   <motion.span
@@ -103,7 +103,7 @@ export function BulkDemo() {
                 {item.title}
               </span>
 
-              <span className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-label text-fg-subtle">
+              <span className="shrink-0 rounded-md border border-line bg-surface px-1.5 py-0.5 text-label text-fg-subtle">
                 {item.status}
               </span>
 
@@ -114,7 +114,7 @@ export function BulkDemo() {
                     initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.12 }}
-                    className="flex shrink-0 items-center gap-1 rounded border border-ok-line bg-ok-bg px-1.5 py-0.5 text-label font-medium text-ok-fg"
+                    className="flex shrink-0 items-center gap-1 rounded-md border border-ok-line bg-ok-bg px-1.5 py-0.5 text-label font-medium text-ok-fg"
                   >
                     <FileText className="h-2.5 w-2.5" />
                     +1

@@ -30,7 +30,7 @@ export function SyncStatus() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.18 }}
-            className="flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-1.5 shadow-sm"
+            className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 shadow-sm"
           >
             <Loader2 className="h-3 w-3 animate-spin text-fg-faint" />
             <span className="font-mono text-label uppercase text-fg-subtle">
@@ -47,7 +47,7 @@ export function SyncStatus() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.18 }}
-            className="pointer-events-auto flex max-w-lg items-start gap-2.5 rounded-md border border-danger-line bg-surface py-2.5 pl-3 pr-2 shadow-sm"
+            className="pointer-events-auto flex max-w-lg items-start gap-2.5 rounded-lg border border-danger-line bg-surface py-2.5 pl-3 pr-2 shadow-sm"
           >
             <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-danger-fg" />
             <span className="text-body leading-relaxed text-fg-muted">
@@ -56,7 +56,7 @@ export function SyncStatus() {
             <button
               type="button"
               onClick={dismiss}
-              className="ml-1 shrink-0 rounded p-1 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
+              className="ml-1 shrink-0 rounded-xl p-1 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
               aria-label="Скрыть сообщение"
             >
               <X className="h-3.5 w-3.5" />

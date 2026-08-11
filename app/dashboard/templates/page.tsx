@@ -2,6 +2,7 @@ import { FileText, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CustomTypesPanel } from "@/components/dashboard/CustomTypesPanel";
+import { Panel } from "@/components/layout/Panel";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { PanelHeading } from "@/components/layout/PanelHeading";
 import { StoreBootstrap } from "@/components/layout/StoreBootstrap";
@@ -34,7 +35,7 @@ export default async function TemplatesPage() {
         <div className="mx-auto max-w-6xl px-8 py-12">
           <PanelHeading
             eyebrow="Шаблоны"
-            title="Формы, которые подставляются автоматически"
+            title="Формы, по которым собираются документы"
             description={`${total} ${plural(
               total,
               "шаблон",
@@ -49,45 +50,40 @@ export default async function TemplatesPage() {
             }
           />
 
-          <div className="mt-10 flex flex-col gap-10">
+          <div className="mt-10 flex flex-col gap-4">
             {/* Общие пользовательские типы — их заводят с рабочего стола */}
             <CustomTypesPanel />
 
             {BUILTIN_SCHEMAS.map((schema) => (
-              <section key={schema.id}>
-                <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3">
-                  <h2 className="text-body font-medium text-fg">
-                    {schema.label}
-                  </h2>
-                  <span className="font-mono text-label uppercase text-fg-faint">
-                    {schema.templates.length}{" "}
-                    {plural(
-                      schema.templates.length,
-                      "шаблон",
-                      "шаблона",
-                      "шаблонов"
-                    )}{" "}
-                    · {schema.hint}
-                  </span>
-                </div>
-
-                <ul className="flex flex-col divide-y divide-line">
+              <Panel
+                key={schema.id}
+                title={schema.label}
+                meta={`${schema.templates.length} ${plural(
+                  schema.templates.length,
+                  "шаблон",
+                  "шаблона",
+                  "шаблонов"
+                )} · ${schema.hint}`}
+                bodyClassName="p-2"
+              >
+                <ul className="flex flex-col">
                   {schema.templates.map((template) => (
-                    <li
-                      key={template}
-                      className="flex items-center gap-3 py-3.5"
-                    >
-                      <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
-                      <span className="min-w-0 flex-1 truncate text-body text-fg">
-                        {template}
-                      </span>
-                      <span className="shrink-0 font-mono text-label uppercase text-fg-faint">
-                        docx
-                      </span>
+                    <li key={template}>
+                      <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-bg">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg text-fg-faint">
+                          <FileText className="h-3.5 w-3.5" />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-body text-fg">
+                          {template}
+                        </span>
+                        <span className="shrink-0 rounded-full border border-line px-2 py-0.5 font-mono text-label uppercase text-fg-faint">
+                          docx
+                        </span>
+                      </div>
                     </li>
                   ))}
                 </ul>
-              </section>
+              </Panel>
             ))}
           </div>
         </div>

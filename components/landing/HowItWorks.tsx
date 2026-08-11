@@ -53,8 +53,8 @@ export function HowItWorks() {
         {STEPS.map((step, index) => (
           <motion.article
             key={step.title}
-            initial={reduceMotion ? undefined : { opacity: 0, y: 24 }}
-            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{
               duration: 0.55,
@@ -157,7 +157,7 @@ function ExtractScene() {
               className={
                 field.sure
                   ? "truncate text-body-sm text-fg"
-                  : "truncate rounded bg-warn-bg px-1.5 py-0.5 text-body-sm text-warn-fg"
+                  : "truncate rounded-md bg-warn-bg px-1.5 py-0.5 text-body-sm text-warn-fg"
               }
             >
               {field.value}

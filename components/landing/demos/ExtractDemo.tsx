@@ -126,7 +126,7 @@ export function ExtractDemo() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.22 }}
-            className="mt-3 flex items-center gap-2.5 rounded border border-line px-3 py-2.5"
+            className="mt-3 flex items-center gap-2.5 rounded-xl border border-line px-3 py-2.5"
           >
             <FileText className="h-4 w-4 shrink-0 text-fg-faint" />
             <span className="min-w-0 flex-1 truncate text-caption text-fg-muted">
@@ -210,7 +210,7 @@ export function ExtractDemo() {
                     repeat: Infinity,
                     delay: index * 0.15,
                   }}
-                  className="h-[42px] rounded border border-line bg-surface"
+                  className="h-[42px] rounded-xl border border-line bg-surface"
                 />
               );
             }
@@ -221,7 +221,7 @@ export function ExtractDemo() {
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.28 }}
-                className="flex items-center justify-between gap-3 rounded border border-line bg-surface px-3 py-2.5"
+                className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface px-3 py-2.5"
               >
                 <span className="shrink-0 text-label text-fg-faint">
                   {field.label}

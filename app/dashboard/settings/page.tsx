@@ -80,7 +80,7 @@ export default async function SettingsPage() {
           <PanelHeading
             eyebrow="Настройки"
             title="Профиль и реквизиты организации"
-            description="Эти значения подставляются в документы вместо ручного ввода."
+            description="Эти значения используются в документах вместо ручного ввода."
           />
 
           {/*
@@ -93,12 +93,12 @@ export default async function SettingsPage() {
               aria-label="Разделы настроек"
               className="mb-10 hidden lg:sticky lg:top-0 lg:mb-0 lg:block lg:self-start"
             >
-              <ul className="flex flex-col border-l border-line">
+              <ul className="flex flex-col gap-0.5">
                 {SECTION_LINKS.map((link) => (
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="-ml-px block border-l border-transparent py-2 pl-4 font-mono text-label uppercase text-fg-faint transition-colors hover:border-fg hover:text-fg"
+                      className="block rounded-lg px-3 py-2 font-mono text-label uppercase text-fg-faint transition-colors hover:bg-surface hover:text-fg"
                     >
                       {link.label}
                     </a>
@@ -107,7 +107,7 @@ export default async function SettingsPage() {
               </ul>
             </nav>
 
-            <div className="flex min-w-0 flex-col gap-14">
+            <div className="flex min-w-0 flex-col gap-4">
               <SettingsSection
                 id="profile"
                 icon={UserRound}
@@ -202,7 +202,7 @@ export default async function SettingsPage() {
                   </span>
                   <button
                     type="submit"
-                    className="shrink-0 border-b border-line-strong pb-0.5 text-body text-fg-muted transition-colors hover:border-fg hover:text-fg"
+                    className="shrink-0 rounded-lg border border-line bg-bg px-3 py-1.5 text-body text-fg-muted transition-colors hover:border-line-strong hover:text-fg"
                   >
                     Выйти
                   </button>

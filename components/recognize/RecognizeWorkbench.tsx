@@ -540,7 +540,7 @@ function StepButton({
       title={title}
       onClick={onClick}
       disabled={disabled}
-      className="rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg disabled:pointer-events-none disabled:opacity-30"
+      className="rounded-xl p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg disabled:pointer-events-none disabled:opacity-30"
     >
       {children}
       <span className="sr-only">{title}</span>
@@ -1262,7 +1262,7 @@ function TextPane({
                * ответила отказом. Прочитать её больше негде — исполнитель
                * работает на другой машине.
                */
-              <div className="m-5 flex flex-col gap-2 rounded border border-danger-line bg-danger-bg/60 p-3.5">
+              <div className="m-5 flex flex-col gap-2 rounded-xl border border-danger-line bg-danger-bg/60 p-3.5">
                 <p className="flex items-start gap-2 text-caption font-medium leading-relaxed text-danger-fg">
                   <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                   Распознать не удалось
@@ -1321,7 +1321,7 @@ function TextPane({
 
                       <span
                         className={cn(
-                          "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
+                          "rounded-full border px-1.5 py-0.5 font-mono text-label uppercase ",
                           page.source === "embedded"
                             ? "border-line text-fg-faint"
                             : "border-brand-line bg-brand-soft/60 text-brand-strong"
@@ -1435,7 +1435,7 @@ function IconButton({
       title={title}
       onClick={onClick}
       className={cn(
-        "rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg",
+        "rounded-xl p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg",
         className
       )}
     >

@@ -35,7 +35,7 @@ export function DocsShell({
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-6">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded bg-inverse text-body font-medium text-inverse-fg">
+              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-inverse text-body font-medium text-inverse-fg">
                 А
               </span>
               <span className="text-body font-medium text-fg">

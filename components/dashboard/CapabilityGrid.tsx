@@ -3,7 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  Boxes,
+  FileSearch,
+  Gavel,
+  Layers,
+  MessageSquareText,
+  ScanText,
+  ShieldCheck,
+  Table2,
+  Wand2,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import {
   Dialog,
@@ -42,6 +54,12 @@ type CapabilityId =
 
 interface Capability {
   id: CapabilityId;
+  /*
+   * Иконка не украшение: девять карточек одинакового веса читаются как
+   * таблица, и глаз ищет нужную построчно. Значок даёт каждой опознавательный
+   * знак, по которому её находят со второго раза не читая.
+   */
+  icon: LucideIcon;
   title: string;
   note: string;
   /** Подпись действия — она же объясняет, что произойдёт по нажатию. */
@@ -63,30 +81,35 @@ const GROUPS: CapabilityGroup[] = [
     items: [
       {
         id: "matrix",
+        icon: Table2,
         title: "Матрица генерации",
         note: "Объекты дела в таблице, реквизиты проверяются до генерации",
         action: "Выбрать дело",
       },
       {
         id: "freeform",
+        icon: Wand2,
         title: "Любой документ",
         note: "Опишите словами — форма подберётся или документ напишется с нуля",
         action: "Описать документ",
       },
       {
         id: "extract",
+        icon: ScanText,
         title: "Разбор документов",
         note: "Реквизиты из PDF, DOCX и сканов переносятся в карточку объекта",
         action: "Загрузить файл",
       },
       {
         id: "custom",
+        icon: Boxes,
         title: "Свои типы объектов",
         note: "Общий тип с произвольными реквизитами — доступен во всех делах",
         action: "Создать тип",
       },
       {
         id: "bulk",
+        icon: Layers,
         title: "Работа по нескольким делам",
         note: "Один запрос — документ в каждом отмеченном деле",
         action: "Отметить дела",
@@ -98,24 +121,28 @@ const GROUPS: CapabilityGroup[] = [
     items: [
       {
         id: "review",
+        icon: FileSearch,
         title: "Разбор договора",
         note: "Замечания по пунктам с готовыми формулировками правок",
         action: "Загрузить договор",
       },
       {
         id: "caselaw",
+        icon: Gavel,
         title: "Судебная практика по пункту",
         note: "Позиции судов по спорному условию с номерами дел",
         action: "Посмотреть практику",
       },
       {
         id: "batch-review",
+        icon: ShieldCheck,
         title: "Проверка пачкой",
         note: "Несколько документов за один раз, опасное — наверх",
         action: "Выбрать дело",
       },
       {
         id: "assistant",
+        icon: MessageSquareText,
         title: "Ассистент по делу",
         note: "Ответы по материалам со ссылкой на пункт и страницу",
         action: "Выбрать дело",
@@ -266,7 +293,7 @@ export function CapabilityGrid() {
                 </span>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-px border border-line bg-surface-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {group.items.map((item, index) => (
                   <motion.button
                     key={item.id}
@@ -280,37 +307,38 @@ export function CapabilityGrid() {
                       ease: [0.22, 0.61, 0.36, 1],
                     }}
                     className={cn(
-                      "group relative flex flex-col items-start overflow-hidden bg-surface p-5 text-left",
-                      "transition-colors duration-300 hover:bg-bg",
-                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
+                      /*
+                       * Карточки разнесены промежутком, а не сложены в
+                       * бесшовное полотно на `gap-px`. Полотно читалось как
+                       * таблица — то есть как перечень, который нужно прочесть
+                       * целиком; отдельные карточки читаются как девять
+                       * кнопок, из которых выбирают одну.
+                       */
+                      "group flex flex-col items-start rounded-2xl border border-line bg-surface p-5 text-left",
+                      "transition-all duration-300 hover:border-line-strong hover:shadow-card",
+                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
                     )}
                   >
-                    {/* Волосяная линия сверху — появляется при наведении */}
-                    <span
-                      aria-hidden
-                      className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-brand transition-transform duration-300 ease-out group-hover:scale-x-100"
-                    />
-
-                    <div className="flex w-full items-baseline gap-2.5">
-                      <span className="font-mono text-label tabular-nums text-fg-ghost transition-colors duration-300 group-hover:text-brand">
-                        {String(offset + index + 1).padStart(2, "0")}
+                    <div className="flex w-full items-center gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
+                        <item.icon className="h-4 w-4" />
                       </span>
-                      <span className="text-body font-medium text-fg">
-                        {item.title}
+                      <span className="font-mono text-label tabular-nums text-fg-ghost">
+                        {String(offset + index + 1).padStart(2, "0")}
                       </span>
                       <ArrowUpRight className="ml-auto h-3.5 w-3.5 shrink-0 text-fg-ghost transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg" />
                     </div>
 
-                    <p className="mt-2.5 text-body leading-relaxed text-fg-subtle">
+                    <span className="mt-4 text-body font-medium text-fg">
+                      {item.title}
+                    </span>
+
+                    <p className="mt-2 text-body leading-relaxed text-fg-subtle">
                       {item.note}
                     </p>
 
-                    <span className="relative mt-5 font-mono text-label uppercase text-fg-faint transition-colors duration-300 group-hover:text-fg">
+                    <span className="mt-5 font-mono text-label uppercase text-fg-faint transition-colors duration-300 group-hover:text-brand">
                       {item.action}
-                      <span
-                        aria-hidden
-                        className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-fg transition-transform duration-300 ease-out group-hover:scale-x-100"
-                      />
                     </span>
                   </motion.button>
                 ))}
@@ -342,8 +370,8 @@ export function CapabilityGrid() {
             <MetaLabel>Любой документ</MetaLabel>
             <SheetTitle>Опишите нужный документ</SheetTitle>
             <SheetDescription>
-              Если подходящая форма есть — реквизиты подставятся в неё. Если
-              нет — документ будет составлен с нуля.
+              Если подходящая форма есть — документ соберётся по ней. Если нет —
+              будет составлен с нуля по данным дела.
             </SheetDescription>
           </SheetHeader>
 

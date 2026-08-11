@@ -85,7 +85,7 @@ export function ExtractionStartDialog({
                   type="button"
                   onClick={() => setTypeId(schema.id)}
                   className={cn(
-                    "flex flex-col gap-0.5 rounded border px-3.5 py-3 text-left transition-colors",
+                    "flex flex-col gap-0.5 rounded-xl border px-3.5 py-3 text-left transition-colors",
                     typeId === schema.id
                       ? "border-fg bg-bg"
                       : "border-line hover:border-line-strong"
@@ -102,7 +102,7 @@ export function ExtractionStartDialog({
                       {schema.label}
                     </span>
                     {schema.isCustom && (
-                      <span className="rounded border border-line px-1.5 py-0.5 font-mono text-label uppercase text-fg-faint">
+                      <span className="rounded-full border border-line px-1.5 py-0.5 font-mono text-label uppercase text-fg-faint">
                         свой
                       </span>
                     )}

@@ -76,7 +76,7 @@ export function Markdown({ content }: { content: string }) {
             );
           }
           return (
-            <code className="rounded border border-line bg-surface px-1.5 py-0.5 font-mono text-caption text-fg">
+            <code className="rounded-md border border-line bg-surface px-1.5 py-0.5 font-mono text-caption text-fg">
               {children}
             </code>
           );

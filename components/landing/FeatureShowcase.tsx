@@ -125,8 +125,8 @@ export function FeatureShowcase({
           <AnimatePresence mode="wait">
             <motion.div
               key={`demo-${active.id}`}
-              initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
-              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
               transition={{ duration: 0.28 }}
               className="min-h-[420px] lg:col-span-8"
@@ -139,8 +139,8 @@ export function FeatureShowcase({
           <AnimatePresence mode="wait">
             <motion.div
               key={`text-${active.id}`}
-              initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
-              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={reduceMotion ? undefined : { opacity: 0, y: -12 }}
               transition={{ duration: 0.28, delay: 0.04 }}
               className="lg:col-span-4"

@@ -60,7 +60,7 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
               onClick={() => choosePeriod(period.days)}
               disabled={isPending}
               className={cn(
-                "rounded border px-3 py-1.5 font-mono text-label uppercase transition-colors",
+                "rounded-full border px-3 py-1.5 font-mono text-label uppercase transition-colors",
                 report.days === period.days
                   ? "border-fg text-fg"
                   : "border-line text-fg-subtle hover:border-fg-faint hover:text-fg",
@@ -78,7 +78,7 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
       </div>
 
       {error && (
-        <p className="rounded border border-danger-line bg-danger-bg/60 px-4 py-3 text-body-sm text-danger-fg">
+        <p className="rounded-xl border border-danger-line bg-danger-bg/60 px-4 py-3 text-body-sm text-danger-fg">
           {error}
         </p>
       )}

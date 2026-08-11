@@ -148,7 +148,7 @@ export function ChatDemo() {
                   <div className="flex min-w-0 flex-col gap-1">
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
-                        className={`rounded border px-1.5 py-0.5 text-label font-medium uppercase ${
+                        className={`rounded-md border px-1.5 py-0.5 text-label font-medium uppercase ${
                           isCritical
                             ? "border-danger-line bg-danger-bg text-danger-fg"
                             : "border-warn-line bg-warn-bg text-warn-fg"
@@ -181,7 +181,7 @@ export function ChatDemo() {
           <span className="flex-1 text-caption text-fg-ghost">
             Спросите Алетейю о деле…
           </span>
-          <span className="flex h-6 w-6 items-center justify-center rounded bg-brand text-label text-inverse-fg">
+          <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-brand text-label text-inverse-fg">
             ↑
           </span>
         </div>

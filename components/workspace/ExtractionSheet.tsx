@@ -119,7 +119,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
 
               {/* Причина неудачи — дословно, как её записал исполнитель */}
               {isFailed && extraction.error && (
-                <div className="mt-5 rounded border border-danger-line bg-danger-bg/70 px-3.5 py-3">
+                <div className="mt-5 rounded-xl border border-danger-line bg-danger-bg/70 px-3.5 py-3">
                   <div className="flex items-start gap-2">
                     <XCircle className="mt-px h-3.5 w-3.5 shrink-0 text-danger-fg" />
                     <p className="text-caption leading-relaxed text-danger-fg">
@@ -161,7 +161,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.26, delay: index * 0.06 }}
                           className={cn(
-                            "flex items-center justify-between gap-3 rounded border px-3 py-2.5",
+                            "flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5",
                             field.uncertain
                               ? "border-warn-line bg-warn-bg/60"
                               : "border-line bg-surface"
@@ -222,7 +222,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                     {extraction.missing.map((key) => (
                       <span
                         key={key}
-                        className="rounded border border-line px-2 py-1 text-label text-fg-subtle"
+                        className="rounded-md border border-line px-2 py-1 text-label text-fg-subtle"
                       >
                         {schema?.fields.find((field) => field.key === key)
                           ?.label ?? key}
@@ -367,7 +367,7 @@ function PagesNote({ looked, total }: { looked: number; total: number }) {
   return (
     <div
       className={cn(
-        "mt-5 flex items-start gap-2 rounded border px-3.5 py-2.5",
+        "mt-5 flex items-start gap-2 rounded-xl border px-3.5 py-2.5",
         full ? "border-line bg-bg" : "border-warn-line bg-warn-bg/60"
       )}
     >

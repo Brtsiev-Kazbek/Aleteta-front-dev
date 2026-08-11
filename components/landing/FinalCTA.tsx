@@ -27,8 +27,8 @@ export function FinalCTA() {
       </div>
 
       <motion.div
-        initial={reduceMotion ? undefined : { opacity: 0, y: 24 }}
-        whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+        initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
         className="relative mx-auto max-w-3xl px-6 py-28 text-center sm:py-36"

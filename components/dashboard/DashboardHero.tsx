@@ -12,8 +12,13 @@ const HEADLINE = ["Девять инструментов —", "весь цик�
 
 /**
  * Шапка рабочего стола повторяет первый экран лендинга: тёмное поле, сетка,
- * мягкое свечение и моноширинная рубрика. Ниже страница остаётся светлой —
- * работать на тёмном неудобно, а вход в продукт должен быть узнаваемым.
+ * свечение и стеклянная кнопка. Ниже страница остаётся светлой — работать на
+ * тёмном неудобно, а вход в продукт должен быть узнаваемым.
+ *
+ * Свечение берётся из общей заготовки `mesh-dark`, а не собирается здесь
+ * своими руками. Раньше собиралось: два пятна, вписанных стилем прямо в
+ * разметку, — и они не совпадали с лендингом ни радиусом, ни оттенком, отчего
+ * вход в продукт выглядел похожим, но чужим.
  */
 export function DashboardHero() {
   const reduceMotion = useReducedMotion();
@@ -49,26 +54,22 @@ export function DashboardHero() {
   return (
     <section className="grain relative overflow-hidden bg-inverse">
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-grid-dark" />
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(36rem 18rem at 18% 0%, rgba(139,92,246,0.18), transparent 62%), radial-gradient(30rem 16rem at 88% 20%, rgba(217,119,6,0.08), transparent 64%)",
-          }}
-        />
+        <div className="mesh-dark absolute inset-0 opacity-80" />
+        <div className="bg-grid-dark absolute inset-0 opacity-60" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-8 py-14">
         <motion.div
-          initial={reduceMotion ? undefined : { opacity: 0 }}
-          animate={reduceMotion ? undefined : { opacity: 1 }}
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center gap-3"
+          className="flex"
         >
-          <span aria-hidden className="h-px w-8 bg-brand" />
-          <span className="font-mono text-label uppercase text-fg-faint">
-            Демонстрационный режим
+          <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+            <span className="text-caption text-inverse-fg/70">
+              Демонстрационный режим
+            </span>
           </span>
         </motion.div>
 
@@ -76,8 +77,8 @@ export function DashboardHero() {
           {HEADLINE.map((chunk, index) => (
             <motion.span
               key={chunk}
-              initial={reduceMotion ? undefined : { opacity: 0, y: 18 }}
-              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{
                 duration: 0.6,
                 delay: 0.1 + index * 0.07,
@@ -91,10 +92,10 @@ export function DashboardHero() {
         </h1>
 
         <motion.p
-          initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.35 }}
-          className="mt-5 max-w-xl text-body leading-relaxed text-fg-faint"
+          className="mt-5 max-w-xl text-body-lg leading-relaxed text-inverse-fg/55"
         >
           Ровно то, что показано на главной странице. Всё ниже запускается на
           демонстрационных данных — ничего не отправляется наружу.
@@ -107,37 +108,37 @@ export function DashboardHero() {
           первое, чего от продукта хотят. Искать его в меню человек не должен.
         */}
         <motion.div
-          initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.42 }}
           className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3"
         >
           <Link
             href="/dashboard/recognize"
-            className="inline-flex items-center gap-2 rounded-md bg-surface px-4 py-2.5 text-body font-medium text-fg transition-colors hover:bg-surface-3"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-inverse-fg px-5 text-body font-medium text-inverse transition-transform duration-200 hover:scale-[1.02]"
           >
             <ScanText className="h-4 w-4" />
             Распознать документ
           </Link>
 
-          <span className="text-caption text-fg-subtle">
+          <span className="text-caption text-inverse-fg/40">
             Скан или PDF — текст появится на странице и останется в поиске
           </span>
         </motion.div>
 
         {/* Текущее состояние рабочей области */}
         <motion.ul
-          initial={reduceMotion ? undefined : { opacity: 0 }}
-          animate={reduceMotion ? undefined : { opacity: 1 }}
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-10 flex flex-wrap items-baseline gap-x-10 gap-y-3 border-t border-inverse-line pt-6"
+          className="mt-10 flex flex-wrap items-baseline gap-x-10 gap-y-3 border-t border-inverse-fg/10 pt-6"
         >
           {stats.map((stat) => (
             <li key={stat.label} className="flex items-baseline gap-2">
               <span className="font-mono text-title-sm tabular-nums text-inverse-fg">
                 <AnimatedNumber value={stat.value} />
               </span>
-              <span className="font-mono text-label uppercase text-fg-subtle">
+              <span className="font-mono text-label uppercase text-inverse-fg/40">
                 {stat.label}
               </span>
             </li>

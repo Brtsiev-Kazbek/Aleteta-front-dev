@@ -201,7 +201,7 @@ export function FreeformDemo() {
     <div className="flex h-full min-h-[520px] flex-col overflow-hidden rounded-lg border border-line bg-surface">
       {/* Запрос */}
       <div className="border-b border-line p-4">
-        <div className="flex min-h-[42px] items-start gap-2 rounded border border-line-strong px-3 py-2.5">
+        <div className="flex min-h-[42px] items-start gap-2 rounded-xl border border-line-strong px-3 py-2.5">
           <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
           <span className="text-caption leading-relaxed text-fg">
             {typed}
@@ -320,7 +320,7 @@ export function FreeformDemo() {
                   key={row}
                   animate={{ opacity: [0.3, 0.6, 0.3] }}
                   transition={{ duration: 1.3, repeat: Infinity, delay: row * 0.15 }}
-                  className="h-2 rounded bg-surface-3"
+                  className="h-2 rounded-full bg-surface-3"
                   style={{ width: `${94 - row * 12}%` }}
                 />
               ))}
@@ -342,7 +342,7 @@ export function FreeformDemo() {
             <span className="min-w-0 flex-1 truncate text-label text-fg-muted">
               {scenario.fileName}
             </span>
-            <span className="inline-flex shrink-0 items-center gap-1.5 rounded border border-line px-2 py-1 font-mono text-label uppercase text-fg-subtle">
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line px-2 py-1 font-mono text-label uppercase text-fg-subtle">
               <Download className="h-3 w-3" />
               Скачать
             </span>

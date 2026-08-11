@@ -125,7 +125,7 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                             duration: 0.24,
                             delay: groupIndex * 0.06 + docIndex * 0.04,
                           }}
-                          className="flex items-center gap-3 rounded border border-line px-3 py-2.5 transition-colors hover:border-line-strong"
+                          className="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5 transition-colors hover:border-line-strong"
                         >
                           <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
                           <span className="min-w-0 flex-1 truncate text-body text-fg">
@@ -149,7 +149,7 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
 
               <div
                 className={cn(
-                  "mt-2.5 rounded-md border bg-surface p-2.5 transition-colors",
+                  "mt-2.5 rounded-lg border bg-surface p-2.5 transition-colors",
                   prompt.trim() ? "border-fg" : "border-line"
                 )}
               >

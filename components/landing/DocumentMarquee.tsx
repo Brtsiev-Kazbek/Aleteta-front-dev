@@ -43,7 +43,7 @@ function Row({
       {doubled.map((item, index) => (
         <span
           key={`${item}-${index}`}
-          className="whitespace-nowrap rounded-md border border-inverse-line bg-fg/60 px-4 py-2.5 text-body text-fg-faint transition-colors hover:border-inverse-line hover:text-inverse-fg"
+          className="whitespace-nowrap rounded-lg border border-inverse-line bg-fg/60 px-4 py-2.5 text-body text-fg-faint transition-colors hover:border-inverse-line hover:text-inverse-fg"
         >
           {item}
         </span>

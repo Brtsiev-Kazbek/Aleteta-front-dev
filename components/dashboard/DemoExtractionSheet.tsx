@@ -150,7 +150,7 @@ export function DemoExtractionSheet() {
                             repeat: Infinity,
                             delay: index * 0.15,
                           }}
-                          className="h-[42px] rounded border border-line bg-surface"
+                          className="h-[42px] rounded-xl border border-line bg-surface"
                         />
                       );
                     }
@@ -162,7 +162,7 @@ export function DemoExtractionSheet() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.26, delay: index * 0.06 }}
                         className={cn(
-                          "flex items-center justify-between gap-3 rounded border px-3 py-2.5",
+                          "flex items-center justify-between gap-3 rounded-xl border px-3 py-2.5",
                           field.uncertain
                             ? "border-warn-line bg-warn-bg/60"
                             : "border-line bg-surface"
@@ -218,7 +218,7 @@ export function DemoExtractionSheet() {
                         type="button"
                         onClick={() => setTargetCaseId(item.id)}
                         className={cn(
-                          "flex items-center gap-2.5 rounded border px-3 py-2.5 text-left transition-colors",
+                          "flex items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition-colors",
                           targetCaseId === item.id
                             ? "border-fg bg-bg"
                             : "border-line hover:border-line-strong"

@@ -5,9 +5,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /*
- * Кнопки повторяют лендинг: основное действие — плотный чёрный прямоугольник
- * с малым радиусом, второстепенное — контур по stone-200. Никаких заливок
- * фирменным цветом и мягких теней: на продуктовых экранах они шумят.
+ * Кнопки повторяют лендинг: основное действие — плотная чернильная плашка,
+ * второстепенное — контур. Никаких заливок фирменным цветом и мягких теней: на
+ * рабочих экранах они шумят.
+ *
+ * РАДИУС ВОСЕМЬ, А НЕ ШЕСТНАДЦАТЬ. Панели вокруг скруглены крупно, и соблазн
+ * подтянуть за ними кнопки велик. Делать этого нельзя: радиус читается
+ * относительно размера предмета, и шестнадцать точек на кнопке высотой
+ * тридцать шесть превращают её в таблетку. Капсула в этом интерфейсе
+ * закреплена за одной ролью — переключателями и метками состояния, — и если
+ * так начнут выглядеть все кнопки подряд, роль пропадёт.
  */
 const buttonVariants = cva(
   /*
@@ -17,7 +24,7 @@ const buttonVariants = cva(
    * белый текст исчезает совсем: остаётся серый прямоугольник, по которому не
    * понять, что именно недоступно.
    */
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-body font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:border-line disabled:bg-surface-2 disabled:text-fg-faint",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-body font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:border-line disabled:bg-surface-2 disabled:text-fg-faint",
   {
     variants: {
       variant: {
@@ -31,9 +38,9 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-caption",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        sm: "h-8 rounded-lg px-3 text-caption",
+        lg: "h-10 rounded-lg px-8",
+        icon: "h-9 w-9 rounded-lg",
       },
     },
     defaultVariants: {

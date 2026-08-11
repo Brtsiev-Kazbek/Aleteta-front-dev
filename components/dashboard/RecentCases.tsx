@@ -25,7 +25,7 @@ export function RecentCases() {
   return (
     <>
       {/* Выбор всех дел для массовой генерации */}
-      <div className="mb-3 flex items-center gap-3 border-b border-line pb-3">
+      <div className="mb-4 flex items-center gap-3">
         <label className="flex cursor-pointer items-center gap-2 font-mono text-label uppercase text-fg-faint transition-colors hover:text-fg">
           <Checkbox
             checked={allSelected}
@@ -42,7 +42,7 @@ export function RecentCases() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-px border border-line bg-surface-3 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
         {cases.map((caseItem, index) => {
         const statusMeta = CASE_STATUS_META[caseItem.status];
         const caseEntities = entities.filter(
@@ -61,8 +61,17 @@ export function RecentCases() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: index * 0.06 }}
             className={cn(
-              "flex flex-col p-5 transition-colors",
-              isSelected ? "bg-bg" : "bg-surface hover:bg-bg/60"
+              /*
+               * Отмеченное дело держится кольцом фирменного цвета, а не сменой
+               * заливки. Заливкой раньше показывались и выбор, и наведение —
+               * два разных состояния одним приёмом, и на полотне без
+               * промежутков понять, что именно отмечено, можно было только по
+               * счётчику.
+               */
+              "flex flex-col rounded-2xl border bg-surface p-5 transition-all",
+              isSelected
+                ? "border-brand-line ring-1 ring-brand-line"
+                : "border-line hover:border-line-strong hover:shadow-card"
             )}
           >
             <div className="flex items-start justify-between gap-3">
@@ -75,7 +84,7 @@ export function RecentCases() {
 
                 <span
                   className={cn(
-                    "inline-flex items-center gap-2 rounded border px-2 py-1 font-mono text-label uppercase ",
+                    "inline-flex items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-label uppercase ",
                     statusMeta.badgeClassName
                   )}
                 >
@@ -90,7 +99,7 @@ export function RecentCases() {
               </div>
 
               {invalidCount > 0 && (
-                <span className="shrink-0 rounded border border-danger-line px-2 py-1 font-mono text-label uppercase text-danger-fg">
+                <span className="shrink-0 rounded-full border border-danger-line bg-danger-bg px-2.5 py-1 font-mono text-label uppercase text-danger-fg">
                   {invalidCount}{" "}
                   {plural(invalidCount, "ошибка", "ошибки", "ошибок")}
                 </span>
@@ -130,7 +139,7 @@ export function RecentCases() {
 
             <Link
               href={`/cases/${caseItem.id}`}
-              className="group mt-4 inline-flex w-fit items-center gap-1.5 border-b border-line pb-0.5 text-body-sm text-fg-muted transition-colors hover:border-fg hover:text-fg"
+              className="group mt-5 inline-flex h-9 w-fit items-center gap-1.5 rounded-lg border border-line bg-bg px-3.5 text-body-sm text-fg-muted transition-colors hover:border-line-strong hover:text-fg"
             >
               Открыть дело
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />

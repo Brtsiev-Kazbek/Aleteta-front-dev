@@ -99,7 +99,7 @@ export function ForgotPasswordForm() {
         </div>
       )}
 
-      <Button type="submit" disabled={isPending} className="mt-7 h-11 gap-2">
+      <Button type="submit" disabled={isPending} className="mt-7 h-11 gap-2 rounded-xl">
         {isPending ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (

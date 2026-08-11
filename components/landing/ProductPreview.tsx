@@ -229,7 +229,7 @@ export function ProductPreview() {
                             : "rgb(254 202 202)",
                         }}
                         transition={{ duration: 0.35 }}
-                        className="flex h-9 items-center gap-2 rounded border px-2.5"
+                        className="flex h-9 items-center gap-2 rounded-xl border px-2.5"
                       >
                         {!isFilled && (
                           <AlertCircle className="h-3.5 w-3.5 shrink-0 text-danger-fg" />
@@ -319,7 +319,7 @@ export function ProductPreview() {
                   }
             }
             transition={{ duration: 0.35 }}
-            className="rounded px-4 py-2 text-body font-medium"
+            className="rounded-xl px-4 py-2 text-body font-medium"
           >
             Сгенерировать пакет
           </motion.div>

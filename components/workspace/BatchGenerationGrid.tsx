@@ -148,7 +148,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-line bg-surface">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-line bg-surface">
       {/* Панель над таблицей */}
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div className="flex flex-col">
@@ -395,12 +395,12 @@ function EntityGroupTable({
         return (
           <div className="flex h-row items-center px-3">
             {validation?.isValid ? (
-              <span className="inline-flex items-center gap-1.5 rounded border border-ok-line px-2 py-1 font-mono text-label uppercase text-ok-fg">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-ok-line bg-ok-bg px-2.5 py-1 font-mono text-label uppercase text-ok-fg">
                 <CheckCircle2 className="h-3 w-3" />
                 Готово
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 rounded border border-danger-line px-2 py-1 font-mono text-label uppercase text-danger-fg">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-line bg-danger-bg px-2.5 py-1 font-mono text-label uppercase text-danger-fg">
                 <AlertTriangle className="h-3 w-3" />
                 {errorCount} {plural(errorCount, "ошибка", "ошибки", "ошибок")}
               </span>
@@ -471,7 +471,7 @@ function EntityGroupTable({
           {entities.length}
         </span>
         {schema.isCustom && (
-          <span className="rounded border border-brand-line px-1.5 py-0.5 font-mono text-label uppercase text-brand-strong">
+          <span className="rounded-full border border-brand-line bg-brand-soft px-2 py-0.5 font-mono text-label uppercase text-brand-strong">
             свой тип
           </span>
         )}
@@ -610,7 +610,7 @@ function EntityCell({
               setEditingCell(null);
             }
           }}
-          className="h-full w-full rounded border border-fg bg-surface px-2.5 text-body text-fg shadow-[0_0_0_3px_rgba(28,25,23,0.08)] outline-none placeholder:text-fg-ghost"
+          className="h-full w-full rounded-lg border border-fg bg-surface px-2.5 text-body text-fg shadow-[0_0_0_3px_rgb(var(--fg)/0.08)] outline-none placeholder:text-fg-ghost"
         />
       </div>
     );

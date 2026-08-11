@@ -55,7 +55,7 @@ function RoleSelect({
         onChange={(event) => onChange(event.target.value as WorkspaceRole)}
         aria-label={label}
         className={cn(
-          "w-full appearance-none rounded-md border border-line bg-surface pl-2.5 pr-7 text-body-sm text-fg-muted transition-colors hover:border-line-strong focus-visible:border-fg focus-visible:outline-none disabled:opacity-50",
+          "w-full appearance-none rounded-lg border border-line bg-surface pl-2.5 pr-7 text-body-sm text-fg-muted transition-colors hover:border-line-strong focus-visible:border-fg focus-visible:outline-none disabled:opacity-50",
           className
         )}
       >
@@ -161,7 +161,7 @@ export function MembersPanel({
           <li key={member.userId} className="flex items-center gap-3.5 py-3.5">
             <span
               aria-hidden
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface font-mono text-label uppercase text-fg-subtle"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-line bg-surface font-mono text-label uppercase text-fg-subtle"
             >
               {initials(member.fullName)}
             </span>
@@ -194,7 +194,7 @@ export function MembersPanel({
             ) : (
               <span
                 className={cn(
-                  "shrink-0 rounded border px-2 py-1 font-mono text-label uppercase ",
+                  "shrink-0 rounded-full border px-2 py-1 font-mono text-label uppercase ",
                   member.role === "owner"
                     ? "border-line-strong text-fg-muted"
                     : "border-line text-fg-faint"

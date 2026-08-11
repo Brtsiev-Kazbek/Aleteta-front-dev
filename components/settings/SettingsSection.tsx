@@ -29,24 +29,25 @@ export function SettingsSection({
      * scroll-mt: без отступа переход по якорю прижимает заголовок к самому
      * краю прокручиваемой области, и раздел выглядит обрезанным.
      */
-    <section id={id} className="scroll-mt-8">
-      <div className="flex items-start justify-between gap-4 border-b border-line pb-3">
-        <div className="flex items-start gap-2.5">
-          <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-faint" />
+    <section
+      id={id}
+      className="scroll-mt-8 overflow-hidden rounded-2xl border border-line bg-surface"
+    >
+      <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-5">
+        <div className="flex items-start gap-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
+            <Icon className="h-4 w-4" />
+          </span>
           <div className="flex min-w-0 flex-col">
-            <h2 className="text-body font-medium text-fg">
-              {title}
-            </h2>
-            <span className="mt-1 text-body text-fg-subtle">
-              {description}
-            </span>
+            <h2 className="text-body font-medium text-fg">{title}</h2>
+            <span className="mt-1 text-body text-fg-subtle">{description}</span>
           </div>
         </div>
 
         {aside}
       </div>
 
-      <div className="pt-5">{children}</div>
+      <div className="px-6 py-6">{children}</div>
     </section>
   );
 }

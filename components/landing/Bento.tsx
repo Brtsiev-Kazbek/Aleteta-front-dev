@@ -234,7 +234,7 @@ function ExtractScene() {
                 "truncate text-body-sm",
                 field.sure
                   ? "text-fg"
-                  : "rounded bg-warn-bg px-1.5 py-0.5 text-warn-fg"
+                  : "rounded-md bg-warn-bg px-1.5 py-0.5 text-warn-fg"
               )}
             >
               {field.value}

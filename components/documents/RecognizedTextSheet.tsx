@@ -290,7 +290,7 @@ function PageBlock({ page }: { page: RecognizedPage }) {
         </span>
         <span
           className={cn(
-            "rounded border px-1.5 py-0.5 font-mono text-label uppercase ",
+            "rounded-full border px-1.5 py-0.5 font-mono text-label uppercase ",
             page.source === "embedded"
               ? "border-line text-fg-faint"
               : "border-brand-line bg-brand-soft/60 text-brand-strong"
@@ -437,7 +437,7 @@ function IconButton({
       type="button"
       title={title}
       onClick={onClick}
-      className="rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-3/70 hover:text-fg"
+      className="rounded-xl p-1.5 text-fg-faint transition-colors hover:bg-surface-3/70 hover:text-fg"
     >
       {children}
       <span className="sr-only">{title}</span>

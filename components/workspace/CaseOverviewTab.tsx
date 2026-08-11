@@ -99,20 +99,22 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           </span>
         </div>
 
-        {/* Полоса готовности вместо карточки с прогрессом */}
-        <div className="mt-5 h-px w-full bg-surface-3">
+        {/*
+          Полоса готовности была волоском в один пиксель. Волосок честно
+          показывал долю, но не читался как показатель: глаз принимал его за
+          разделитель между блоками. Полоса в шесть точек со скруглением
+          сообщает то же самое и не требует, чтобы в неё вглядывались.
+        */}
+        <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
           <motion.div
             animate={{ width: `${stats.percent}%` }}
             transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
-            className={cn(
-              "h-px",
-              isReady ? "bg-ok" : "bg-fg"
-            )}
+            className={cn("h-full rounded-full", isReady ? "bg-ok" : "bg-fg")}
           />
         </div>
 
-        {/* Три показателя — тонкие разделители, без плашек */}
-        <div className="mt-8 grid grid-cols-3 gap-px bg-surface-3">
+        {/* Три показателя — отдельными плитками */}
+        <div className="mt-8 grid grid-cols-3 gap-3">
           {[
             { value: stats.total, label: "объектов" },
             { value: stats.valid, label: "готовы" },
@@ -120,7 +122,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           ].map((tile) => (
             <div
               key={tile.label}
-              className="bg-surface px-4 py-5 transition-colors hover:bg-bg"
+              className="rounded-2xl border border-line bg-surface px-4 py-5"
             >
               <span className="font-mono text-heading tabular-nums text-fg">
                 <AnimatedNumber value={tile.value} />
@@ -141,7 +143,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
               <button
                 type="button"
                 onClick={() => setActiveTab("entities")}
-                className="border-b border-line pb-0.5 text-caption text-fg-subtle transition-colors hover:border-fg hover:text-fg"
+                className="rounded-full border border-line bg-surface px-3 py-1 text-caption text-fg-subtle transition-colors hover:border-line-strong hover:text-fg"
               >
                 Открыть матрицу
               </button>
@@ -149,21 +151,21 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           </div>
 
           {problems.length === 0 ? (
-            <div className="mt-4 flex items-center gap-3 border-t border-line pt-5">
+            <div className="mt-4 flex items-center gap-3 rounded-2xl border border-ok-line bg-ok-bg px-4 py-4">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-ok-fg" />
-              <span className="text-body text-fg-soft">
+              <span className="text-body text-ok-fg">
                 Все объекты заполнены — пакет можно генерировать
               </span>
             </div>
           ) : (
-            <ul className="mt-4 flex flex-col divide-y divide-line border-t border-line">
+            <ul className="mt-4 flex flex-col gap-2">
               {problems.map(({ entity, schema, validation }, index) => (
                 <motion.li
                   key={entity.id}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.24, delay: index * 0.05 }}
-                  className="group flex cursor-pointer items-center gap-4 py-4 transition-colors hover:bg-bg"
+                  className="group flex cursor-pointer items-center gap-4 rounded-2xl border border-line bg-surface px-4 py-3.5 transition-colors hover:border-danger-line hover:bg-danger-bg"
                   onClick={() => setActiveTab("entities")}
                 >
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-danger-fg" />
@@ -202,7 +204,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           {caseItem.description}
         </p>
 
-        <dl className="mt-6 flex flex-col divide-y divide-line border-y border-line">
+        <dl className="mt-6 flex flex-col divide-y divide-line-soft rounded-2xl border border-line bg-surface px-4">
           {[
             { label: "Создано", value: formatDate(caseItem.createdAt) },
             { label: "Документов", value: String(documents.length) },
@@ -251,7 +253,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
 
                     <div
                       className={cn(
-                        "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded border bg-surface",
+                        "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border bg-surface",
                         item.kind === "ai"
                           ? "border-brand-line text-brand"
                           : "border-line text-fg-faint"

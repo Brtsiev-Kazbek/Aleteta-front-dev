@@ -203,7 +203,7 @@ function Frame({
               : "Листается отдельно — связать с текстом"
           }
           className={cn(
-            "flex items-center gap-1.5 rounded border px-2 py-1 font-mono text-label uppercase transition-colors",
+            "flex items-center gap-1.5 rounded-full border px-2 py-1 font-mono text-label uppercase transition-colors",
             syncScroll
               ? "border-warn-line bg-warn-bg text-warn-fg"
               : "border-line text-fg-faint hover:text-fg"
@@ -245,7 +245,7 @@ function Frame({
               target="_blank"
               rel="noopener noreferrer"
               title="Открыть в отдельном окне"
-              className="ml-1 rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
+              className="ml-1 rounded-xl p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span className="sr-only">Открыть в отдельном окне</span>
@@ -276,7 +276,7 @@ function PageStep({
       title={title}
       onClick={onClick}
       disabled={disabled}
-      className="rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg disabled:pointer-events-none disabled:opacity-30"
+      className="rounded-xl p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg disabled:pointer-events-none disabled:opacity-30"
     >
       {children}
       <span className="sr-only">{title}</span>
