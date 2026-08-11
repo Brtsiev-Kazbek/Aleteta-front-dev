@@ -276,14 +276,14 @@ export function CapabilityGrid() {
 
   return (
     <>
-      <div className="flex flex-col gap-10">
-        {GROUPS.map((group, groupIndex) => {
-          // Сквозная нумерация по обеим группам — как перечень на лендинге.
-          const offset = GROUPS.slice(0, groupIndex).reduce(
-            (sum, item) => sum + item.items.length,
-            0
-          );
-
+      <div className="flex flex-col gap-8">
+        {/*
+          Сквозная нумерация инструментов убрана. На лендинге номер работал —
+          там перечень читают подряд и он показывает объём. В кабинете
+          инструмент выбирают, а не пересчитывают, и номер только отнимал
+          строку у названия.
+        */}
+        {GROUPS.map((group) => {
           return (
             <section key={group.title}>
               <div className="flex items-baseline justify-between gap-3">
@@ -303,7 +303,7 @@ export function CapabilityGrid() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
                       duration: 0.4,
-                      delay: (offset + index) * 0.04,
+                      delay: index * 0.04,
                       ease: [0.22, 0.61, 0.36, 1],
                     }}
                     className={cn(
@@ -314,7 +314,7 @@ export function CapabilityGrid() {
                        * целиком; отдельные карточки читаются как девять
                        * кнопок, из которых выбирают одну.
                        */
-                      "group flex flex-col items-start rounded-2xl border border-line bg-surface p-5 text-left",
+                      "group flex flex-col items-start rounded-2xl border border-line bg-surface p-4 text-left",
                       "transition-all duration-300 hover:border-line-strong hover:shadow-card",
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
                     )}
@@ -323,21 +323,19 @@ export function CapabilityGrid() {
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
                         <item.icon className="h-4 w-4" />
                       </span>
-                      <span className="font-mono text-label tabular-nums text-fg-ghost">
-                        {String(offset + index + 1).padStart(2, "0")}
+
+                      <span className="min-w-0 flex-1 truncate text-body font-medium text-fg">
+                        {item.title}
                       </span>
-                      <ArrowUpRight className="ml-auto h-3.5 w-3.5 shrink-0 text-fg-ghost transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg" />
+
+                      <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-fg-ghost transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg" />
                     </div>
 
-                    <span className="mt-4 text-body font-medium text-fg">
-                      {item.title}
-                    </span>
-
-                    <p className="mt-2 text-body leading-relaxed text-fg-subtle">
+                    <p className="mt-3 text-body-sm leading-relaxed text-fg-subtle">
                       {item.note}
                     </p>
 
-                    <span className="mt-5 font-mono text-label uppercase text-fg-faint transition-colors duration-300 group-hover:text-brand">
+                    <span className="mt-4 font-mono text-label uppercase text-fg-faint transition-colors duration-300 group-hover:text-brand">
                       {item.action}
                     </span>
                   </motion.button>

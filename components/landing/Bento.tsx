@@ -32,19 +32,16 @@ import { cn } from "@/lib/utils";
 export function Bento() {
   const reduceMotion = useReducedMotion();
 
-  const appear = (index: number) =>
-    reduceMotion
-      ? {}
-      : {
-          initial: { opacity: 0, y: 22 },
-          whileInView: { opacity: 1, y: 0 },
-          viewport: { once: true, margin: "-60px" },
-          transition: {
-            duration: 0.55,
-            delay: (index % 3) * 0.07,
-            ease: [0.22, 0.61, 0.36, 1] as const,
-          },
-        };
+  const appear = (index: number) => ({
+    initial: reduceMotion ? (false as const) : { opacity: 0, y: 22 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-60px" },
+    transition: {
+      duration: 0.55,
+      delay: (index % 3) * 0.07,
+      ease: [0.22, 0.61, 0.36, 1] as const,
+    },
+  });
 
   return (
     <section id="features" className="relative overflow-hidden bg-bg">

@@ -58,14 +58,11 @@ export function Hero() {
   const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
   const lift = useTransform(scrollYProgress, [0, 1], [40, 0]);
 
-  const appear = (delay: number) =>
-    reduceMotion
-      ? {}
-      : {
-          initial: { opacity: 0, y: 22 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.7, delay, ease: [0.22, 0.61, 0.36, 1] },
-        };
+  const appear = (delay: number) => ({
+    initial: reduceMotion ? (false as const) : { opacity: 0, y: 22 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.7, delay, ease: [0.22, 0.61, 0.36, 1] },
+  });
 
   return (
     <section className="relative overflow-hidden bg-inverse">

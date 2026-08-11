@@ -48,14 +48,12 @@ export function SectionShell({
   const ground =
     tone === "dark" ? "bg-inverse" : tone === "muted" ? "bg-bg" : "bg-surface";
 
-  const appear = reduceMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: 20 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: "-100px" },
-        transition: { duration: 0.6, ease: [0.22, 0.61, 0.36, 1] as const },
-      };
+  const appear = {
+    initial: reduceMotion ? (false as const) : { opacity: 0, y: 20 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-100px" },
+    transition: { duration: 0.6, ease: [0.22, 0.61, 0.36, 1] as const },
+  };
 
   return (
     <section

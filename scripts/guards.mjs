@@ -224,14 +224,23 @@ report(
  * сразу с конечных значений». Движения нет, содержимое на месте.
  */
 const motionFiles = await Promise.all(
-  ["components/dashboard/DashboardHero.tsx", "components/landing/Pricing.tsx"].map(
+  [
+    "components/dashboard/CabinetHeader.tsx",
+    "components/dashboard/CabinetBento.tsx",
+    "components/landing/Pricing.tsx",
+  ].map(
     (file) => source(file)
   )
 );
 report(
-  motionFiles.every((file) => !file.includes("initial={reduceMotion ? undefined")),
+  motionFiles.every(
+    (file) =>
+      !file.includes("initial={reduceMotion ? undefined") &&
+      !/reduceMotion\s*\n?\s*\?\s*\{\}/.test(file)
+  ),
   "«уменьшить движение» не прячет содержимое",
-  "initial={reduceMotion ? undefined} оставляет прозрачность в нуле навсегда — нужен false"
+  "и `initial={reduceMotion ? undefined}`, и `reduceMotion ? {} : {…}` оставляют " +
+    "прозрачность в нуле навсегда — нужен initial={false} при неизменном animate"
 );
 
 /*
