@@ -148,15 +148,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
   }
 
   return (
-    /*
-     * Плотная поверхность: строка ниже, чем в читательской части приложения.
-     * Дело на сорок объектов должно помещаться на экран целиком — ради этого
-     * таблица и делалась.
-     */
-    <div
-      data-density="compact"
-      className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-card"
-    >
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-line bg-surface">
       {/* Панель над таблицей */}
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div className="flex flex-col">

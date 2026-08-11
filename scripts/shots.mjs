@@ -237,6 +237,25 @@ const FREEZE_CSS = `
   .grain::after { display: none !important; }
 `;
 
+/**
+ * Снять не всё, а названное: `SHOTS_ONLY=case-entities,dashboard`.
+ *
+ * Нужно, когда перебираешь варианты оформления: разглядывать тридцать девять
+ * картинок на каждый вариант незачем, хватает двух показательных.
+ */
+const ONLY = (process.env.SHOTS_ONLY ?? "")
+  .split(",")
+  .map((name) => name.trim())
+  .filter(Boolean);
+
+const WANTED = ONLY.length
+  ? ROUTES.filter((route) => ONLY.includes(route.name))
+  : ROUTES;
+
+const SIZES = process.env.SHOTS_WIDTHS
+  ? process.env.SHOTS_WIDTHS.split(",").map(Number)
+  : WIDTHS;
+
 async function capture(label) {
   const target = path.join(SHOTS, label);
   await rm(target, { recursive: true, force: true });
@@ -245,7 +264,7 @@ async function capture(label) {
   const browser = await chromium.launch({ executablePath: EXECUTABLE });
 
   try {
-    for (const width of WIDTHS) {
+    for (const width of SIZES) {
       const context = await browser.newContext({
         viewport: { width, height: 900 },
         deviceScaleFactor: 1,
@@ -258,7 +277,7 @@ async function capture(label) {
       const page = await context.newPage();
       await page.addStyleTag({ content: FREEZE_CSS }).catch(() => {});
 
-      for (const route of ROUTES) {
+      for (const route of WANTED) {
         const name = `${route.name}@${width}`;
 
         try {
@@ -302,7 +321,7 @@ async function capture(label) {
   }
 
   const files = (await readdir(target)).filter((f) => f.endsWith(".png"));
-  console.log(`\nСнято ${files.length} из ${ROUTES.length * WIDTHS.length} в .shots/${label}`);
+  console.log(`\nСнято ${files.length} из ${WANTED.length * SIZES.length} в .shots/${label}`);
 }
 
 /* ------------------------------------------------------------------ */

@@ -161,16 +161,16 @@ const config: Config = {
        * подпись в одну строку и абзац в пять получают одинаковый.
        */
       fontSize: {
-        label: ["0.6875rem", { lineHeight: "1rem", letterSpacing: "0.06em" }],
-        caption: ["0.75rem", { lineHeight: "1.125rem" }],
+        label: ["0.625rem", { lineHeight: "0.875rem", letterSpacing: "0.12em" }],
+        caption: ["0.75rem", { lineHeight: "1.0625rem" }],
         "body-sm": ["0.8125rem", { lineHeight: "1.25rem" }],
-        body: ["0.9375rem", { lineHeight: "1.5rem" }],
-        "body-lg": ["1rem", { lineHeight: "1.625rem" }],
+        body: ["0.8125rem", { lineHeight: "1.3125rem" }],
+        "body-lg": ["0.9375rem", { lineHeight: "1.5rem" }],
         "title-sm": ["1.0625rem", { lineHeight: "1.4", letterSpacing: "-0.01em" }],
-        title: ["1.25rem", { lineHeight: "1.3", letterSpacing: "-0.015em" }],
-        heading: ["1.625rem", { lineHeight: "1.2", letterSpacing: "-0.02em" }],
-        display: ["2.125rem", { lineHeight: "1.12", letterSpacing: "-0.03em" }],
-        "display-lg": ["2.75rem", { lineHeight: "1.06", letterSpacing: "-0.035em" }],
+        title: ["1.25rem", { lineHeight: "1.3", letterSpacing: "-0.02em" }],
+        heading: ["1.75rem", { lineHeight: "1.15", letterSpacing: "-0.03em" }],
+        display: ["2rem", { lineHeight: "1.12", letterSpacing: "-0.035em" }],
+        "display-lg": ["2.5rem", { lineHeight: "1.06", letterSpacing: "-0.035em" }],
       },
 
       fontFamily: {
