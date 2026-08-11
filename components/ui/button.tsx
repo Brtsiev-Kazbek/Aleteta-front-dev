@@ -10,22 +10,39 @@ import { cn } from "@/lib/utils";
  * фирменным цветом и мягких теней: на продуктовых экранах они шумят.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40",
+  /*
+   * У выключенной кнопки свои цвета, а не общая прозрачность.
+   *
+   * Прозрачность гасит фон и надпись одновременно, и на чернильной кнопке
+   * белый текст исчезает совсем: остаётся серый прямоугольник, по которому не
+   * понять, что именно недоступно. Здесь же выключенное состояние сообщает
+   * ровно то, что должно: «действие есть, но пока нельзя».
+   */
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-body-sm font-medium transition-[background-color,border-color,color,box-shadow] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/45 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:pointer-events-none disabled:border-line disabled:bg-surface-2 disabled:text-fg-faint disabled:shadow-none",
   {
     variants: {
       variant: {
-        default: "bg-inverse text-inverse-fg hover:bg-inverse-3",
-        destructive: "bg-red-600 text-inverse-fg hover:bg-red-700",
+        /*
+         * Основное действие — чернильное, а не фирменного цвета. В продукте,
+         * где цветом размечены состояния документа (проверено, требует
+         * внимания, ошибка), синяя кнопка спорит с ними за внимание и
+         * выигрывает не по делу. Чернильная не спорит ни с чем.
+         *
+         * Токен `fg`, а не `inverse`: кнопка обязана перевернуться вместе с
+         * темой, а обложка лендинга — нет.
+         */
+        default: "bg-fg text-surface shadow-raise hover:bg-fg-muted",
+        destructive: "bg-danger text-inverse-fg shadow-raise hover:opacity-90",
         outline:
-          "border border-line bg-surface text-fg-muted hover:border-line-strong hover:bg-bg hover:text-fg",
+          "border border-line bg-surface text-fg-muted shadow-raise hover:border-line-strong hover:text-fg",
         secondary: "bg-surface-2 text-fg hover:bg-surface-3",
         ghost: "text-fg-subtle hover:bg-surface-2 hover:text-fg",
-        link: "text-fg underline-offset-4 hover:underline",
+        link: "text-brand underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
+        default: "h-9 px-3.5",
+        sm: "h-8 px-3 text-caption",
+        lg: "h-11 px-6 text-body",
         icon: "h-9 w-9",
       },
     },

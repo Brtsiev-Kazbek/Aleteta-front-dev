@@ -37,8 +37,14 @@ export function toEntitySchema(row: EntityTypeRow): EntitySchema {
     /*
      * В базе часть описания реквизита необязательна, во фронте — обязательна.
      * Достраиваем недостающее здесь, чтобы компоненты не проверяли каждое поле
-     * на существование. Регулярное выражение приходит строкой (POSIX), поэтому
-     * собираем RegExp — база и браузер проверяют по одному и тому же шаблону.
+     * на существование.
+     *
+     * Шаблон проверки остаётся СТРОКОЙ и здесь не собирается. Готовое выражение
+     * — объект класса, а такие не проходят из серверного компонента в
+     * клиентский: Next отвергает их целиком, и страница отвечает пятисотой.
+     * Поймали это ровно так: встроенные типы поехали из базы вместе со своими
+     * шаблонами, и приложение слегло на всех внутренних экранах. Собирается
+     * выражение там, где применяется, — см. `lib/validation.ts`.
      */
     fields: readFieldDefinitions(row.fields).map((field) => ({
       key: field.key,
@@ -46,24 +52,11 @@ export function toEntitySchema(row: EntityTypeRow): EntitySchema {
       required: field.required,
       placeholder: field.placeholder ?? "",
       width: field.width ?? 220,
-      ...(field.pattern ? { pattern: safeRegExp(field.pattern) } : {}),
+      ...(field.pattern ? { pattern: field.pattern } : {}),
       ...(field.patternError ? { patternError: field.patternError } : {}),
     })),
     templates: row.templates,
   };
-}
-
-/**
- * Шаблон из базы может оказаться несовместимым с движком регулярных выражений
- * браузера. Падать из-за этого нельзя: пропускаем проверку формата, обязательность
- * поля всё равно проверит база.
- */
-function safeRegExp(source: string): RegExp | undefined {
-  try {
-    return new RegExp(source);
-  } catch {
-    return undefined;
-  }
 }
 
 export function toEntity(row: EntityRow): Entity {

@@ -42,6 +42,37 @@ export function findSchema(
   );
 }
 
+/**
+ * Готовое выражение по строке шаблона.
+ *
+ * Шаблоны хранятся строками — и в базе, и в описаниях типов, — потому что
+ * готовое выражение не проходит через границу «сервер → клиент»: Next
+ * пропускает туда только простые значения, а объект класса отвергает целиком.
+ *
+ * Разбор кэшируется: проверка идёт на каждое нажатие клавиши в таблице
+ * реквизитов, и собирать выражение заново на каждый символ незачем.
+ *
+ * Неразбираемый шаблон не должен ронять таблицу: база хранит их в POSIX, и
+ * теоретически возможен шаблон, который движок браузера не поймёт. В этом
+ * случае формат просто не проверяется — обязательность поля проверит база.
+ */
+const compiled = new Map<string, RegExp | null>();
+
+function toRegExp(source: string): RegExp | null {
+  const known = compiled.get(source);
+  if (known !== undefined) return known;
+
+  let built: RegExp | null = null;
+  try {
+    built = new RegExp(source);
+  } catch {
+    built = null;
+  }
+
+  compiled.set(source, built);
+  return built;
+}
+
 export function validateEntity(
   entity: Entity,
   schema: EntitySchema
@@ -61,7 +92,9 @@ export function validateEntity(
       continue;
     }
 
-    if (field.pattern && !field.pattern.test(value)) {
+    const shape = field.pattern ? toRegExp(field.pattern) : null;
+
+    if (shape && !shape.test(value)) {
       const message =
         field.patternError ?? `Неверный формат поля «${field.label}»`;
       fieldErrors[field.key] = message;

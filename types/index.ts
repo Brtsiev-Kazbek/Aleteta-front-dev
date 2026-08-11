@@ -81,8 +81,16 @@ export interface EntityFieldSchema {
   required: boolean;
   placeholder: string;
   width: number;
-  /** Проверка формата — применяется только к непустому значению. */
-  pattern?: RegExp;
+  /**
+   * Проверка формата — применяется только к непустому значению.
+   *
+   * Строка, а не готовое выражение, и это не мелочь. Описания типов приходят с
+   * сервера в клиентский компонент, а через эту границу проходят только простые
+   * значения: объект класса — в том числе RegExp — Next отвергает целиком, и
+   * страница отвечает пятисотой. Собирается выражение там, где применяется, —
+   * см. `lib/validation.ts`.
+   */
+  pattern?: string;
   patternError?: string;
 }
 
@@ -122,7 +130,7 @@ export const REAL_ESTATE_SCHEMA: EntitySchema = {
       required: true,
       placeholder: "15:09:0000000:0000",
       width: 210,
-      pattern: /^\d{2}:\d{2}:\d{6,7}:\d{1,4}$/,
+      pattern: "^\\d{2}:\\d{2}:\\d{6,7}:\\d{1,4}$",
       patternError: "Неверный формат. Пример: 15:09:0000000:0000",
     },
     {
@@ -131,7 +139,7 @@ export const REAL_ESTATE_SCHEMA: EntitySchema = {
       required: true,
       placeholder: "440 кв.м.",
       width: 150,
-      pattern: /\d/,
+      pattern: "\\d",
       patternError: "Площадь должна содержать число. Пример: 440 кв.м.",
     },
     {
@@ -171,7 +179,7 @@ export const LEGAL_ENTITY_SCHEMA: EntitySchema = {
       required: true,
       placeholder: "1513000000",
       width: 170,
-      pattern: /^\d{10}$/,
+      pattern: "^\\d{10}$",
       patternError: "ИНН юрлица состоит из 10 цифр",
     },
     {
@@ -180,7 +188,7 @@ export const LEGAL_ENTITY_SCHEMA: EntitySchema = {
       required: true,
       placeholder: "151301001",
       width: 170,
-      pattern: /^\d{9}$/,
+      pattern: "^\\d{9}$",
       patternError: "КПП состоит из 9 цифр",
     },
     {
@@ -223,7 +231,7 @@ export const INDIVIDUAL_SCHEMA: EntitySchema = {
       required: true,
       placeholder: "90 12 345678",
       width: 190,
-      pattern: /^\d{2} \d{2} \d{6}$/,
+      pattern: "^\\d{2} \\d{2} \\d{6}$",
       patternError: "Формат паспорта: 90 12 345678",
     },
     {
@@ -232,7 +240,7 @@ export const INDIVIDUAL_SCHEMA: EntitySchema = {
       required: true,
       placeholder: "123-456-789 00",
       width: 190,
-      pattern: /^\d{3}-\d{3}-\d{3} \d{2}$/,
+      pattern: "^\\d{3}-\\d{3}-\\d{3} \\d{2}$",
       patternError: "Формат СНИЛС: 123-456-789 00",
     },
     {
