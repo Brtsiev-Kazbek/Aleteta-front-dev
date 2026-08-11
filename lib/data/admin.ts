@@ -2,29 +2,29 @@ import "server-only";
 
 import { redirect } from "next/navigation";
 
-import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/types/database";
 
 /**
  * Данные для администратора установки.
  *
- * ДВА КЛИЕНТА, И ПОРЯДОК МЕЖДУ НИМИ КРИТИЧЕН. Право проверяется клиентом,
- * работающим под правами вошедшего: политика на `profiles` не даст прочитать
- * чужую строку, поэтому подделать ответ нельзя. И только после этого в дело
- * идёт служебный клиент, который политики обходит.
+ * ПРАВО ПРОВЕРЯЕТ БАЗА, А НЕ ПРИЛОЖЕНИЕ. Каждая функция `platform_*` объявлена
+ * `security definer` и начинается с `app.is_platform_admin()`. Поэтому здесь
+ * работает обычный клиент вошедшего: даже если страницу однажды откроют
+ * обходным путём, база ответит отказом.
  *
- * Обратный порядок — сначала данные, потом проверка — выглядел бы так же и был
- * бы дырой: любой вошедший получил бы весь журнал заданий по всем
- * пространствам, пока кто-нибудь не заметил.
+ * Первая версия раздела ходила служебным ключом, обходящим политики. Работало,
+ * но требовало держать ключ в переменных площадки и означало: любая ошибка в
+ * коде страницы — утечка всех арендаторов разом. Проверка, живущая в одном
+ * месте внутри базы, надёжнее восьми политик и одного «не забыть».
  *
- * ПОЧЕМУ ВООБЩЕ СЛУЖЕБНЫЙ КЛИЕНТ. Администратор установки по определению
- * смотрит поверх арендаторов: сколько пространств, где встала очередь, куда
- * уходит расход. Политики на всех таблицах привязаны к членству в
- * пространстве, и обойти их изнутри нельзя — можно только добавить для
- * администратора отдельные политики на каждую таблицу. Это восемь политик,
- * которые придётся держать в согласии; одна проверка в одном месте надёжнее.
+ * ОТКАЗ — ЭТО ДАННЫЕ, А НЕ ИСКЛЮЧЕНИЕ. Функции могут не существовать (миграция
+ * не накатана) или ответить отказом. Оба случая обычны при развёртывании, и
+ * страница обязана объяснить их словами, а не стеком.
  */
+
+type Rpc = Database["public"]["Functions"];
 
 export interface AdminGuard {
   userId: string;
@@ -35,15 +35,10 @@ export interface AdminGuard {
 /**
  * Пускает дальше только администратора установки.
  *
- * Не бросает исключение, а уводит: для человека без прав раздела просто не
- * существует, и страница ошибки сообщила бы ему, что он что-то нашёл.
+ * Уводит, а не бросает: для человека без прав раздела просто не существует, и
+ * страница ошибки сообщила бы ему, что он что-то нашёл.
  */
 export async function requirePlatformAdmin(): Promise<AdminGuard> {
-  /*
-   * Без базы раздела не существует. Проверка стоит первой, потому что
-   * посредник (middleware) без переменных Supabase пропускает всё подряд —
-   * иначе на свежем клоне репозитория не открылся бы даже лендинг.
-   */
   if (!isSupabaseConfigured()) redirect("/dashboard");
 
   const supabase = createClient();
@@ -70,206 +65,266 @@ export async function requirePlatformAdmin(): Promise<AdminGuard> {
 }
 
 /* ------------------------------------------------------------------ */
+/*  ТИПЫ                                                               */
+/* ------------------------------------------------------------------ */
+
+export type JobStatus = Database["public"]["Enums"]["job_status"];
+export type AiTask = Database["public"]["Enums"]["ai_task"];
+export type PlatformRole = Database["public"]["Enums"]["platform_role"];
+
+export interface AdminTotals {
+  users: number;
+  usersNew7d: number;
+  workspaces: number;
+  workspacesArchived: number;
+  cases: number;
+  documents: number;
+  entities: number;
+  pages: number;
+  storageBytes: number;
+  jobs30d: number;
+  cost30d: number;
+  tokensIn30d: number;
+  tokensOut30d: number;
+  failureRate: number;
+}
+
+export interface QueueRow {
+  status: JobStatus;
+  jobs: number;
+  oldest: string | null;
+}
+
+export interface SpendDay {
+  day: string;
+  jobs: number;
+  failed: number;
+  tokensIn: number;
+  tokensOut: number;
+  cost: number;
+}
 
 export interface AdminWorkspace {
   id: string;
   name: string;
+  slug: string;
   plan: string;
-  createdAt: string;
-  archivedAt: string | null;
+  ownerEmail: string | null;
   members: number;
   cases: number;
   documents: number;
+  storageBytes: number;
+  cost30d: number;
+  lastActivityAt: string | null;
+  archivedAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  fullName: string | null;
+  jobTitle: string | null;
+  role: PlatformRole;
+  workspaces: number;
+  owns: number;
+  lastActivityAt: string | null;
+  createdAt: string;
 }
 
 export interface AdminJob {
   id: string;
-  task: string;
-  status: string;
-  workspaceName: string;
+  task: AiTask;
+  status: JobStatus;
+  workspaceName: string | null;
+  actorEmail: string | null;
   model: string | null;
   attempts: number;
+  progress: number;
+  tokensIn: number;
+  tokensOut: number;
   cost: number;
-  createdAt: string;
-  finishedAt: string | null;
   error: string | null;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
 }
 
-/**
- * Отчёт не собрался — и почему.
- *
- * Служебный ключ живёт только в переменных окружения площадки: репозиторий
- * открытый, и класть его туда нельзя. Значит, вполне обычен случай, когда
- * приложение развёрнуто, а ключа нет, — и падать пятисотой в этом случае
- * неправильно: администратор увидит стек вместо объяснения и пойдёт искать
- * ошибку в коде.
- */
-export interface AdminUnavailable {
+/** Раздел открылся, а данные не пришли. Всегда с причиной. */
+export interface AdminFailure {
   reason: string;
 }
 
-export interface AdminOverview {
-  totals: {
-    workspaces: number;
-    users: number;
-    cases: number;
-    documents: number;
-    pages: number;
-    entities: number;
-  };
-  /** Очередь по состояниям — то, из-за чего сюда и заходят. */
-  queue: Record<string, number>;
-  spend: {
-    days: number;
-    requests: number;
-    failed: number;
-    tokensIn: number;
-    tokensOut: number;
-    cost: number;
-  };
-  workspaces: AdminWorkspace[];
-  jobs: AdminJob[];
+export function isFailure<T>(value: T | AdminFailure): value is AdminFailure {
+  return typeof value === "object" && value !== null && "reason" in value;
 }
 
-/** Сколько дней попадает в отчёт о расходе. */
-const SPEND_DAYS = 30;
+/* ------------------------------------------------------------------ */
+/*  ЧТЕНИЕ                                                             */
+/* ------------------------------------------------------------------ */
 
-/** Сколько последних заданий показываем. */
-const JOB_LIMIT = 20;
-
-export async function loadAdminOverview(): Promise<
-  AdminOverview | AdminUnavailable
-> {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return {
-      reason:
-        "Не задан SUPABASE_SERVICE_ROLE_KEY. Раздел смотрит поверх всех " +
-        "пространств, а политики доступа привязаны к членству — без " +
-        "служебного ключа собрать сводку нельзя.",
-    };
+/**
+ * Превращает отказ базы в человеческую причину.
+ *
+ * Самая частая причина здесь — не накатанная миграция: код раздела уехал на
+ * площадку раньше функций. Сообщение Postgres об этом («function ... does not
+ * exist») администратору ничего не говорит, поэтому подменяем его на понятное.
+ */
+function explain(message: string): string {
+  if (/does not exist|schema cache/i.test(message)) {
+    return (
+      "В базе нет функций раздела. Накатите миграцию " +
+      "supabase/migrations/20260811090000_platform_admin.sql — до этого " +
+      "показывать нечего."
+    );
   }
+  if (/администратору установки/i.test(message)) {
+    return "База отказала: у этой учётной записи нет прав администратора установки.";
+  }
+  return message;
+}
 
-  const supabase = createAdminClient();
+export async function loadOverview(): Promise<
+  | {
+      totals: AdminTotals;
+      queue: QueueRow[];
+      spend: SpendDay[];
+    }
+  | AdminFailure
+> {
+  const supabase = createClient();
 
-  const since = new Date(
-    Date.now() - SPEND_DAYS * 24 * 60 * 60 * 1000
-  ).toISOString();
-
-  /*
-   * Счётчики берём через `head: true`: нужен только `count`, и тащить строки
-   * ради их числа незачем. На четырёх пространствах разницы нет, на четырёх
-   * тысячах — это разница между страницей и таймаутом.
-   */
-  const [
-    workspaces,
-    profiles,
-    cases,
-    documents,
-    pages,
-    entities,
-    members,
-    jobs,
-    spendRows,
-  ] = await Promise.all([
-    supabase
-      .from("workspaces")
-      .select("id, name, plan, created_at, archived_at")
-      .order("created_at", { ascending: false }),
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
-    supabase.from("cases").select("workspace_id"),
-    supabase.from("documents").select("workspace_id"),
-    supabase.from("document_pages").select("id", { count: "exact", head: true }),
-    supabase.from("entities").select("id", { count: "exact", head: true }),
-    supabase.from("workspace_members").select("workspace_id"),
-    supabase
-      .from("ai_jobs")
-      .select(
-        "id, task, status, workspace_id, model, attempts, cost, created_at, finished_at, error"
-      )
-      .order("created_at", { ascending: false })
-      .limit(JOB_LIMIT),
-    supabase
-      .from("ai_jobs")
-      .select("status, tokens_in, tokens_out, cost")
-      .gte("created_at", since),
+  const [overview, queue, spend] = await Promise.all([
+    supabase.rpc("platform_overview"),
+    supabase.rpc("platform_queue"),
+    supabase.rpc("platform_spend_daily", { days: 30 }),
   ]);
 
-  const workspaceRows = workspaces.data ?? [];
-  const names = new Map(workspaceRows.map((row) => [row.id, row.name]));
+  const failed = overview.error ?? queue.error ?? spend.error;
+  if (failed) return { reason: explain(failed.message) };
 
-  /** Сколько строк приходится на каждое пространство. */
-  function countBy(rows: { workspace_id: string }[] | null) {
-    const map = new Map<string, number>();
-    for (const row of rows ?? []) {
-      map.set(row.workspace_id, (map.get(row.workspace_id) ?? 0) + 1);
-    }
-    return map;
-  }
-
-  const memberCounts = countBy(members.data);
-  const caseCounts = countBy(cases.data);
-  const documentCounts = countBy(documents.data);
-
-  const queue: Record<string, number> = {};
-  const spend = {
-    days: SPEND_DAYS,
-    requests: 0,
-    failed: 0,
-    tokensIn: 0,
-    tokensOut: 0,
-    cost: 0,
-  };
-
-  for (const row of spendRows.data ?? []) {
-    spend.requests += 1;
-    if (row.status === "failed") spend.failed += 1;
-    spend.tokensIn += row.tokens_in ?? 0;
-    spend.tokensOut += row.tokens_out ?? 0;
-    spend.cost += Number(row.cost ?? 0);
-  }
-
-  /*
-   * Состояния очереди считаем по всей таблице, а не за тридцать дней: задание,
-   * застрявшее в работе два месяца назад, — ровно то, ради чего этот раздел и
-   * нужен, и выпадать из отчёта оно не должно.
-   */
-  const { data: statusRows } = await supabase.from("ai_jobs").select("status");
-  for (const row of statusRows ?? []) {
-    queue[row.status] = (queue[row.status] ?? 0) + 1;
-  }
+  const row = (overview.data as Rpc["platform_overview"]["Returns"])?.[0];
+  if (!row) return { reason: "База вернула пустую сводку." };
 
   return {
     totals: {
-      workspaces: workspaceRows.length,
-      users: profiles.count ?? 0,
-      cases: cases.data?.length ?? 0,
-      documents: documents.data?.length ?? 0,
-      pages: pages.count ?? 0,
-      entities: entities.count ?? 0,
+      users: Number(row.users ?? 0),
+      usersNew7d: Number(row.users_new_7d ?? 0),
+      workspaces: Number(row.workspaces ?? 0),
+      workspacesArchived: Number(row.workspaces_archived ?? 0),
+      cases: Number(row.cases ?? 0),
+      documents: Number(row.documents ?? 0),
+      entities: Number(row.entities ?? 0),
+      pages: Number(row.pages ?? 0),
+      storageBytes: Number(row.storage_bytes ?? 0),
+      jobs30d: Number(row.jobs_30d ?? 0),
+      cost30d: Number(row.cost_30d ?? 0),
+      tokensIn30d: Number(row.tokens_in_30d ?? 0),
+      tokensOut30d: Number(row.tokens_out_30d ?? 0),
+      failureRate: Number(row.failure_rate ?? 0),
     },
-    queue,
-    spend,
-    workspaces: workspaceRows.map((row) => ({
-      id: row.id,
-      name: row.name,
-      plan: row.plan ?? "free",
-      createdAt: row.created_at,
-      archivedAt: row.archived_at,
-      members: memberCounts.get(row.id) ?? 0,
-      cases: caseCounts.get(row.id) ?? 0,
-      documents: documentCounts.get(row.id) ?? 0,
+    queue: (queue.data ?? []).map((item) => ({
+      status: item.status,
+      jobs: Number(item.jobs ?? 0),
+      oldest: item.oldest,
     })),
-    jobs: (jobs.data ?? []).map((row) => ({
-      id: row.id,
-      task: row.task,
-      status: row.status,
-      workspaceName: names.get(row.workspace_id) ?? "—",
-      model: row.model,
-      attempts: row.attempts ?? 0,
-      cost: Number(row.cost ?? 0),
-      createdAt: row.created_at,
-      finishedAt: row.finished_at,
-      error: row.error,
+    spend: (spend.data ?? []).map((item) => ({
+      day: item.day,
+      jobs: Number(item.jobs ?? 0),
+      failed: Number(item.failed ?? 0),
+      tokensIn: Number(item.tokens_in ?? 0),
+      tokensOut: Number(item.tokens_out ?? 0),
+      cost: Number(item.cost ?? 0),
     })),
   };
+}
+
+export async function loadWorkspaces(
+  search?: string
+): Promise<AdminWorkspace[] | AdminFailure> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc("platform_workspaces", {
+    search: search?.trim() || undefined,
+    limit_count: 100,
+    offset_count: 0,
+  });
+
+  if (error) return { reason: explain(error.message) };
+
+  return (data ?? []).map((row) => ({
+    id: row.workspace_id,
+    name: row.name,
+    slug: row.slug,
+    plan: row.plan ?? "free",
+    ownerEmail: row.owner_email,
+    members: Number(row.members ?? 0),
+    cases: Number(row.cases ?? 0),
+    documents: Number(row.documents ?? 0),
+    storageBytes: Number(row.storage_bytes ?? 0),
+    cost30d: Number(row.cost_30d ?? 0),
+    lastActivityAt: row.last_activity_at,
+    archivedAt: row.archived_at,
+    createdAt: row.created_at,
+  }));
+}
+
+export async function loadUsers(
+  search?: string
+): Promise<AdminUser[] | AdminFailure> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc("platform_users", {
+    search: search?.trim() || undefined,
+    limit_count: 100,
+    offset_count: 0,
+  });
+
+  if (error) return { reason: explain(error.message) };
+
+  return (data ?? []).map((row) => ({
+    id: row.user_id,
+    email: row.email,
+    fullName: row.full_name,
+    jobTitle: row.job_title,
+    role: row.platform_role,
+    workspaces: Number(row.workspaces ?? 0),
+    owns: Number(row.owns ?? 0),
+    lastActivityAt: row.last_activity_at,
+    createdAt: row.created_at,
+  }));
+}
+
+export async function loadJobs(filters: {
+  status?: JobStatus;
+  task?: AiTask;
+}): Promise<AdminJob[] | AdminFailure> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc("platform_jobs", {
+    status_filter: filters.status,
+    task_filter: filters.task,
+    limit_count: 100,
+    offset_count: 0,
+  });
+
+  if (error) return { reason: explain(error.message) };
+
+  return (data ?? []).map((row) => ({
+    id: row.job_id,
+    task: row.task,
+    status: row.status,
+    workspaceName: row.workspace_name,
+    actorEmail: row.actor_email,
+    model: row.model,
+    attempts: Number(row.attempts ?? 0),
+    progress: Number(row.progress ?? 0),
+    tokensIn: Number(row.tokens_in ?? 0),
+    tokensOut: Number(row.tokens_out ?? 0),
+    cost: Number(row.cost ?? 0),
+    error: row.error,
+    createdAt: row.created_at,
+    startedAt: row.started_at,
+    finishedAt: row.finished_at,
+  }));
 }

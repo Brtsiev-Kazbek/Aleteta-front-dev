@@ -1325,6 +1325,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      configure_worker_key: { Args: { new_key: string }; Returns: string }
       document_text: {
         Args: { from_page?: number; target_document: string; to_page?: number }
         Returns: string
@@ -1343,33 +1344,111 @@ export type Database = {
         }
         Returns: undefined
       }
+      platform_cancel_job: { Args: { target_job: string }; Returns: undefined }
+      platform_jobs: {
+        Args: {
+          limit_count?: number
+          offset_count?: number
+          status_filter?: Database["public"]["Enums"]["job_status"]
+          task_filter?: Database["public"]["Enums"]["ai_task"]
+        }
+        Returns: {
+          actor_email: string
+          attempts: number
+          cost: number
+          created_at: string
+          error: string
+          finished_at: string
+          job_id: string
+          model: string
+          progress: number
+          started_at: string
+          status: Database["public"]["Enums"]["job_status"]
+          task: Database["public"]["Enums"]["ai_task"]
+          tokens_in: number
+          tokens_out: number
+          workspace_id: string
+          workspace_name: string
+        }[]
+      }
       platform_overview: {
         Args: never
         Returns: {
-          ai_cost_usd_30d: number
-          ai_failure_rate: number
-          ai_jobs_30d: number
           cases: number
+          cost_30d: number
           documents: number
           entities: number
+          failure_rate: number
+          jobs_30d: number
+          pages: number
           storage_bytes: number
+          tokens_in_30d: number
+          tokens_out_30d: number
           users: number
           users_new_7d: number
           workspaces: number
+          workspaces_archived: number
         }[]
       }
-      platform_signups: {
+      platform_queue: {
+        Args: never
+        Returns: {
+          jobs: number
+          oldest: string
+          status: Database["public"]["Enums"]["job_status"]
+        }[]
+      }
+      platform_requeue_failed: {
+        Args: { task_filter?: Database["public"]["Enums"]["ai_task"] }
+        Returns: number
+      }
+      platform_requeue_job: { Args: { target_job: string }; Returns: undefined }
+      platform_set_plan: {
+        Args: { new_plan: string; target_workspace: string }
+        Returns: undefined
+      }
+      platform_set_role: {
+        Args: {
+          new_role: Database["public"]["Enums"]["platform_role"]
+          target_user: string
+        }
+        Returns: undefined
+      }
+      platform_set_workspace_archived: {
+        Args: { archived: boolean; target_workspace: string }
+        Returns: undefined
+      }
+      platform_spend_daily: {
         Args: { days?: number }
         Returns: {
+          cost: number
           day: string
-          signups: number
+          failed: number
+          jobs: number
+          tokens_in: number
+          tokens_out: number
+        }[]
+      }
+      platform_users: {
+        Args: { limit_count?: number; offset_count?: number; search?: string }
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          job_title: string
+          last_activity_at: string
+          owns: number
+          platform_role: Database["public"]["Enums"]["platform_role"]
+          user_id: string
+          workspaces: number
         }[]
       }
       platform_workspaces: {
         Args: { limit_count?: number; offset_count?: number; search?: string }
         Returns: {
-          ai_cost_usd_30d: number
+          archived_at: string
           cases: number
+          cost_30d: number
           created_at: string
           documents: number
           last_activity_at: string
@@ -1378,6 +1457,7 @@ export type Database = {
           owner_email: string
           plan: string
           slug: string
+          storage_bytes: number
           workspace_id: string
         }[]
       }
