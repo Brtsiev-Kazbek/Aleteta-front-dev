@@ -149,7 +149,7 @@ export function RecognizedTextSheet({
       >
         {/* Ярус 1: что это за файл */}
         {/* Место справа оставлено крестику: он висит поверх, в правом верхнем углу. */}
-        <SheetHeader className="border-b border-stone-200 px-6 py-5 pr-14">
+        <SheetHeader className="border-b border-line px-6 py-5 pr-14">
           <SheetTitle className="text-[15px]">{title || "Документ"}</SheetTitle>
           <SheetDescription className="text-[12.5px] leading-relaxed">
             Текст дословно, как его прочитала модель. Из него потом берутся
@@ -158,7 +158,7 @@ export function RecognizedTextSheet({
         </SheetHeader>
 
         {/* Ярус 2: состояние и действия */}
-        <div className="shrink-0 border-b border-stone-200 bg-stone-50/70 px-6 py-3">
+        <div className="shrink-0 border-b border-line bg-stone-50/70 px-6 py-3">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <StatusLine
               status={status}
@@ -266,10 +266,10 @@ export function RecognizedTextSheet({
         </div>
 
         {/* Ярус 4: куда идти дальше */}
-        <div className="shrink-0 border-t border-stone-200 px-6 py-3">
+        <div className="shrink-0 border-t border-line px-6 py-3">
           <Link
             href="/dashboard/recognize"
-            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500 transition-colors hover:text-stone-900"
+            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle transition-colors hover:text-fg"
           >
             Все расшифровки и поиск по ним
             <ArrowUpRight className="h-3 w-3" />
@@ -284,15 +284,15 @@ export function RecognizedTextSheet({
 function PageBlock({ page }: { page: RecognizedPage }) {
   return (
     <section>
-      <header className="mb-2 flex items-center gap-2 border-b border-stone-200 pb-1.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
+      <header className="mb-2 flex items-center gap-2 border-b border-line pb-1.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
           Страница {page.page}
         </span>
         <span
           className={cn(
             "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]",
             page.source === "embedded"
-              ? "border-stone-200 text-stone-400"
+              ? "border-line text-fg-faint"
               : "border-violet-200 bg-violet-50/60 text-violet-700"
           )}
           title={page.model ?? undefined}
@@ -301,7 +301,7 @@ function PageBlock({ page }: { page: RecognizedPage }) {
         </span>
       </header>
 
-      <pre className="whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-stone-700">
+      <pre className="whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-fg-muted">
         {page.text}
       </pre>
     </section>
@@ -392,11 +392,11 @@ function Empty({
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
       <Icon
-        className={cn("h-5 w-5 text-stone-300", spinning && "animate-spin")}
+        className={cn("h-5 w-5 text-fg-ghost", spinning && "animate-spin")}
       />
-      <p className="text-[13px] text-stone-900">{title}</p>
+      <p className="text-[13px] text-fg">{title}</p>
       {hint && (
-        <p className="max-w-sm text-[12.5px] leading-relaxed text-stone-500">
+        <p className="max-w-sm text-[12.5px] leading-relaxed text-fg-subtle">
           {hint}
         </p>
       )}
@@ -414,7 +414,7 @@ function Meta({
   return (
     <span
       className={cn(
-        "flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500",
+        "flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle",
         className
       )}
     >
@@ -437,7 +437,7 @@ function IconButton({
       type="button"
       title={title}
       onClick={onClick}
-      className="rounded p-1.5 text-stone-400 transition-colors hover:bg-stone-200/70 hover:text-stone-900"
+      className="rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-3/70 hover:text-fg"
     >
       {children}
       <span className="sr-only">{title}</span>

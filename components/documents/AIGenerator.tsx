@@ -153,8 +153,8 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
         {/* Поле запроса */}
         <div
           className={cn(
-            "rounded-lg border bg-white p-4 transition-colors",
-            prompt.trim() ? "border-stone-900" : "border-stone-200"
+            "rounded-lg border bg-surface p-4 transition-colors",
+            prompt.trim() ? "border-stone-900" : "border-line"
           )}
         >
           <AutoGrowTextarea
@@ -170,8 +170,8 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
             disabled={isBusy}
           />
 
-          <div className="mt-3 flex items-center justify-between gap-3 border-t border-stone-100 pt-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-line-soft pt-3">
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
               Enter — сгенерировать
             </span>
             <Button
@@ -194,7 +194,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                 key={item}
                 type="button"
                 onClick={() => setPrompt(item)}
-                className="rounded border border-stone-200 bg-white px-2.5 py-1.5 text-xs text-stone-600 transition-colors hover:border-stone-900 hover:text-stone-900"
+                className="rounded border border-line bg-surface px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-stone-900 hover:text-fg"
               >
                 {item}
               </button>
@@ -214,23 +214,23 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
                 className={cn(
                   "h-3.5 w-3.5 shrink-0",
                   stage === "searching"
-                    ? "animate-pulse text-stone-900"
-                    : "text-stone-400"
+                    ? "animate-pulse text-fg"
+                    : "text-fg-faint"
                 )}
               />
 
               {stage === "searching" ? (
-                <span className="text-[11px] text-stone-500">
+                <span className="text-[11px] text-fg-subtle">
                   Проверяю, есть ли подходящий шаблон…
                 </span>
               ) : match?.found ? (
-                <span className="text-[11px] text-stone-600">
+                <span className="text-[11px] text-fg-soft">
                   Шаблон найден:{" "}
-                  <span className="text-stone-900">{match.name}</span> —
+                  <span className="text-fg">{match.name}</span> —
                   реквизиты подставлены
                 </span>
               ) : (
-                <span className="text-[11px] text-stone-600">
+                <span className="text-[11px] text-fg-soft">
                   Шаблона нет —{" "}
                   <span className="font-medium text-violet-700">
                     документ составлен с нуля
@@ -246,19 +246,19 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-4 overflow-hidden rounded-lg border border-stone-200 bg-white"
+            className="mt-4 overflow-hidden rounded-lg border border-line bg-surface"
           >
-            <div className="flex items-center gap-3 border-b border-stone-200 px-5 py-2.5">
+            <div className="flex items-center gap-3 border-b border-line px-5 py-2.5">
               <MetaLabel>Документ</MetaLabel>
               {stage === "typing" && (
-                <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                   составляется
                 </span>
               )}
             </div>
 
-            <div className="bg-stone-100 p-5">
-              <article className="mx-auto max-w-[32rem] bg-white px-8 py-9 shadow-sm">
+            <div className="bg-surface-2 p-5">
+              <article className="mx-auto max-w-[32rem] bg-surface px-8 py-9 shadow-sm">
                 <MarkdownDocument
                   text={visibleText}
                   showCaret={stage === "typing"}
@@ -270,7 +270,7 @@ export function AIGenerator({ onClose }: AIGeneratorProps) {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-wrap items-center gap-2 border-t border-stone-200 px-5 py-3.5"
+                className="flex flex-wrap items-center gap-2 border-t border-line px-5 py-3.5"
               >
                 <Button
                   variant="outline"
@@ -345,7 +345,7 @@ function MarkdownDocument({
           return (
             <h3
               key={index}
-              className="mt-5 text-[10px] font-bold text-stone-900"
+              className="mt-5 text-[10px] font-bold text-fg"
             >
               {line.slice(3)}
               {caret}
@@ -357,7 +357,7 @@ function MarkdownDocument({
           return (
             <h2
               key={index}
-              className="text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-stone-900"
+              className="text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-fg"
             >
               {line.slice(2)}
               {caret}
@@ -376,7 +376,7 @@ function MarkdownDocument({
         return (
           <p
             key={index}
-            className="mt-2.5 text-justify text-[10px] leading-[1.75] text-stone-700"
+            className="mt-2.5 text-justify text-[10px] leading-[1.75] text-fg-muted"
           >
             {line}
             {caret}

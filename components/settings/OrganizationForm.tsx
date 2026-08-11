@@ -139,7 +139,7 @@ export function OrganizationForm({
       </div>
 
       {!canEdit && (
-        <p className="text-[13px] leading-relaxed text-stone-500">
+        <p className="text-[13px] leading-relaxed text-fg-subtle">
           Реквизиты меняет владелец или администратор пространства.
         </p>
       )}

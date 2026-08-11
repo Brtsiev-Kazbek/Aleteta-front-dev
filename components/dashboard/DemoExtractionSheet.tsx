@@ -78,12 +78,12 @@ export function DemoExtractionSheet() {
         {extraction && (
           <>
             {/* Исходный файл */}
-            <div className="flex shrink-0 items-center gap-2.5 border-b border-stone-200 px-5 py-3.5">
-              <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
-              <span className="min-w-0 flex-1 truncate text-[13px] text-stone-700">
+            <div className="flex shrink-0 items-center gap-2.5 border-b border-line px-5 py-3.5">
+              <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
+              <span className="min-w-0 flex-1 truncate text-[13px] text-fg-muted">
                 {extraction.file.name}
               </span>
-              <span className="shrink-0 font-mono text-[10px] text-stone-400">
+              <span className="shrink-0 font-mono text-[10px] text-fg-faint">
                 {formatFileSize(extraction.file.sizeBytes)}
               </span>
             </div>
@@ -105,7 +105,7 @@ export function DemoExtractionSheet() {
                             ? "bg-emerald-100 text-emerald-600"
                             : isCurrent
                               ? "bg-stone-900 text-white"
-                              : "bg-stone-100 text-stone-300"
+                              : "bg-surface-2 text-fg-ghost"
                         )}
                       >
                         {isStepDone ? (
@@ -121,10 +121,10 @@ export function DemoExtractionSheet() {
                         className={cn(
                           "text-[13px] transition-colors",
                           isStepDone
-                            ? "text-stone-400"
+                            ? "text-fg-faint"
                             : isCurrent
-                              ? "text-stone-900"
-                              : "text-stone-300"
+                              ? "text-fg"
+                              : "text-fg-ghost"
                         )}
                       >
                         {step}
@@ -150,7 +150,7 @@ export function DemoExtractionSheet() {
                             repeat: Infinity,
                             delay: index * 0.15,
                           }}
-                          className="h-[42px] rounded border border-stone-200 bg-white"
+                          className="h-[42px] rounded border border-line bg-surface"
                         />
                       );
                     }
@@ -165,10 +165,10 @@ export function DemoExtractionSheet() {
                           "flex items-center justify-between gap-3 rounded border px-3 py-2.5",
                           field.uncertain
                             ? "border-amber-200 bg-amber-50/60"
-                            : "border-stone-200 bg-white"
+                            : "border-line bg-surface"
                         )}
                       >
-                        <span className="shrink-0 text-[11px] text-stone-400">
+                        <span className="shrink-0 text-[11px] text-fg-faint">
                           {field.label}
                         </span>
 
@@ -176,7 +176,7 @@ export function DemoExtractionSheet() {
                           {field.uncertain && (
                             <AlertTriangle className="h-3 w-3 shrink-0 text-amber-600" />
                           )}
-                          <span className="min-w-0 truncate text-[13px] text-stone-900">
+                          <span className="min-w-0 truncate text-[13px] text-fg">
                             {field.value}
                           </span>
                         </span>
@@ -186,7 +186,7 @@ export function DemoExtractionSheet() {
                 </div>
 
                 {isDone && uncertainCount > 0 && (
-                  <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
+                  <p className="mt-3 text-[11px] leading-relaxed text-fg-subtle">
                     {uncertainCount}{" "}
                     {plural(
                       uncertainCount,
@@ -221,7 +221,7 @@ export function DemoExtractionSheet() {
                           "flex items-center gap-2.5 rounded border px-3 py-2.5 text-left transition-colors",
                           targetCaseId === item.id
                             ? "border-stone-900 bg-stone-50"
-                            : "border-stone-200 hover:border-stone-300"
+                            : "border-line hover:border-line-strong"
                         )}
                       >
                         <span
@@ -232,7 +232,7 @@ export function DemoExtractionSheet() {
                               : "bg-stone-300"
                           )}
                         />
-                        <span className="min-w-0 flex-1 truncate text-[13px] text-stone-700">
+                        <span className="min-w-0 flex-1 truncate text-[13px] text-fg-muted">
                           {item.title}
                         </span>
                       </button>
@@ -242,7 +242,7 @@ export function DemoExtractionSheet() {
               )}
             </ScrollArea>
 
-            <div className="flex shrink-0 items-center gap-2 border-t border-stone-200 px-5 py-4">
+            <div className="flex shrink-0 items-center gap-2 border-t border-line px-5 py-4">
               {extraction.applied ? (
                 <motion.div
                   initial={{ opacity: 0 }}

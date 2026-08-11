@@ -289,12 +289,12 @@ function Dropzone({
         compact ? "px-6 py-8" : "px-6 py-20",
         isDragging
           ? "border-violet-400 bg-violet-50/50"
-          : "border-stone-300 bg-white/60 hover:border-stone-400"
+          : "border-line-strong bg-surface/60 hover:border-stone-400"
       )}
     >
       <Upload
         className={cn(
-          "text-stone-300 transition-colors",
+          "text-fg-ghost transition-colors",
           compact ? "h-5 w-5" : "h-7 w-7",
           isDragging && "text-violet-500"
         )}
@@ -302,7 +302,7 @@ function Dropzone({
 
       <p
         className={cn(
-          "font-medium tracking-[-0.01em] text-stone-900",
+          "font-medium tracking-[-0.01em] text-fg",
           compact ? "text-[14px]" : "text-[17px]"
         )}
       >
@@ -310,7 +310,7 @@ function Dropzone({
       </p>
 
       {!compact && (
-        <p className="max-w-md text-[13px] leading-relaxed text-stone-500">
+        <p className="max-w-md text-[13px] leading-relaxed text-fg-subtle">
           Скан, фотография или PDF. Текст появится на этой же странице по мере
           того, как читаются страницы, — уходить и возвращаться не нужно.
         </p>
@@ -328,7 +328,7 @@ function Dropzone({
       </Button>
 
       {disabled && (
-        <p className="text-[12px] text-stone-400">
+        <p className="text-[12px] text-fg-faint">
           Загрузка работает только с подключённой базой.
         </p>
       )}
@@ -422,7 +422,7 @@ function SearchPanel({
   return (
     <section className="flex flex-col gap-3">
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-faint" />
 
         <Input
           value={query}
@@ -446,11 +446,11 @@ function SearchPanel({
         {/* Счётчик и стрелки — там же, где их ищут: справа в поле */}
         <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
           {isSearching && (
-            <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin text-stone-400" />
+            <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin text-fg-faint" />
           )}
 
           {hits !== null && !isSearching && (
-            <span className="mr-1 font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+            <span className="mr-1 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
               {found.length === 0
                 ? "нет совпадений"
                 : `${index >= 0 ? index + 1 : "—"} из ${found.length}`}
@@ -488,7 +488,7 @@ function SearchPanel({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="scrollable-area flex max-h-64 flex-col divide-y divide-stone-200 overflow-y-auto rounded-lg border border-stone-200 bg-white"
+            className="scrollable-area flex max-h-64 flex-col divide-y divide-line overflow-y-auto rounded-lg border border-line bg-surface"
           >
             {found.map((hit, position) => {
               const isCurrent = position === index;
@@ -503,12 +503,12 @@ function SearchPanel({
                       isCurrent ? "bg-amber-50/70" : "hover:bg-stone-50"
                     )}
                   >
-                    <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+                    <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
                       <span className="truncate">{hit.documentTitle}</span>
-                      <span className="shrink-0 text-stone-300">·</span>
+                      <span className="shrink-0 text-fg-ghost">·</span>
                       <span className="shrink-0">стр. {hit.page}</span>
                     </span>
-                    <span className="text-[13px] leading-relaxed text-stone-700">
+                    <span className="text-[13px] leading-relaxed text-fg-muted">
                       <SearchFragment fragment={hit.fragment} />
                     </span>
                   </button>
@@ -540,7 +540,7 @@ function StepButton({
       title={title}
       onClick={onClick}
       disabled={disabled}
-      className="rounded p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900 disabled:pointer-events-none disabled:opacity-30"
+      className="rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg disabled:pointer-events-none disabled:opacity-30"
     >
       {children}
       <span className="sr-only">{title}</span>
@@ -582,8 +582,8 @@ function FileList({
               className={cn(
                 "group rounded-lg border p-3 transition-colors",
                 isSelected
-                  ? "border-stone-900 bg-white"
-                  : "border-stone-200 bg-white/60 hover:border-stone-400"
+                  ? "border-stone-900 bg-surface"
+                  : "border-line bg-surface/60 hover:border-stone-400"
               )}
             >
               <button
@@ -591,13 +591,13 @@ function FileList({
                 onClick={() => onSelect(document.id)}
                 className="flex w-full items-start gap-2.5 text-left"
               >
-                <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-stone-300" />
+                <FileText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-ghost" />
 
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] text-stone-900">
+                  <span className="truncate text-[13px] text-fg">
                     {document.title}
                   </span>
-                  <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+                  <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
                     {formatDate(document.createdAt)}
                   </span>
                 </span>
@@ -669,13 +669,13 @@ function FileStrip({
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 transition-colors",
               isSelected
-                ? "border-stone-900 bg-white"
-                : "border-stone-200 bg-white/60 hover:border-stone-400"
+                ? "border-stone-900 bg-surface"
+                : "border-line bg-surface/60 hover:border-stone-400"
             )}
           >
-            <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
+            <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
 
-            <span className="max-w-[14rem] truncate text-[12.5px] text-stone-900">
+            <span className="max-w-[14rem] truncate text-[12.5px] text-fg">
               {document.title}
             </span>
 
@@ -1145,7 +1145,7 @@ function TextPane({
 
   if (!document) {
     return (
-      <div className="flex items-center justify-center rounded-lg border border-stone-200 bg-white/60 p-12 text-[13px] text-stone-500">
+      <div className="flex items-center justify-center rounded-lg border border-line bg-surface/60 p-12 text-[13px] text-fg-subtle">
         Выберите файл слева.
       </div>
     );
@@ -1163,14 +1163,14 @@ function TextPane({
      */
     <div className="flex h-full min-w-0 flex-col gap-3">
       {/* Шапка: имя файла, поиск по нему, действия */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-stone-200 bg-white px-4 py-2.5">
-        <h2 className="min-w-0 flex-1 truncate text-[14px] font-medium tracking-[-0.01em] text-stone-900">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-line bg-surface px-4 py-2.5">
+        <h2 className="min-w-0 flex-1 truncate text-[14px] font-medium tracking-[-0.01em] text-fg">
           {document.title}
         </h2>
 
         {hasText && (
           <div className="relative">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400" />
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-fg-faint" />
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -1188,7 +1188,7 @@ function TextPane({
 
             <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center">
               {terms.length > 0 && (
-                <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.1em] text-stone-400">
+                <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-faint">
                   {marks.total === 0 ? "нет" : `${at + 1}/${marks.total}`}
                 </span>
               )}
@@ -1249,7 +1249,7 @@ function TextPane({
       </div>
 
       {/* Расшифровка */}
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-lg border border-line bg-surface">
         <div
           ref={scrollRef}
           className="scrollable-area min-h-0 min-w-0 flex-1 overflow-y-auto"
@@ -1278,7 +1278,7 @@ function TextPane({
                   </p>
                 )}
 
-                <p className="pl-5 text-[12px] leading-relaxed text-stone-500">
+                <p className="pl-5 text-[12px] leading-relaxed text-fg-subtle">
                   Исправив причину, нажмите «распознать заново».
                 </p>
               </div>
@@ -1290,7 +1290,7 @@ function TextPane({
                 </Meta>
               </div>
             ) : !hasText ? (
-              <p className="p-5 text-[13px] leading-relaxed text-stone-500">
+              <p className="p-5 text-[13px] leading-relaxed text-fg-subtle">
                 {isRunning
                   ? "Страницы дочитываются — текст появится здесь сам, по мере готовности."
                   : "Текста нет: страницы оказались пустыми."}
@@ -1306,14 +1306,14 @@ function TextPane({
                     */}
                     <header
                       className={cn(
-                        "sticky top-0 z-10 flex items-center gap-2 border-b border-stone-200 bg-white/95 px-5 py-2 backdrop-blur",
+                        "sticky top-0 z-10 flex items-center gap-2 border-b border-line bg-surface/95 px-5 py-2 backdrop-blur",
                         position > 0 && "border-t"
                       )}
                     >
                       <button
                         type="button"
                         onClick={() => onOpenPage(page.page)}
-                        className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500 transition-colors hover:text-stone-900"
+                        className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle transition-colors hover:text-fg"
                         title="Показать эту страницу в оригинале"
                       >
                         Страница {page.page}
@@ -1323,7 +1323,7 @@ function TextPane({
                         className={cn(
                           "rounded border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em]",
                           page.source === "embedded"
-                            ? "border-stone-200 text-stone-400"
+                            ? "border-line text-fg-faint"
                             : "border-violet-200 bg-violet-50/60 text-violet-700"
                         )}
                         title={page.model ?? undefined}
@@ -1338,7 +1338,7 @@ function TextPane({
                       )}
                     </header>
 
-                    <pre className="whitespace-pre-wrap break-words px-5 py-4 font-mono text-[12.5px] leading-[1.7] text-stone-700">
+                    <pre className="whitespace-pre-wrap break-words px-5 py-4 font-mono text-[12.5px] leading-[1.7] text-fg-muted">
                       <HighlightedText
                         text={page.text}
                         terms={terms}
@@ -1401,7 +1401,7 @@ function Meta({
   return (
     <span
       className={cn(
-        "flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500",
+        "flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle",
         className
       )}
     >
@@ -1435,7 +1435,7 @@ function IconButton({
       title={title}
       onClick={onClick}
       className={cn(
-        "rounded p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900",
+        "rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg",
         className
       )}
     >

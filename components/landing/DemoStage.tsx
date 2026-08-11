@@ -24,7 +24,7 @@ export function DemoStage({
   return (
     <div
       className={cn(
-        "relative rounded-2xl border border-stone-200/80 bg-gradient-to-b from-white to-stone-50/60 p-2.5 sm:p-3.5",
+        "relative rounded-2xl border border-line/80 bg-gradient-to-b from-white to-stone-50/60 p-2.5 sm:p-3.5",
         className
       )}
     >

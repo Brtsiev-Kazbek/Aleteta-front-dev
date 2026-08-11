@@ -93,12 +93,12 @@ export default async function SettingsPage() {
               aria-label="Разделы настроек"
               className="mb-10 hidden lg:sticky lg:top-0 lg:mb-0 lg:block lg:self-start"
             >
-              <ul className="flex flex-col border-l border-stone-200">
+              <ul className="flex flex-col border-l border-line">
                 {SECTION_LINKS.map((link) => (
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="-ml-px block border-l border-transparent py-2 pl-4 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400 transition-colors hover:border-stone-900 hover:text-stone-900"
+                      className="-ml-px block border-l border-transparent py-2 pl-4 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:border-stone-900 hover:text-fg"
                     >
                       {link.label}
                     </a>
@@ -134,7 +134,7 @@ export default async function SettingsPage() {
                 title="Организация"
                 description="Реквизиты, которые подставляются в шаблоны документов."
                 aside={
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                     тариф: {settings.workspace.plan}
                   </span>
                 }
@@ -151,7 +151,7 @@ export default async function SettingsPage() {
                 title="Участники"
                 description="Кто работает с делами этого пространства."
                 aside={
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                     вы — {ROLE_LABELS[settings.myRole] ?? settings.myRole}
                   </span>
                 }
@@ -195,14 +195,14 @@ export default async function SettingsPage() {
                 <form
                   action="/auth/signout"
                   method="post"
-                  className="mt-8 flex items-center justify-between gap-4 border-t border-stone-200 pt-5"
+                  className="mt-8 flex items-center justify-between gap-4 border-t border-line pt-5"
                 >
-                  <span className="text-[13px] text-stone-500">
+                  <span className="text-[13px] text-fg-subtle">
                     Выйти из аккаунта на этом устройстве.
                   </span>
                   <button
                     type="submit"
-                    className="shrink-0 border-b border-stone-300 pb-0.5 text-[13px] text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-900"
+                    className="shrink-0 border-b border-line-strong pb-0.5 text-[13px] text-fg-muted transition-colors hover:border-stone-900 hover:text-fg"
                   >
                     Выйти
                   </button>
@@ -230,11 +230,11 @@ function NotConfigured() {
             description="Приложение открыто на встроенном наборе данных — сохранять настройки некуда."
           />
 
-          <p className="mt-8 text-sm leading-relaxed text-stone-600">
-            Скопируйте <code className="text-stone-900">.env.example</code> в{" "}
-            <code className="text-stone-900">.env.local</code>, заполните адрес
+          <p className="mt-8 text-sm leading-relaxed text-fg-soft">
+            Скопируйте <code className="text-fg">.env.example</code> в{" "}
+            <code className="text-fg">.env.local</code>, заполните адрес
             проекта и ключи Supabase и примените миграции — порядок описан в{" "}
-            <code className="text-stone-900">docs/SUPABASE.md</code>. После
+            <code className="text-fg">docs/SUPABASE.md</code>. После
             этого профиль, реквизиты организации и состав участников появятся
             здесь.
           </p>

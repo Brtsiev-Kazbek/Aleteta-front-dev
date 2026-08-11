@@ -56,7 +56,7 @@ export function BatchReviewSheet() {
         <SheetHeader>
           <div className="flex items-center gap-2">
             <MetaLabel>Проверка пачкой</MetaLabel>
-            <span className="ml-auto font-mono text-[10px] tabular-nums text-stone-400">
+            <span className="ml-auto font-mono text-[10px] tabular-nums text-fg-faint">
               {Math.min(cursor, queue.length)} / {queue.length}
             </span>
           </div>
@@ -95,7 +95,7 @@ export function BatchReviewSheet() {
                   key={item.id}
                   className={cn(
                     "flex items-center gap-2.5 rounded border px-3 py-2.5 transition-colors",
-                    hasCritical ? "border-red-200" : "border-stone-200"
+                    hasCritical ? "border-red-200" : "border-line"
                   )}
                 >
                   <span className="flex h-4 w-4 shrink-0 items-center justify-center">
@@ -109,16 +109,16 @@ export function BatchReviewSheet() {
                         />
                       )
                     ) : isChecking ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-stone-900" />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-fg" />
                     ) : (
-                      <FileText className="h-3.5 w-3.5 text-stone-300" />
+                      <FileText className="h-3.5 w-3.5 text-fg-ghost" />
                     )}
                   </span>
 
                   <span
                     className={cn(
                       "min-w-0 flex-1 truncate text-[13px] transition-colors",
-                      result ? "text-stone-800" : "text-stone-400"
+                      result ? "text-stone-800" : "text-fg-faint"
                     )}
                   >
                     {item.title}
@@ -155,13 +155,13 @@ export function BatchReviewSheet() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-5 border-t border-stone-200 pt-5"
+                className="mt-5 border-t border-line pt-5"
               >
                 <div className="flex items-baseline gap-2.5">
-                  <span className="font-mono text-3xl tabular-nums text-stone-900">
+                  <span className="font-mono text-3xl tabular-nums text-fg">
                     {totals.critical + totals.warning}
                   </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
                     замечаний в {queue.length}{" "}
                     {plural(
                       queue.length,
@@ -197,13 +197,13 @@ export function BatchReviewSheet() {
 
                 <div className="mt-5">
                   <MetaLabel>Порядок разбора</MetaLabel>
-                  <ol className="mt-3 flex flex-col divide-y divide-stone-200 border-t border-stone-200">
+                  <ol className="mt-3 flex flex-col divide-y divide-line border-t border-line">
                     {sorted.map((item, index) => (
                       <li
                         key={item.documentId}
                         className="flex items-center gap-3 py-2.5"
                       >
-                        <span className="shrink-0 font-mono text-[10px] tabular-nums text-stone-300">
+                        <span className="shrink-0 font-mono text-[10px] tabular-nums text-fg-ghost">
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         <span className="min-w-0 flex-1 truncate text-[13px] text-stone-800">
@@ -218,7 +218,7 @@ export function BatchReviewSheet() {
                     ))}
                   </ol>
 
-                  <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
+                  <p className="mt-3 text-[11px] leading-relaxed text-fg-subtle">
                     Сверху документы с критическими замечаниями — разбирать всю
                     пачку подряд не нужно.
                   </p>
@@ -228,7 +228,7 @@ export function BatchReviewSheet() {
           </AnimatePresence>
         </ScrollArea>
 
-        <div className="flex shrink-0 items-center gap-2 border-t border-stone-200 px-5 py-4">
+        <div className="flex shrink-0 items-center gap-2 border-t border-line px-5 py-4">
           <Button
             className="flex-1"
             disabled={!isDone}

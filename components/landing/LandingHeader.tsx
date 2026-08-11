@@ -33,7 +33,7 @@ export function LandingHeader() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         isScrolled
-          ? "border-b border-stone-200 bg-stone-50/85 backdrop-blur-md"
+          ? "border-b border-line bg-stone-50/85 backdrop-blur-md"
           : "border-b border-transparent"
       )}
     >
@@ -42,7 +42,7 @@ export function LandingHeader() {
           <span
             className={cn(
               "flex h-7 w-7 items-center justify-center rounded text-[13px] font-medium transition-colors",
-              isScrolled ? "bg-stone-950 text-white" : "bg-white text-stone-950"
+              isScrolled ? "bg-stone-950 text-white" : "bg-surface text-stone-950"
             )}
           >
             А
@@ -50,7 +50,7 @@ export function LandingHeader() {
           <span
             className={cn(
               "text-sm font-medium tracking-[-0.01em] transition-colors",
-              isScrolled ? "text-stone-900" : "text-white"
+              isScrolled ? "text-fg" : "text-white"
             )}
           >
             Алетейя
@@ -65,8 +65,8 @@ export function LandingHeader() {
               className={cn(
                 "text-[13px] transition-colors",
                 isScrolled
-                  ? "text-stone-500 hover:text-stone-900"
-                  : "text-stone-400 hover:text-white"
+                  ? "text-fg-subtle hover:text-fg"
+                  : "text-fg-faint hover:text-white"
               )}
             >
               {link.label}
@@ -80,8 +80,8 @@ export function LandingHeader() {
             className={cn(
               "hidden text-[13px] transition-colors sm:block",
               isScrolled
-                ? "text-stone-500 hover:text-stone-900"
-                : "text-stone-400 hover:text-white"
+                ? "text-fg-subtle hover:text-fg"
+                : "text-fg-faint hover:text-white"
             )}
           >
             Войти
@@ -93,7 +93,7 @@ export function LandingHeader() {
               "inline-flex h-9 items-center rounded-md px-4 text-[13px] font-medium transition-colors",
               isScrolled
                 ? "bg-stone-950 text-white hover:bg-stone-900"
-                : "bg-white text-stone-950 hover:bg-stone-200"
+                : "bg-surface text-stone-950 hover:bg-surface-3"
             )}
           >
             Начать работу

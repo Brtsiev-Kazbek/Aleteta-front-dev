@@ -88,7 +88,7 @@ export function ExtractionStartDialog({
                     "flex flex-col gap-0.5 rounded border px-3.5 py-3 text-left transition-colors",
                     typeId === schema.id
                       ? "border-stone-900 bg-stone-50"
-                      : "border-stone-200 hover:border-stone-300"
+                      : "border-line hover:border-line-strong"
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -98,21 +98,21 @@ export function ExtractionStartDialog({
                         typeId === schema.id ? "bg-stone-900" : "bg-stone-300"
                       )}
                     />
-                    <span className="text-[13px] text-stone-900">
+                    <span className="text-[13px] text-fg">
                       {schema.label}
                     </span>
                     {schema.isCustom && (
-                      <span className="rounded border border-stone-200 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-stone-400">
+                      <span className="rounded border border-line px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-fg-faint">
                         свой
                       </span>
                     )}
                   </span>
 
-                  <span className="pl-3.5 text-[11.5px] leading-relaxed text-stone-500">
+                  <span className="pl-3.5 text-[11.5px] leading-relaxed text-fg-subtle">
                     {schema.hint || "Без пояснения"}
                   </span>
 
-                  <span className="pl-3.5 font-mono text-[9px] uppercase tracking-[0.1em] text-stone-400">
+                  <span className="pl-3.5 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-faint">
                     {schema.fields.length}{" "}
                     {plural(
                       schema.fields.length,

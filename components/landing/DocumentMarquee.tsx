@@ -43,7 +43,7 @@ function Row({
       {doubled.map((item, index) => (
         <span
           key={`${item}-${index}`}
-          className="whitespace-nowrap rounded-md border border-stone-800 bg-stone-900/60 px-4 py-2.5 text-sm text-stone-400 transition-colors hover:border-stone-700 hover:text-stone-200"
+          className="whitespace-nowrap rounded-md border border-inverse-line bg-stone-900/60 px-4 py-2.5 text-sm text-fg-faint transition-colors hover:border-stone-700 hover:text-stone-200"
         >
           {item}
         </span>
@@ -56,12 +56,12 @@ export function DocumentMarquee() {
   return (
     <section
       aria-label="Типы документов, которые формирует система"
-      className="border-b border-stone-200 bg-stone-950 pb-14 pt-2"
+      className="border-b border-line bg-stone-950 pb-14 pt-2"
     >
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex items-center gap-3">
           <span className="h-px w-8 bg-stone-700" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-stone-500">
+          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
             Что собирается автоматически
           </span>
         </div>
@@ -74,7 +74,7 @@ export function DocumentMarquee() {
       </div>
 
       <div className="mx-auto mt-7 max-w-6xl px-6">
-        <p className="max-w-xl text-sm leading-relaxed text-stone-500">
+        <p className="max-w-xl text-sm leading-relaxed text-fg-subtle">
           Список не закрытый: свои шаблоны и свои типы объектов добавляются без
           участия разработчиков.
         </p>

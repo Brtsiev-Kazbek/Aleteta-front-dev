@@ -94,13 +94,13 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
           key="analysis"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg border border-stone-200 bg-white p-5"
+          className="rounded-lg border border-line bg-surface p-5"
         >
           <div className="flex items-baseline justify-between gap-3">
-            <span className="min-w-0 truncate text-[13px] text-stone-900">
+            <span className="min-w-0 truncate text-[13px] text-fg">
               {file.name}
             </span>
-            <span className="shrink-0 font-mono text-[10px] text-stone-400">
+            <span className="shrink-0 font-mono text-[10px] text-fg-faint">
               {formatFileSize(file.sizeBytes)}
             </span>
           </div>
@@ -121,7 +121,7 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
                         ? "bg-emerald-100 text-emerald-600"
                         : isCurrent
                           ? "bg-stone-900 text-white"
-                          : "bg-stone-100 text-stone-300"
+                          : "bg-surface-2 text-fg-ghost"
                     )}
                   >
                     {isDone ? (
@@ -137,10 +137,10 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
                     className={cn(
                       "text-[13px] transition-colors",
                       isDone
-                        ? "text-stone-400"
+                        ? "text-fg-faint"
                         : isCurrent
-                          ? "text-stone-900"
-                          : "text-stone-300"
+                          ? "text-fg"
+                          : "text-fg-ghost"
                     )}
                   >
                     {step}
@@ -150,7 +150,7 @@ export function AIReviewDropzone({ onAnalyzed }: AIReviewDropzoneProps) {
             })}
           </ol>
 
-          <div className="mt-5 border-t border-stone-200 pt-3">
+          <div className="mt-5 border-t border-line pt-3">
             <MetaLabel>
               Замечания привязываются к абзацам исходного текста
             </MetaLabel>

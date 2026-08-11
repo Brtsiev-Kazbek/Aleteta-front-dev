@@ -84,7 +84,7 @@ export function PackageBuilder() {
   const cost = Math.round((totalMinutes / 60) * hourlyRate);
 
   return (
-    <section className="bg-white">
+    <section className="bg-surface">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="08"
@@ -93,14 +93,14 @@ export function PackageBuilder() {
           description="Укажите объекты и свою оценку трудозатрат. Расчёт показан по шагам — его можно проверить."
         />
 
-        <div className="mt-12 grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 lg:grid-cols-2">
+        <div className="mt-12 grid grid-cols-1 gap-px border border-line bg-surface-3 lg:grid-cols-2">
           {/* Ввод */}
-          <div className="bg-white p-6 lg:p-8">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+          <div className="bg-surface p-6 lg:p-8">
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
               Объекты в деле
             </span>
 
-            <div className="mt-4 flex flex-col divide-y divide-stone-100 border-y border-stone-100">
+            <div className="mt-4 flex flex-col divide-y divide-line-soft border-y border-line-soft">
               {KINDS.map((kind) => {
                 const count = counts[kind.id] ?? 0;
 
@@ -111,13 +111,13 @@ export function PackageBuilder() {
                         className={cn(
                           "text-sm transition-colors",
                           count > 0
-                            ? "font-medium text-stone-900"
-                            : "text-stone-500"
+                            ? "font-medium text-fg"
+                            : "text-fg-subtle"
                         )}
                       >
                         {kind.label}
                       </span>
-                      <span className="mt-0.5 truncate text-[11px] text-stone-400">
+                      <span className="mt-0.5 truncate text-[11px] text-fg-faint">
                         {kind.documents.length}{" "}
                         {plural(
                           kind.documents.length,
@@ -135,12 +135,12 @@ export function PackageBuilder() {
                         onClick={() => change(kind.id, -1)}
                         disabled={count === 0}
                         aria-label={`Убавить: ${kind.label}`}
-                        className="flex h-8 w-8 items-center justify-center rounded border border-stone-200 text-stone-500 transition-colors hover:border-stone-300 hover:text-stone-900 disabled:opacity-30"
+                        className="flex h-8 w-8 items-center justify-center rounded border border-line text-fg-subtle transition-colors hover:border-line-strong hover:text-fg disabled:opacity-30"
                       >
                         <Minus className="h-3.5 w-3.5" />
                       </button>
 
-                      <span className="w-10 text-center font-mono text-sm tabular-nums text-stone-900">
+                      <span className="w-10 text-center font-mono text-sm tabular-nums text-fg">
                         {count}
                       </span>
 
@@ -148,7 +148,7 @@ export function PackageBuilder() {
                         type="button"
                         onClick={() => change(kind.id, 1)}
                         aria-label={`Добавить: ${kind.label}`}
-                        className="flex h-8 w-8 items-center justify-center rounded border border-stone-200 text-stone-500 transition-colors hover:border-stone-300 hover:text-stone-900"
+                        className="flex h-8 w-8 items-center justify-center rounded border border-line text-fg-subtle transition-colors hover:border-line-strong hover:text-fg"
                       >
                         <Plus className="h-3.5 w-3.5" />
                       </button>
@@ -162,7 +162,7 @@ export function PackageBuilder() {
             <div className="mt-7">
               <label
                 htmlFor="minutes"
-                className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400"
+                className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
               >
                 Минут на один документ вручную
               </label>
@@ -178,9 +178,9 @@ export function PackageBuilder() {
                   onChange={(event) =>
                     setMinutesPerDoc(Number(event.target.value))
                   }
-                  className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-stone-200 accent-violet-600"
+                  className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-surface-3 accent-violet-600"
                 />
-                <span className="w-14 shrink-0 text-right font-mono text-sm tabular-nums text-stone-900">
+                <span className="w-14 shrink-0 text-right font-mono text-sm tabular-nums text-fg">
                   {minutesPerDoc} мин
                 </span>
               </div>
@@ -195,7 +195,7 @@ export function PackageBuilder() {
                       "rounded border px-2 py-1 font-mono text-[10px] transition-colors",
                       minutesPerDoc === preset
                         ? "border-stone-900 bg-stone-900 text-white"
-                        : "border-stone-200 text-stone-500 hover:border-stone-300"
+                        : "border-line text-fg-subtle hover:border-line-strong"
                     )}
                   >
                     {preset} мин
@@ -207,7 +207,7 @@ export function PackageBuilder() {
             <div className="mt-6">
               <label
                 htmlFor="rate"
-                className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400"
+                className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
               >
                 Стоимость часа работы, ₽
               </label>
@@ -221,19 +221,19 @@ export function PackageBuilder() {
                 onChange={(event) =>
                   setHourlyRate(Math.max(0, Number(event.target.value)))
                 }
-                className="mt-2.5 h-10 w-full rounded border border-stone-200 px-3 font-mono text-sm text-stone-900 outline-none transition-colors focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+                className="mt-2.5 h-10 w-full rounded border border-line px-3 font-mono text-sm text-fg outline-none transition-colors focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
               />
             </div>
           </div>
 
           {/* Результат */}
           <div className="flex flex-col bg-stone-950 p-6 lg:p-8">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-500">
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
               Соберётся одним действием
             </span>
 
             {totalObjects === 0 ? (
-              <p className="mt-8 text-sm text-stone-500">
+              <p className="mt-8 text-sm text-fg-subtle">
                 Добавьте хотя бы один объект, чтобы увидеть расчёт.
               </p>
             ) : (
@@ -248,14 +248,14 @@ export function PackageBuilder() {
                   >
                     {totalDocuments}
                   </motion.span>
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-stone-500">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-subtle">
                     {plural(totalDocuments, "документ", "документа", "документов")}
                   </span>
                 </div>
 
                 {/* Открытая арифметика — расчёт можно проверить */}
-                <div className="mt-6 flex flex-col gap-2 border-t border-stone-800 pt-4">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-600">
+                <div className="mt-6 flex flex-col gap-2 border-t border-inverse-line pt-4">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
                     Как получилось
                   </span>
 
@@ -269,10 +269,10 @@ export function PackageBuilder() {
                         transition={{ duration: 0.2 }}
                         className="flex items-baseline justify-between gap-3"
                       >
-                        <span className="min-w-0 truncate text-[12px] text-stone-400">
+                        <span className="min-w-0 truncate text-[12px] text-fg-faint">
                           {line.kind.label}
                         </span>
-                        <span className="shrink-0 font-mono text-[11px] tabular-nums text-stone-500">
+                        <span className="shrink-0 font-mono text-[11px] tabular-nums text-fg-subtle">
                           {line.objects} × {line.templates} ={" "}
                           <span className="text-stone-200">{line.documents}</span>
                         </span>
@@ -282,8 +282,8 @@ export function PackageBuilder() {
                 </div>
 
                 {/* Состав пакета */}
-                <div className="mt-5 flex flex-1 flex-col gap-3 border-t border-stone-800 pt-4">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-600">
+                <div className="mt-5 flex flex-1 flex-col gap-3 border-t border-inverse-line pt-4">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
                     Состав пакета
                   </span>
 
@@ -295,10 +295,10 @@ export function PackageBuilder() {
                           className="flex items-center gap-2.5"
                         >
                           <FileText className="h-3 w-3 shrink-0 text-violet-400" />
-                          <span className="min-w-0 flex-1 truncate text-[13px] text-stone-300">
+                          <span className="min-w-0 flex-1 truncate text-[13px] text-fg-ghost">
                             {document}
                           </span>
-                          <span className="shrink-0 font-mono text-[10px] tabular-nums text-stone-600">
+                          <span className="shrink-0 font-mono text-[10px] tabular-nums text-fg-soft">
                             ×{line.objects}
                           </span>
                         </div>
@@ -308,29 +308,29 @@ export function PackageBuilder() {
                 </div>
 
                 {/* Трудозатраты */}
-                <div className="mt-5 grid grid-cols-2 gap-4 border-t border-stone-800 pt-4">
+                <div className="mt-5 grid grid-cols-2 gap-4 border-t border-inverse-line pt-4">
                   <div>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-600">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
                       Вручную
                     </span>
                     <p className="mt-1.5 font-mono text-xl tabular-nums text-white">
                       {hours > 0 ? `${hours} ч ` : ""}
                       {minutes > 0 || hours === 0 ? `${minutes} мин` : ""}
                     </p>
-                    <p className="mt-1 font-mono text-[10px] text-stone-600">
+                    <p className="mt-1 font-mono text-[10px] text-fg-soft">
                       {totalDocuments} × {minutesPerDoc} мин
                     </p>
                   </div>
 
                   {hourlyRate > 0 && (
                     <div>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-600">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
                         В деньгах
                       </span>
                       <p className="mt-1.5 font-mono text-xl tabular-nums text-white">
                         {cost.toLocaleString("ru-RU")} ₽
                       </p>
-                      <p className="mt-1 font-mono text-[10px] text-stone-600">
+                      <p className="mt-1 font-mono text-[10px] text-fg-soft">
                         по {hourlyRate.toLocaleString("ru-RU")} ₽/час
                       </p>
                     </div>
@@ -342,9 +342,9 @@ export function PackageBuilder() {
         </div>
 
         {/* Честная сноска об источниках */}
-        <div className="mt-6 flex flex-col gap-2 border-l-2 border-stone-200 pl-4">
-          <p className="max-w-3xl text-[12px] leading-relaxed text-stone-500">
-            <span className="font-medium text-stone-700">
+        <div className="mt-6 flex flex-col gap-2 border-l-2 border-line pl-4">
+          <p className="max-w-3xl text-[12px] leading-relaxed text-fg-subtle">
+            <span className="font-medium text-fg-muted">
               О цифрах.
             </span>{" "}
             Время на один документ вы задаёте сами — универсального норматива
@@ -353,7 +353,7 @@ export function PackageBuilder() {
             («The social economy», 2012), сотрудники умственного труда тратят
             около 19% рабочей недели на поиск и сбор информации.
           </p>
-          <p className="max-w-3xl text-[12px] leading-relaxed text-stone-400">
+          <p className="max-w-3xl text-[12px] leading-relaxed text-fg-faint">
             Расчёт выше — оценка на ваших допущениях, а не обещание результата.
           </p>
         </div>

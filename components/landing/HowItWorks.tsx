@@ -46,7 +46,7 @@ export function HowItWorks() {
       id="how"
       ref={sectionRef}
       onMouseMove={handleMove}
-      className="grain relative overflow-hidden border-b border-stone-800 bg-stone-950"
+      className="grain relative overflow-hidden border-b border-inverse-line bg-stone-950"
     >
       {/* Свет за курсором */}
       {!reduceMotion && (
@@ -66,7 +66,7 @@ export function HowItWorks() {
               10
             </span>
             <span className="h-px w-8 bg-stone-700" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-stone-500">
+            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
               Как это работает
             </span>
           </div>
@@ -91,7 +91,7 @@ export function HowItWorks() {
                 <h3 className="mt-5 text-lg font-medium text-white">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-stone-400">
+                <p className="mt-3 text-sm leading-relaxed text-fg-faint">
                   {step.text}
                 </p>
               </motion.div>

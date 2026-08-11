@@ -49,7 +49,7 @@ export function CasePickerDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col divide-y divide-stone-200 border-y border-stone-200">
+        <div className="flex flex-col divide-y divide-line border-y border-line">
           {cases.map((item, index) => {
             const statusMeta = CASE_STATUS_META[item.status];
             const entityCount = entities.filter(
@@ -67,7 +67,7 @@ export function CasePickerDialog({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: index * 0.05 }}
                 onClick={() => onPick(item.id)}
-                className="group flex items-center gap-3 py-3.5 text-left transition-colors hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-400"
+                className="group flex items-center gap-3 py-3.5 text-left transition-colors hover:bg-stone-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
               >
                 <span
                   className={cn(
@@ -77,10 +77,10 @@ export function CasePickerDialog({
                 />
 
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] text-stone-900">
+                  <span className="truncate text-[13px] text-fg">
                     {item.title}
                   </span>
-                  <span className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+                  <span className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
                     {entityCount}{" "}
                     {plural(entityCount, "объект", "объекта", "объектов")} ·{" "}
                     {documentCount}{" "}
@@ -93,7 +93,7 @@ export function CasePickerDialog({
                   </span>
                 </span>
 
-                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-stone-300 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-stone-900" />
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-fg-ghost transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-fg" />
               </motion.button>
             );
           })}

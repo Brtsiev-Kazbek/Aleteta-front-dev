@@ -115,7 +115,7 @@ export function Audience() {
         <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-12">
           {/* Роли */}
           <Reveal className="lg:col-span-4">
-            <div className="flex flex-col border-l border-stone-200">
+            <div className="flex flex-col border-l border-line">
               {SEGMENTS.map((segment, index) => {
                 const isActive = segment.id === activeId;
 
@@ -137,7 +137,7 @@ export function Audience() {
                       <span
                         className={cn(
                           "font-mono text-[10px] tabular-nums transition-colors",
-                          isActive ? "text-violet-600" : "text-stone-300"
+                          isActive ? "text-violet-600" : "text-fg-ghost"
                         )}
                       >
                         {String(index + 1).padStart(2, "0")}
@@ -146,8 +146,8 @@ export function Audience() {
                         className={cn(
                           "text-sm transition-colors",
                           isActive
-                            ? "font-medium text-stone-900"
-                            : "text-stone-500 hover:text-stone-700"
+                            ? "font-medium text-fg"
+                            : "text-fg-subtle hover:text-fg-muted"
                         )}
                       >
                         {segment.role}
@@ -169,15 +169,15 @@ export function Audience() {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.25 }}
               >
-                <h3 className="text-xl font-medium leading-snug tracking-[-0.01em] text-stone-900">
+                <h3 className="text-xl font-medium leading-snug tracking-[-0.01em] text-fg">
                   {active.headline}
                 </h3>
 
-                <div className="mt-6 border-l-2 border-stone-200 pl-5">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+                <div className="mt-6 border-l-2 border-line pl-5">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
                     Как сейчас
                   </span>
-                  <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                  <p className="mt-2 text-sm leading-relaxed text-fg-soft">
                     {active.today}
                   </p>
                 </div>
@@ -187,14 +187,14 @@ export function Audience() {
                     Что делает Алетейя
                   </span>
 
-                  <ul className="mt-3 grid grid-cols-1 divide-y divide-stone-100 border-y border-stone-100 sm:grid-cols-2 sm:divide-y-0">
+                  <ul className="mt-3 grid grid-cols-1 divide-y divide-line-soft border-y border-line-soft sm:grid-cols-2 sm:divide-y-0">
                     {active.tasks.map((task) => (
                       <li
                         key={task}
                         className="flex items-start gap-3 py-3 sm:py-3.5"
                       >
                         <span className="mt-2 h-px w-3 shrink-0 bg-stone-300" />
-                        <span className="text-sm leading-snug text-stone-700">
+                        <span className="text-sm leading-snug text-fg-muted">
                           {task}
                         </span>
                       </li>

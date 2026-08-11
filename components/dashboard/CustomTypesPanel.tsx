@@ -28,8 +28,8 @@ export function CustomTypesPanel() {
 
   return (
     <section>
-      <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-stone-200 pb-3">
-        <h2 className="text-[15px] font-medium tracking-[-0.01em] text-stone-900">
+      <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3">
+        <h2 className="text-[15px] font-medium tracking-[-0.01em] text-fg">
           Свои типы объектов
         </h2>
 
@@ -48,14 +48,14 @@ export function CustomTypesPanel() {
       </div>
 
       {ownSchemas.length === 0 ? (
-        <p className="py-6 text-[13px] leading-relaxed text-stone-500">
+        <p className="py-6 text-[13px] leading-relaxed text-fg-subtle">
           Пока ни одного своего типа. Опишите то, с чем работаете именно вы —
           транспорт, оборудование, объекты аренды, студенческие работы: набор
           реквизитов станет колонками таблицы и будет проверяться перед
           генерацией.
         </p>
       ) : (
-        <ul className="flex flex-col divide-y divide-stone-200">
+        <ul className="flex flex-col divide-y divide-line">
           <AnimatePresence initial={false}>
             {ownSchemas.map((schema) => {
               const usage = entities.filter(
@@ -75,10 +75,10 @@ export function CustomTypesPanel() {
                   className="group flex items-center gap-3 py-3.5"
                 >
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm text-stone-900">
+                    <span className="truncate text-sm text-fg">
                       {schema.label}
                     </span>
-                    <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+                    <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
                       {schema.fields.length}{" "}
                       {plural(
                         schema.fields.length,
@@ -102,13 +102,13 @@ export function CustomTypesPanel() {
                     {schema.fields.slice(0, 4).map((field) => (
                       <span
                         key={field.key}
-                        className="rounded border border-stone-200 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-stone-500"
+                        className="rounded border border-line px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-fg-subtle"
                       >
                         {field.label}
                       </span>
                     ))}
                     {schema.fields.length > 4 && (
-                      <span className="font-mono text-[9px] text-stone-300">
+                      <span className="font-mono text-[9px] text-fg-ghost">
                         +{schema.fields.length - 4}
                       </span>
                     )}

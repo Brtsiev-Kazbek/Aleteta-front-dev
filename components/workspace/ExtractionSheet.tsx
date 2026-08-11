@@ -100,12 +100,12 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
         {extraction && isMine && (
           <>
             {/* Исходный файл */}
-            <div className="flex shrink-0 items-center gap-2.5 border-b border-stone-200 px-5 py-3.5">
-              <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
-              <span className="min-w-0 flex-1 truncate text-[13px] text-stone-700">
+            <div className="flex shrink-0 items-center gap-2.5 border-b border-line px-5 py-3.5">
+              <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
+              <span className="min-w-0 flex-1 truncate text-[13px] text-fg-muted">
                 {extraction.file.name}
               </span>
-              <span className="shrink-0 font-mono text-[10px] text-stone-400">
+              <span className="shrink-0 font-mono text-[10px] text-fg-faint">
                 {formatFileSize(extraction.file.sizeBytes)}
               </span>
             </div>
@@ -147,7 +147,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                   </MetaLabel>
 
                   {extraction.fields.length === 0 ? (
-                    <p className="mt-3 text-[12.5px] leading-relaxed text-stone-500">
+                    <p className="mt-3 text-[12.5px] leading-relaxed text-fg-subtle">
                       Ни одного реквизита в документе не нашлось. Карточка
                       создана пустой — заполните её руками или попробуйте
                       другой тип объекта.
@@ -164,15 +164,15 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                             "flex items-center justify-between gap-3 rounded border px-3 py-2.5",
                             field.uncertain
                               ? "border-amber-200 bg-amber-50/60"
-                              : "border-stone-200 bg-white"
+                              : "border-line bg-surface"
                           )}
                         >
                           <span className="flex shrink-0 flex-col">
-                            <span className="text-[11px] text-stone-400">
+                            <span className="text-[11px] text-fg-faint">
                               {field.label}
                             </span>
                             {field.page != null && (
-                              <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-stone-300">
+                              <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-fg-ghost">
                                 стр. {field.page}
                               </span>
                             )}
@@ -182,7 +182,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                             {field.uncertain && (
                               <AlertTriangle className="h-3 w-3 shrink-0 text-amber-600" />
                             )}
-                            <span className="min-w-0 truncate text-right text-[13px] text-stone-900">
+                            <span className="min-w-0 truncate text-right text-[13px] text-fg">
                               {field.value}
                             </span>
                           </span>
@@ -192,7 +192,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                   )}
 
                   {uncertainCount > 0 && (
-                    <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
+                    <p className="mt-3 text-[11px] leading-relaxed text-fg-subtle">
                       {uncertainCount}{" "}
                       {plural(
                         uncertainCount,
@@ -222,14 +222,14 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                     {extraction.missing.map((key) => (
                       <span
                         key={key}
-                        className="rounded border border-stone-200 px-2 py-1 text-[11px] text-stone-500"
+                        className="rounded border border-line px-2 py-1 text-[11px] text-fg-subtle"
                       >
                         {schema?.fields.find((field) => field.key === key)
                           ?.label ?? key}
                       </span>
                     ))}
                   </div>
-                  <p className="mt-2.5 text-[11px] leading-relaxed text-stone-500">
+                  <p className="mt-2.5 text-[11px] leading-relaxed text-fg-subtle">
                     Эти поля остались пустыми: модель их в тексте не увидела и
                     не стала додумывать.
                   </p>
@@ -237,7 +237,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
               )}
             </ScrollArea>
 
-            <div className="flex shrink-0 items-center gap-2 border-t border-stone-200 px-5 py-4">
+            <div className="flex shrink-0 items-center gap-2 border-t border-line px-5 py-4">
               {isFailed ? (
                 <Button className="flex-1 gap-1.5" onClick={() => void retry()}>
                   <RotateCcw className="h-3.5 w-3.5" />
@@ -256,7 +256,7 @@ export function ExtractionSheet({ caseId }: { caseId: string }) {
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <span className="flex flex-1 items-center gap-2 text-[12.5px] text-stone-500">
+                <span className="flex flex-1 items-center gap-2 text-[12.5px] text-fg-subtle">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   Можно закрыть — работа продолжится
                 </span>
@@ -316,7 +316,7 @@ function Progress({
                   ? "bg-emerald-100 text-emerald-600"
                   : isCurrent
                     ? "bg-stone-900 text-white"
-                    : "bg-stone-100 text-stone-300"
+                    : "bg-surface-2 text-fg-ghost"
               )}
             >
               {isStepDone ? (
@@ -332,17 +332,17 @@ function Progress({
               className={cn(
                 "text-[13px] transition-colors",
                 isStepDone
-                  ? "text-stone-400"
+                  ? "text-fg-faint"
                   : isCurrent
-                    ? "text-stone-900"
-                    : "text-stone-300"
+                    ? "text-fg"
+                    : "text-fg-ghost"
               )}
             >
               {step.label}
             </span>
 
             {isCurrent && progress > 0 && progress < 100 && (
-              <span className="ml-auto font-mono text-[10px] tabular-nums text-stone-400">
+              <span className="ml-auto font-mono text-[10px] tabular-nums text-fg-faint">
                 {progress}%
               </span>
             )}
@@ -368,16 +368,16 @@ function PagesNote({ looked, total }: { looked: number; total: number }) {
     <div
       className={cn(
         "mt-5 flex items-start gap-2 rounded border px-3.5 py-2.5",
-        full ? "border-stone-200 bg-stone-50" : "border-amber-200 bg-amber-50/60"
+        full ? "border-line bg-stone-50" : "border-amber-200 bg-amber-50/60"
       )}
     >
       <ScanLine
         className={cn(
           "mt-px h-3.5 w-3.5 shrink-0",
-          full ? "text-stone-400" : "text-amber-600"
+          full ? "text-fg-faint" : "text-amber-600"
         )}
       />
-      <p className="text-[12px] leading-relaxed text-stone-600">
+      <p className="text-[12px] leading-relaxed text-fg-soft">
         {full ? (
           <>
             Просмотрен весь документ — {total}{" "}

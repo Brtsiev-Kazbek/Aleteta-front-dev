@@ -66,20 +66,20 @@ export function FAQ() {
     <section id="faq" className="mx-auto max-w-3xl px-6 py-20">
       <SectionHeading eyebrow="Вопросы" title="Частые вопросы" />
 
-      <div className="mt-12 flex flex-col border-t border-stone-200">
+      <div className="mt-12 flex flex-col border-t border-line">
         {ITEMS.map((item, index) => {
           const isOpen = openId === item.id;
 
           return (
             <Reveal key={item.id} delay={index * 0.04}>
-              <div className="border-b border-stone-200">
+              <div className="border-b border-line">
                 <button
                   type="button"
                   aria-expanded={isOpen}
                   onClick={() => setOpenId(isOpen ? null : item.id)}
                   className="group flex w-full items-start gap-4 py-5 text-left"
                 >
-                  <span className="mt-0.5 shrink-0 font-mono text-[10px] tabular-nums text-stone-300">
+                  <span className="mt-0.5 shrink-0 font-mono text-[10px] tabular-nums text-fg-ghost">
                     {String(index + 1).padStart(2, "0")}
                   </span>
 
@@ -87,8 +87,8 @@ export function FAQ() {
                     className={cn(
                       "flex-1 text-sm transition-colors",
                       isOpen
-                        ? "font-medium text-stone-900"
-                        : "text-stone-700 group-hover:text-stone-900"
+                        ? "font-medium text-fg"
+                        : "text-fg-muted group-hover:text-fg"
                     )}
                   >
                     {item.question}
@@ -102,7 +102,7 @@ export function FAQ() {
                     <ChevronDown
                       className={cn(
                         "h-4 w-4 transition-colors",
-                        isOpen ? "text-stone-900" : "text-stone-300"
+                        isOpen ? "text-fg" : "text-fg-ghost"
                       )}
                     />
                   </motion.span>
@@ -116,7 +116,7 @@ export function FAQ() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.25, ease: "easeInOut" }}
                     >
-                      <p className="max-w-2xl pb-6 pl-[2.1rem] text-sm leading-relaxed text-stone-600">
+                      <p className="max-w-2xl pb-6 pl-[2.1rem] text-sm leading-relaxed text-fg-soft">
                         {item.answer}
                       </p>
                     </motion.div>

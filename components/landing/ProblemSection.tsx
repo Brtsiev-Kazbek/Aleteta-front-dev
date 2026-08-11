@@ -39,7 +39,7 @@ const PAINS: Pain[] = [
 
 export function ProblemSection() {
   return (
-    <section className="bg-white">
+    <section className="bg-surface">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index="01"
@@ -48,31 +48,31 @@ export function ProblemSection() {
           description="Не потому, что задача сложная. Потому, что она повторяется."
         />
 
-        <div className="mt-12 grid grid-cols-1 border-t border-stone-200 md:grid-cols-2">
+        <div className="mt-12 grid grid-cols-1 border-t border-line md:grid-cols-2">
           {PAINS.map((pain, index) => (
             <Reveal
               key={pain.title}
               delay={index * 0.07}
               className={
                 index % 2 === 0
-                  ? "border-b border-stone-200 md:border-r"
-                  : "border-b border-stone-200"
+                  ? "border-b border-line md:border-r"
+                  : "border-b border-line"
               }
             >
               <div className="flex h-full flex-col p-6 lg:p-8">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-mono text-2xl tabular-nums tracking-tight text-stone-900">
+                  <span className="font-mono text-2xl tabular-nums tracking-tight text-fg">
                     {pain.metric}
                   </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
                     {pain.unit}
                   </span>
                 </div>
 
-                <h3 className="mt-4 text-base font-medium leading-snug text-stone-900">
+                <h3 className="mt-4 text-base font-medium leading-snug text-fg">
                   {pain.title}
                 </h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-stone-600">
+                <p className="mt-2.5 text-sm leading-relaxed text-fg-soft">
                   {pain.text}
                 </p>
               </div>

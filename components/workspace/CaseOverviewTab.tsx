@@ -86,21 +86,21 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           <span
             className={cn(
               "font-mono text-6xl leading-none tabular-nums tracking-tight transition-colors duration-500",
-              isReady ? "text-emerald-600" : "text-stone-900"
+              isReady ? "text-emerald-600" : "text-fg"
             )}
           >
             <AnimatedNumber value={Math.round(stats.percent)} />
-            <span className="text-2xl text-stone-300">%</span>
+            <span className="text-2xl text-fg-ghost">%</span>
           </span>
 
-          <span className="pb-1.5 text-sm text-stone-500">
+          <span className="pb-1.5 text-sm text-fg-subtle">
             {stats.valid} из {stats.total}{" "}
             {plural(stats.total, "объекта", "объектов", "объектов")} готовы
           </span>
         </div>
 
         {/* Полоса готовности вместо карточки с прогрессом */}
-        <div className="mt-5 h-px w-full bg-stone-200">
+        <div className="mt-5 h-px w-full bg-surface-3">
           <motion.div
             animate={{ width: `${stats.percent}%` }}
             transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
@@ -112,7 +112,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
         </div>
 
         {/* Три показателя — тонкие разделители, без плашек */}
-        <div className="mt-8 grid grid-cols-3 gap-px bg-stone-200">
+        <div className="mt-8 grid grid-cols-3 gap-px bg-surface-3">
           {[
             { value: stats.total, label: "объектов" },
             { value: stats.valid, label: "готовы" },
@@ -120,12 +120,12 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           ].map((tile) => (
             <div
               key={tile.label}
-              className="bg-white px-4 py-5 transition-colors hover:bg-stone-50"
+              className="bg-surface px-4 py-5 transition-colors hover:bg-stone-50"
             >
-              <span className="font-mono text-2xl tabular-nums text-stone-900">
+              <span className="font-mono text-2xl tabular-nums text-fg">
                 <AnimatedNumber value={tile.value} />
               </span>
-              <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+              <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                 {tile.label}
               </p>
             </div>
@@ -141,7 +141,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
               <button
                 type="button"
                 onClick={() => setActiveTab("entities")}
-                className="border-b border-stone-200 pb-0.5 text-xs text-stone-500 transition-colors hover:border-stone-900 hover:text-stone-900"
+                className="border-b border-line pb-0.5 text-xs text-fg-subtle transition-colors hover:border-stone-900 hover:text-fg"
               >
                 Открыть матрицу
               </button>
@@ -149,14 +149,14 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           </div>
 
           {problems.length === 0 ? (
-            <div className="mt-4 flex items-center gap-3 border-t border-stone-200 pt-5">
+            <div className="mt-4 flex items-center gap-3 border-t border-line pt-5">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
-              <span className="text-sm text-stone-600">
+              <span className="text-sm text-fg-soft">
                 Все объекты заполнены — пакет можно генерировать
               </span>
             </div>
           ) : (
-            <ul className="mt-4 flex flex-col divide-y divide-stone-200 border-t border-stone-200">
+            <ul className="mt-4 flex flex-col divide-y divide-line border-t border-line">
               {problems.map(({ entity, schema, validation }, index) => (
                 <motion.li
                   key={entity.id}
@@ -169,7 +169,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-red-500" />
 
                   <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm text-stone-900">
+                    <span className="truncate text-sm text-fg">
                       {entity.data[schema.fields[0]?.key ?? "name"]?.trim() ||
                         `Без наименования · ${schema.label}`}
                     </span>
@@ -178,7 +178,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
                     </span>
                   </div>
 
-                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400 transition-colors group-hover:text-stone-900">
+                  <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint transition-colors group-hover:text-fg">
                     {validation.errors.length}{" "}
                     {plural(
                       validation.errors.length,
@@ -198,11 +198,11 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
       <section className="lg:col-span-5">
         <MetaLabel>О деле</MetaLabel>
 
-        <p className="mt-4 text-sm leading-relaxed text-stone-600">
+        <p className="mt-4 text-sm leading-relaxed text-fg-soft">
           {caseItem.description}
         </p>
 
-        <dl className="mt-6 flex flex-col divide-y divide-stone-200 border-y border-stone-200">
+        <dl className="mt-6 flex flex-col divide-y divide-line border-y border-line">
           {[
             { label: "Создано", value: formatDate(caseItem.createdAt) },
             { label: "Документов", value: String(documents.length) },
@@ -212,10 +212,10 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
               key={row.label}
               className="flex items-baseline justify-between gap-4 py-3"
             >
-              <dt className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+              <dt className="shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                 {row.label}
               </dt>
-              <dd className="truncate text-sm text-stone-900">{row.value}</dd>
+              <dd className="truncate text-sm text-fg">{row.value}</dd>
             </div>
           ))}
         </dl>
@@ -225,7 +225,7 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           className="mt-6 w-full gap-2"
           onClick={() => toggleAssistant(true)}
         >
-          <Sparkles className="h-4 w-4 text-stone-400" />
+          <Sparkles className="h-4 w-4 text-fg-faint" />
           Спросить Алетейю о деле
         </Button>
 
@@ -234,11 +234,11 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
           <MetaLabel>Активность</MetaLabel>
 
           {activity.length === 0 ? (
-            <p className="mt-4 border-t border-stone-200 pt-5 text-sm text-stone-400">
+            <p className="mt-4 border-t border-line pt-5 text-sm text-fg-faint">
               Действий по делу пока не было
             </p>
           ) : (
-            <ol className="mt-4 flex flex-col gap-5 border-t border-stone-200 pt-5">
+            <ol className="mt-4 flex flex-col gap-5 border-t border-line pt-5">
               {activity.map((item, index) => {
                 const Icon = ACTIVITY_ICONS[item.kind] ?? FileText;
                 const isLast = index === activity.length - 1;
@@ -246,25 +246,25 @@ export function CaseOverviewTab({ caseItem }: { caseItem: Case }) {
                 return (
                   <li key={item.id} className="relative flex gap-3.5">
                     {!isLast && (
-                      <span className="absolute left-[13px] top-8 h-[calc(100%+4px)] w-px bg-stone-200" />
+                      <span className="absolute left-[13px] top-8 h-[calc(100%+4px)] w-px bg-surface-3" />
                     )}
 
                     <div
                       className={cn(
-                        "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded border bg-white",
+                        "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded border bg-surface",
                         item.kind === "ai"
                           ? "border-violet-200 text-violet-600"
-                          : "border-stone-200 text-stone-400"
+                          : "border-line text-fg-faint"
                       )}
                     >
                       <Icon className="h-3 w-3" />
                     </div>
 
                     <div className="flex min-w-0 flex-col">
-                      <span className="text-sm leading-snug text-stone-900">
+                      <span className="text-sm leading-snug text-fg">
                         {item.text}
                       </span>
-                      <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                      <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                         {item.actor} · {formatDate(item.at)}
                       </span>
                     </div>

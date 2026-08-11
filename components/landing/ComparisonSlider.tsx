@@ -78,7 +78,7 @@ export function ComparisonSlider() {
               setDragging(true);
               updateFromClientX(event.clientX);
             }}
-            className="relative select-none overflow-hidden rounded-lg border border-stone-200 bg-white"
+            className="relative select-none overflow-hidden rounded-lg border border-line bg-surface"
           >
             {/* Слой «после» — базовый */}
             <TableLayer variant="after" />
@@ -115,16 +115,16 @@ export function ComparisonSlider() {
                   }
                 }}
                 className={cn(
-                  "absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border border-stone-300 bg-white shadow-md transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900",
+                  "absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full border border-line-strong bg-surface shadow-md transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900",
                   isDragging && "scale-110"
                 )}
               >
-                <MoveHorizontal className="h-4 w-4 text-stone-600" />
+                <MoveHorizontal className="h-4 w-4 text-fg-soft" />
               </button>
             </div>
 
             {/* Подписи сторон */}
-            <span className="pointer-events-none absolute left-4 top-4 z-10 rounded bg-white/90 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-500 backdrop-blur">
+            <span className="pointer-events-none absolute left-4 top-4 z-10 rounded bg-surface/90 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle backdrop-blur">
               Как сейчас
             </span>
             <span className="pointer-events-none absolute right-4 top-4 z-10 rounded bg-stone-950 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white">
@@ -148,7 +148,7 @@ function TableLayer({ variant }: { variant: "before" | "after" }) {
             {["Наименование", "ИНН", "КПП", "Директор", "Статус"].map((column) => (
               <th
                 key={column}
-                className="whitespace-nowrap border-b border-stone-200 px-4 pb-2.5 pt-14 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-stone-400"
+                className="whitespace-nowrap border-b border-line px-4 pb-2.5 pt-14 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-fg-faint"
               >
                 {column}
               </th>
@@ -164,7 +164,7 @@ function TableLayer({ variant }: { variant: "before" | "after" }) {
 
             return (
               <tr key={row.name}>
-                <td className="whitespace-nowrap border-b border-stone-100 px-4 py-3.5 text-sm text-stone-800">
+                <td className="whitespace-nowrap border-b border-line-soft px-4 py-3.5 text-sm text-stone-800">
                   {row.name}
                 </td>
 
@@ -179,11 +179,11 @@ function TableLayer({ variant }: { variant: "before" | "after" }) {
                   invalid={isBefore && row.broken.kpp !== undefined}
                 />
 
-                <td className="whitespace-nowrap border-b border-stone-100 px-4 py-3.5 text-sm text-stone-700">
+                <td className="whitespace-nowrap border-b border-line-soft px-4 py-3.5 text-sm text-fg-muted">
                   {row.director}
                 </td>
 
-                <td className="whitespace-nowrap border-b border-stone-100 px-4 py-3.5">
+                <td className="whitespace-nowrap border-b border-line-soft px-4 py-3.5">
                   {hasError ? (
                     <span className="inline-flex items-center gap-1.5 rounded border border-red-200 bg-red-50 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-red-700">
                       <AlertCircle className="h-3 w-3" />
@@ -203,13 +203,13 @@ function TableLayer({ variant }: { variant: "before" | "after" }) {
       </table>
 
       {/* Нижняя строка со счётчиком */}
-      <div className="flex items-center justify-between gap-4 border-t border-stone-200 px-4 py-3.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+      <div className="flex items-center justify-between gap-4 border-t border-line px-4 py-3.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
           Готово к генерации{" "}
           <span
             className={cn(
               "ml-1 text-sm",
-              isBefore ? "text-stone-900" : "text-emerald-600"
+              isBefore ? "text-fg" : "text-emerald-600"
             )}
           >
             {isBefore ? "1 / 3" : "3 / 3"}
@@ -220,7 +220,7 @@ function TableLayer({ variant }: { variant: "before" | "after" }) {
           className={cn(
             "whitespace-nowrap rounded px-4 py-2 text-sm font-medium",
             isBefore
-              ? "bg-stone-200 text-stone-400"
+              ? "bg-surface-3 text-fg-faint"
               : "bg-stone-950 text-white"
           )}
         >
@@ -241,7 +241,7 @@ function Cell({
   invalid?: boolean;
 }) {
   return (
-    <td className="whitespace-nowrap border-b border-stone-100 px-4 py-3.5">
+    <td className="whitespace-nowrap border-b border-line-soft px-4 py-3.5">
       {invalid ? (
         <span className="inline-flex items-center gap-1.5 rounded border border-red-200 bg-red-50 px-2 py-1">
           <AlertCircle className="h-3 w-3 shrink-0 text-red-500" />
@@ -252,7 +252,7 @@ function Cell({
           </span>
         </span>
       ) : (
-        <span className={cn("text-sm text-stone-700", mono && "font-mono text-[13px]")}>
+        <span className={cn("text-sm text-fg-muted", mono && "font-mono text-[13px]")}>
           {value}
         </span>
       )}

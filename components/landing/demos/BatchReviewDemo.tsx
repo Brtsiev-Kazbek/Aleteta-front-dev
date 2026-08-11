@@ -67,12 +67,12 @@ export function BatchReviewDemo() {
   );
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <div className="flex items-center justify-between border-b border-stone-200 px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-surface">
+      <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
           Проверка пачкой
         </span>
-        <span className="font-mono text-[10px] tabular-nums text-stone-400">
+        <span className="font-mono text-[10px] tabular-nums text-fg-faint">
           {checked} / {DOCS.length}
         </span>
       </div>
@@ -103,16 +103,16 @@ export function BatchReviewDemo() {
                     <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={3} />
                   )
                 ) : isChecking ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-stone-900" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-fg" />
                 ) : (
-                  <FileText className="h-3.5 w-3.5 text-stone-300" />
+                  <FileText className="h-3.5 w-3.5 text-fg-ghost" />
                 )}
               </span>
 
               <span
                 className={cn(
                   "min-w-0 flex-1 truncate text-xs transition-colors",
-                  isChecked ? "text-stone-800" : "text-stone-400"
+                  isChecked ? "text-stone-800" : "text-fg-faint"
                 )}
               >
                 {doc.name}
@@ -149,13 +149,13 @@ export function BatchReviewDemo() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-auto rounded border border-stone-200 bg-stone-50 p-3.5"
+              className="mt-auto rounded border border-line bg-stone-50 p-3.5"
             >
               <div className="flex items-baseline gap-2">
-                <span className="font-mono text-2xl tabular-nums text-stone-900">
+                <span className="font-mono text-2xl tabular-nums text-fg">
                   {totalCritical + totalWarning}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
+                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
                   замечаний в {DOCS.length} документах
                 </span>
               </div>
@@ -171,7 +171,7 @@ export function BatchReviewDemo() {
                 </span>
               </div>
 
-              <p className="mt-2.5 text-[11px] leading-relaxed text-stone-600">
+              <p className="mt-2.5 text-[11px] leading-relaxed text-fg-soft">
                 Сначала открываются документы с критическими замечаниями —
                 разбирать всю пачку подряд не нужно.
               </p>

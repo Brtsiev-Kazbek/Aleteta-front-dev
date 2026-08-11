@@ -42,7 +42,7 @@ export function ResetPasswordForm({ hasSession }: { hasSession: boolean }) {
 
         <Link
           href="/auth/forgot-password"
-          className="mt-7 w-fit border-b border-stone-300 pb-0.5 text-sm text-stone-900 transition-colors hover:border-stone-900"
+          className="mt-7 w-fit border-b border-line-strong pb-0.5 text-sm text-fg transition-colors hover:border-stone-900"
         >
           Запросить новую ссылку
         </Link>

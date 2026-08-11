@@ -203,7 +203,7 @@ export function RegisterForm({
           }}
           className="mt-0.5"
         />
-        <span className="text-[13px] leading-relaxed text-stone-500">
+        <span className="text-[13px] leading-relaxed text-fg-subtle">
           Согласен на обработку персональных данных и принимаю условия
           использования сервиса.
         </span>
@@ -224,11 +224,11 @@ export function RegisterForm({
         Зарегистрироваться
       </Button>
 
-      <p className="mt-6 text-sm text-stone-500">
+      <p className="mt-6 text-sm text-fg-subtle">
         Уже есть аккаунт?{" "}
         <Link
           href={`/auth/login?next=${encodeURIComponent(nextPath)}`}
-          className="border-b border-stone-300 pb-0.5 text-stone-900 transition-colors hover:border-stone-900"
+          className="border-b border-line-strong pb-0.5 text-fg transition-colors hover:border-stone-900"
         >
           Войти
         </Link>

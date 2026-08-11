@@ -96,7 +96,7 @@ export function Sidebar() {
       initial={false}
       animate={{ width: isExpanded ? 232 : 68 }}
       transition={{ duration: 0.24, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className="flex h-screen shrink-0 flex-col overflow-hidden border-r border-stone-200 bg-white"
+      className="flex h-screen shrink-0 flex-col overflow-hidden border-r border-line bg-surface"
     >
       {/* Логотип */}
       <div
@@ -123,10 +123,10 @@ export function Sidebar() {
                 transition={{ duration: 0.16 }}
                 className="flex min-w-0 flex-col leading-none"
               >
-                <span className="truncate text-sm font-medium tracking-[-0.01em] text-stone-900">
+                <span className="truncate text-sm font-medium tracking-[-0.01em] text-fg">
                   Алетейя
                 </span>
-                <span className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-stone-400">
+                <span className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-fg-faint">
                   {isBackedByDatabase
                     ? (viewer?.workspaceName ?? "Рабочее пространство")
                     : "Демо-режим"}
@@ -163,7 +163,7 @@ export function Sidebar() {
         )}
       >
         {isExpanded && (
-          <p className="px-3 pb-1.5 pt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-stone-400">
+          <p className="px-3 pb-1.5 pt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-fg-faint">
             Рабочая область
           </p>
         )}
@@ -180,8 +180,8 @@ export function Sidebar() {
                   "relative flex h-9 items-center rounded-md transition-colors",
                   isExpanded ? "w-full gap-3 px-3" : "w-9 justify-center",
                   active
-                    ? "bg-stone-100 text-stone-900"
-                    : "text-stone-400 hover:bg-stone-50 hover:text-stone-900"
+                    ? "bg-surface-2 text-fg"
+                    : "text-fg-faint hover:bg-stone-50 hover:text-fg"
                 )}
               >
                 {/* Активный пункт помечен волосяной линией, а не заливкой цветом */}
@@ -208,7 +208,7 @@ export function Sidebar() {
       {/* Профиль */}
       <div
         className={cn(
-          "flex shrink-0 items-center gap-2.5 border-t border-stone-200 py-3",
+          "flex shrink-0 items-center gap-2.5 border-t border-line py-3",
           isExpanded ? "px-4" : "justify-center px-0"
         )}
       >
@@ -219,7 +219,7 @@ export function Sidebar() {
           {/* Ведёт в настройки: это единственное место, где профиль правится. */}
           <Link
             href="/dashboard/settings"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-stone-200 text-[11px] font-medium text-stone-600 transition-colors hover:border-stone-300 hover:text-stone-900"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line text-[11px] font-medium text-fg-soft transition-colors hover:border-line-strong hover:text-fg"
           >
             {initials || "А"}
             <span className="sr-only">Профиль пользователя</span>
@@ -228,10 +228,10 @@ export function Sidebar() {
 
         {isExpanded && (
           <div className="flex min-w-0 flex-col leading-tight">
-            <span className="truncate text-[13px] text-stone-900">
+            <span className="truncate text-[13px] text-fg">
               {viewer?.fullName ?? "Гость"}
             </span>
-            <span className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-stone-400">
+            <span className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.14em] text-fg-faint">
               {viewer?.email ?? "демонстрационный стенд"}
             </span>
           </div>
@@ -244,7 +244,7 @@ export function Sidebar() {
       <SyncStatus />
 
       {/* Переключатель */}
-      <div className="shrink-0 border-t border-stone-200 p-2">
+      <div className="shrink-0 border-t border-line p-2">
         <MaybeTooltip
           show={!isExpanded}
           label="Развернуть меню"
@@ -254,7 +254,7 @@ export function Sidebar() {
             size="icon"
             onClick={() => toggleSidebar()}
             aria-expanded={isExpanded}
-            className="h-8 w-full text-stone-400 hover:text-stone-700"
+            className="h-8 w-full text-fg-faint hover:text-fg-muted"
           >
             {isExpanded ? (
               <PanelLeftClose className="h-4 w-4" />

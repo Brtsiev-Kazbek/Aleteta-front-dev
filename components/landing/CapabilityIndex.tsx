@@ -83,7 +83,7 @@ export function CapabilityIndex() {
           description="Ничего из перечисленного не требует отдельной настройки или доработки."
         />
 
-        <div className="mt-12 grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-1 gap-px border border-line bg-surface-3 md:grid-cols-2 lg:grid-cols-4">
           {GROUPS.map((group, groupIndex) => {
             const isDimmed = activeGroup !== null && activeGroup !== group.id;
 
@@ -94,21 +94,21 @@ export function CapabilityIndex() {
                   onMouseLeave={() => setActiveGroup(null)}
                   animate={{ opacity: isDimmed ? 0.45 : 1 }}
                   transition={{ duration: 0.25 }}
-                  className="flex h-full flex-col bg-white p-6"
+                  className="flex h-full flex-col bg-surface p-6"
                 >
                   <div className="flex items-baseline gap-2.5">
                     <span className="font-mono text-[10px] tabular-nums text-violet-600">
                       {String(groupIndex + 1).padStart(2, "0")}
                     </span>
-                    <h3 className="text-sm font-medium text-stone-900">
+                    <h3 className="text-sm font-medium text-fg">
                       {group.title}
                     </h3>
-                    <span className="ml-auto font-mono text-[10px] tabular-nums text-stone-300">
+                    <span className="ml-auto font-mono text-[10px] tabular-nums text-fg-ghost">
                       {group.items.length}
                     </span>
                   </div>
 
-                  <ul className="mt-5 flex flex-col divide-y divide-stone-100 border-t border-stone-100">
+                  <ul className="mt-5 flex flex-col divide-y divide-line-soft border-t border-line-soft">
                     {group.items.map((item) => (
                       <li key={item.name} className="group/item py-3">
                         <span
@@ -119,7 +119,7 @@ export function CapabilityIndex() {
                         >
                           {item.name}
                         </span>
-                        <span className="mt-0.5 block text-[11px] leading-snug text-stone-400">
+                        <span className="mt-0.5 block text-[11px] leading-snug text-fg-faint">
                           {item.note}
                         </span>
                       </li>

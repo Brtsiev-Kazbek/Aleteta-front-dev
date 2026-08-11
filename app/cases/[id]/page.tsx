@@ -83,20 +83,20 @@ export default function CaseWorkspacePage() {
 
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Шапка дела */}
-        <header className="shrink-0 border-b border-stone-200 bg-white px-8 pt-6">
+        <header className="shrink-0 border-b border-line bg-surface px-8 pt-6">
           <div className="flex items-start justify-between gap-6">
             <div className="flex min-w-0 flex-col">
               {/* Статус в виде метки — как рубрики на лендинге */}
               <div className="flex flex-wrap items-center gap-2.5">
                 <Link
                   href="/dashboard"
-                  className="group inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400 transition-colors hover:text-stone-900"
+                  className="group inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:text-fg"
                 >
                   <ChevronRight className="h-3 w-3 rotate-180 transition-transform duration-300 group-hover:-translate-x-0.5" />
                   Все дела
                 </Link>
 
-                <span aria-hidden className="h-3 w-px bg-stone-200" />
+                <span aria-hidden className="h-3 w-px bg-surface-3" />
 
                 <span
                   className={cn(
@@ -114,7 +114,7 @@ export default function CaseWorkspacePage() {
                 </span>
               </div>
 
-              <h1 className="mt-3.5 max-w-3xl text-xl font-medium leading-[1.15] tracking-[-0.03em] text-stone-900 sm:text-[1.6rem]">
+              <h1 className="mt-3.5 max-w-3xl text-xl font-medium leading-[1.15] tracking-[-0.03em] text-fg sm:text-[1.6rem]">
                 {caseItem.title}
               </h1>
 
@@ -123,7 +123,7 @@ export default function CaseWorkspacePage() {
                 {caseItem.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400"
+                    className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint"
                   >
                     {tag}
                   </span>
@@ -134,7 +134,7 @@ export default function CaseWorkspacePage() {
             <Button onClick={handleToggleAssistant} className="shrink-0 gap-2">
               <Sparkles className="h-4 w-4" />
               Ассистент
-              <kbd className="ml-0.5 rounded border border-white/20 bg-white/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70">
+              <kbd className="ml-0.5 rounded border border-white/20 bg-surface/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70">
                 ⌘J
               </kbd>
             </Button>
@@ -155,14 +155,14 @@ export default function CaseWorkspacePage() {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="relative gap-2 rounded-none border-b border-transparent bg-transparent px-0 pb-3 pt-0 text-sm font-normal text-stone-400 shadow-none transition-colors hover:text-stone-900 data-[state=active]:bg-transparent data-[state=active]:text-stone-900 data-[state=active]:shadow-none"
+                    className="relative gap-2 rounded-none border-b border-transparent bg-transparent px-0 pb-3 pt-0 text-sm font-normal text-fg-faint shadow-none transition-colors hover:text-fg data-[state=active]:bg-transparent data-[state=active]:text-fg data-[state=active]:shadow-none"
                   >
                     {tab.label}
                     {count !== null && (
                       <span
                         className={cn(
                           "font-mono text-[10px] tabular-nums transition-colors",
-                          isActive ? "text-stone-900" : "text-stone-300"
+                          isActive ? "text-fg" : "text-fg-ghost"
                         )}
                       >
                         {count}

@@ -31,24 +31,24 @@ export function DocsShell({
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Шапка */}
-      <header className="sticky top-0 z-30 border-b border-stone-200 bg-stone-50/90 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-line bg-stone-50/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-6 px-6">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2.5">
               <span className="flex h-7 w-7 items-center justify-center rounded bg-stone-950 text-[13px] font-medium text-white">
                 А
               </span>
-              <span className="text-sm font-medium tracking-[-0.01em] text-stone-900">
+              <span className="text-sm font-medium tracking-[-0.01em] text-fg">
                 Алетейя
               </span>
             </Link>
 
             <span
               aria-hidden
-              className="hidden h-4 w-px bg-stone-200 sm:block"
+              className="hidden h-4 w-px bg-surface-3 sm:block"
             />
 
-            <span className="hidden items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-stone-400 sm:flex">
+            <span className="hidden items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-fg-faint sm:flex">
               <BookOpen className="h-3 w-3" />
               Документация
             </span>
@@ -57,13 +57,13 @@ export function DocsShell({
           <div className="flex items-center gap-5">
             <a
               href={`${REPO}/tree/main/docs/api`}
-              className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400 transition-colors hover:text-stone-900 sm:block"
+              className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:text-fg sm:block"
             >
               Справочник по коду
             </a>
             <a
               href={REPO}
-              className="group inline-flex items-center gap-1.5 text-[13px] text-stone-600 transition-colors hover:text-stone-900"
+              className="group inline-flex items-center gap-1.5 text-[13px] text-fg-soft transition-colors hover:text-fg"
             >
               GitHub
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -79,11 +79,11 @@ export function DocsShell({
           className="hidden w-52 shrink-0 lg:block"
         >
           <div className="sticky top-24">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
               Разделы
             </span>
 
-            <ul className="mt-4 flex flex-col border-l border-stone-200">
+            <ul className="mt-4 flex flex-col border-l border-line">
               {DOC_PAGES.map((page, index) => {
                 const isActive = page.slug === activeSlug;
 
@@ -94,14 +94,14 @@ export function DocsShell({
                       className={cn(
                         "-ml-px flex items-baseline gap-2.5 border-l py-2 pl-4 text-[13px] transition-colors",
                         isActive
-                          ? "border-stone-900 text-stone-900"
-                          : "border-transparent text-stone-500 hover:border-stone-300 hover:text-stone-900"
+                          ? "border-stone-900 text-fg"
+                          : "border-transparent text-fg-subtle hover:border-line-strong hover:text-fg"
                       )}
                     >
                       <span
                         className={cn(
                           "font-mono text-[10px] tabular-nums",
-                          isActive ? "text-violet-600" : "text-stone-300"
+                          isActive ? "text-violet-600" : "text-fg-ghost"
                         )}
                       >
                         {String(index + 1).padStart(2, "0")}
@@ -116,7 +116,7 @@ export function DocsShell({
             {sourceFile && (
               <a
                 href={`${REPO}/edit/main/docs/${sourceFile}`}
-                className="mt-8 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400 transition-colors hover:text-stone-900"
+                className="mt-8 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:text-fg"
               >
                 Править страницу
                 <ArrowUpRight className="h-3 w-3" />

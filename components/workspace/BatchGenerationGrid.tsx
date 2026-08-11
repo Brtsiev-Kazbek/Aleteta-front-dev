@@ -148,14 +148,14 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-line bg-surface">
       {/* Панель над таблицей */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-stone-200 px-4 py-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div className="flex flex-col">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
             Объекты дела
           </span>
-          <span className="mt-1 text-[13px] text-stone-500">
+          <span className="mt-1 text-[13px] text-fg-subtle">
             Реквизиты подставляются в шаблоны при генерации пакета
           </span>
         </div>
@@ -169,7 +169,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-72">
-            <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+            <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
               Тип объекта
             </DropdownMenuLabel>
 
@@ -181,7 +181,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
                   onSelect={() => addEntity(caseId, schema.id)}
                   className="items-start gap-2.5 py-2.5"
                 >
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-stone-400" />
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-fg-faint" />
                   <span className="flex min-w-0 flex-col">
                     <span className="flex items-center gap-1.5">
                       <span className="truncate font-medium">
@@ -193,7 +193,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
                         </span>
                       )}
                     </span>
-                    <span className="truncate text-xs text-stone-400">
+                    <span className="truncate text-xs text-fg-faint">
                       {schema.hint}
                     </span>
                   </span>
@@ -210,7 +210,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
               <span className="flex min-w-0 flex-col">
                 <span className="font-medium">Создать свой тип</span>
-                <span className="truncate text-xs text-stone-400">
+                <span className="truncate text-xs text-fg-faint">
                   Появится в списке во всех делах
                 </span>
               </span>
@@ -227,11 +227,11 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
       <div className="scrollable-area relative min-h-0 flex-1 overflow-auto">
         {entities.length === 0 ? (
           <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-2.5 p-10 text-center">
-            <Inbox className="h-5 w-5 text-stone-300" />
-            <p className="mt-1 text-sm text-stone-900">
+            <Inbox className="h-5 w-5 text-fg-ghost" />
+            <p className="mt-1 text-sm text-fg">
               В деле пока нет объектов
             </p>
-            <p className="max-w-sm text-[13px] leading-relaxed text-stone-500">
+            <p className="max-w-sm text-[13px] leading-relaxed text-fg-subtle">
               Добавьте участок, контрагента или сотрудника, опишите свой тип —
               либо загрузите файл во вкладке «Документы», и реквизиты
               перенесутся сюда сами.
@@ -252,9 +252,9 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
       </div>
 
       {/* Липкая панель готовности и запуска генерации */}
-      <div className="shrink-0 border-t border-stone-200 bg-white/95 backdrop-blur">
+      <div className="shrink-0 border-t border-line bg-surface/95 backdrop-blur">
         {/* Полоса готовности — состояние видно раньше, чем прочитан текст */}
-        <div className="h-px w-full bg-stone-200">
+        <div className="h-px w-full bg-surface-3">
           <motion.div
             animate={{
               width: `${
@@ -278,13 +278,13 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
             )}
 
             <div className="flex flex-col leading-tight">
-              <span className="font-mono text-[13px] tabular-nums text-stone-900">
+              <span className="font-mono text-[13px] tabular-nums text-fg">
                 {stats.valid} / {stats.total}
-                <span className="ml-2 font-sans text-[13px] text-stone-500">
+                <span className="ml-2 font-sans text-[13px] text-fg-subtle">
                   готово к генерации
                 </span>
               </span>
-              <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+              <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                 {stats.allValid
                   ? "Все обязательные реквизиты заполнены"
                   : `${stats.errorFields} ${plural(
@@ -421,7 +421,7 @@ function EntityGroupTable({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 text-stone-300 transition-colors hover:text-stone-900"
+                className="h-7 w-7 text-fg-ghost transition-colors hover:text-fg"
               >
                 <MoreHorizontal className="h-4 w-4" />
                 <span className="sr-only">Действия над объектом</span>
@@ -432,7 +432,7 @@ function EntityGroupTable({
               <DropdownMenuItem
                 onSelect={() => duplicateEntity(row.original.id)}
               >
-                <Copy className="h-4 w-4 text-stone-400" />
+                <Copy className="h-4 w-4 text-fg-faint" />
                 Дублировать
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -460,14 +460,14 @@ function EntityGroupTable({
   });
 
   return (
-    <section className="border-b border-stone-200 last:border-b-0">
+    <section className="border-b border-line last:border-b-0">
       {/* Заголовок группы */}
       <div className="sticky left-0 flex items-center gap-2 bg-stone-50 px-4 py-2.5">
-        <Icon className="h-3 w-3 shrink-0 text-stone-400" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-500">
+        <Icon className="h-3 w-3 shrink-0 text-fg-faint" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
           {schema.label}
         </span>
-        <span className="font-mono text-[10px] tabular-nums text-stone-300">
+        <span className="font-mono text-[10px] tabular-nums text-fg-ghost">
           {entities.length}
         </span>
         {schema.isCustom && (
@@ -493,7 +493,7 @@ function EntityGroupTable({
                       left: meta?.stickyLeft,
                     }}
                     className={cn(
-                      "h-9 whitespace-nowrap border-y border-stone-200 bg-white px-3 text-left font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-stone-400",
+                      "h-9 whitespace-nowrap border-y border-line bg-surface px-3 text-left font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-fg-faint",
                       isSticky &&
                         "sticky z-10 shadow-[1px_0_0_0_rgb(231,229,228)]"
                     )}
@@ -535,9 +535,9 @@ function EntityGroupTable({
                       left: meta?.stickyLeft,
                     }}
                     className={cn(
-                      "border-b border-stone-200/70 p-0 align-middle",
+                      "border-b border-line/70 p-0 align-middle",
                       isSticky &&
-                        "sticky z-10 bg-white shadow-[1px_0_0_0_rgb(231,229,228)] group-hover:bg-stone-50/70"
+                        "sticky z-10 bg-surface shadow-[1px_0_0_0_rgb(231,229,228)] group-hover:bg-stone-50/70"
                     )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -610,7 +610,7 @@ function EntityCell({
               setEditingCell(null);
             }
           }}
-          className="h-full w-full rounded border border-stone-900 bg-white px-2.5 text-sm text-stone-900 shadow-[0_0_0_3px_rgba(28,25,23,0.08)] outline-none placeholder:text-stone-300"
+          className="h-full w-full rounded border border-stone-900 bg-surface px-2.5 text-sm text-fg shadow-[0_0_0_3px_rgba(28,25,23,0.08)] outline-none placeholder:text-fg-ghost"
         />
       </div>
     );
@@ -650,10 +650,10 @@ function EntityCell({
         onClick={() =>
           setEditingCell({ entityId: entity.id, field: field.key })
         }
-        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-400"
+        className="group/cell flex h-11 w-full items-center gap-1.5 px-3 text-left transition-colors hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
       >
-        <Plus className="h-3.5 w-3.5 shrink-0 text-stone-200 transition-colors group-hover/cell:text-stone-900" />
-        <span className="truncate text-sm text-stone-300 transition-colors group-hover/cell:text-stone-500">
+        <Plus className="h-3.5 w-3.5 shrink-0 text-stone-200 transition-colors group-hover/cell:text-fg" />
+        <span className="truncate text-sm text-fg-ghost transition-colors group-hover/cell:text-fg-subtle">
           Добавить
         </span>
       </button>
@@ -680,7 +680,7 @@ function EntityCell({
             className="flex h-11 w-full items-center gap-1.5 border border-amber-200 bg-amber-50/70 px-3 text-left transition-colors hover:bg-amber-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-400"
           >
             <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-600" />
-            <span className="truncate text-sm text-stone-900">{value}</span>
+            <span className="truncate text-sm text-fg">{value}</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs">
@@ -698,9 +698,9 @@ function EntityCell({
     <button
       type="button"
       onClick={() => setEditingCell({ entityId: entity.id, field: field.key })}
-      className="flex h-11 w-full items-center px-3 text-left transition-colors hover:bg-stone-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-400"
+      className="flex h-11 w-full items-center px-3 text-left transition-colors hover:bg-surface-2/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
     >
-      <span className="truncate text-sm text-stone-900">{value}</span>
+      <span className="truncate text-sm text-fg">{value}</span>
     </button>
   );
 }

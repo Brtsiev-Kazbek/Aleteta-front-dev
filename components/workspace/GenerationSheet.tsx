@@ -70,7 +70,7 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
           <div className="flex items-center gap-2">
             <MetaLabel>Пакет документов</MetaLabel>
             {status === "running" && (
-              <Loader2 className="h-3 w-3 animate-spin text-stone-400" />
+              <Loader2 className="h-3 w-3 animate-spin text-fg-faint" />
             )}
           </div>
 
@@ -100,7 +100,7 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
         {status === "running" && (
           <div className="px-5 py-6">
             <Progress value={progress} />
-            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
               {Math.round(progress)}%
             </p>
           </div>
@@ -125,10 +125,10 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                             duration: 0.24,
                             delay: groupIndex * 0.06 + docIndex * 0.04,
                           }}
-                          className="flex items-center gap-3 rounded border border-stone-200 px-3 py-2.5 transition-colors hover:border-stone-300"
+                          className="flex items-center gap-3 rounded border border-line px-3 py-2.5 transition-colors hover:border-line-strong"
                         >
-                          <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
-                          <span className="min-w-0 flex-1 truncate text-[13px] text-stone-900">
+                          <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
+                          <span className="min-w-0 flex-1 truncate text-[13px] text-fg">
                             {doc.name}
                           </span>
                           <Check
@@ -144,13 +144,13 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
             </ScrollArea>
 
             {/* Свободный запрос: пакет не ограничен готовыми шаблонами */}
-            <div className="shrink-0 border-t border-stone-200 px-5 py-4">
+            <div className="shrink-0 border-t border-line px-5 py-4">
               <MetaLabel>Нужен документ не из списка?</MetaLabel>
 
               <div
                 className={cn(
-                  "mt-2.5 rounded-md border bg-white p-2.5 transition-colors",
-                  prompt.trim() ? "border-stone-900" : "border-stone-200"
+                  "mt-2.5 rounded-md border bg-surface p-2.5 transition-colors",
+                  prompt.trim() ? "border-stone-900" : "border-line"
                 )}
               >
                 <AutoGrowTextarea
@@ -167,8 +167,8 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                   placeholder="Опишите документ: дополнительное соглашение о рассрочке платежа на 6 месяцев со штрафом 0,1% за просрочку…"
                 />
 
-                <div className="mt-2 flex items-center justify-between gap-2 border-t border-stone-100 pt-2">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+                <div className="mt-2 flex items-center justify-between gap-2 border-t border-line-soft pt-2">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                     Enter — сгенерировать
                   </span>
                   <Button
@@ -200,25 +200,25 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
                       className={cn(
                         "h-3 w-3 shrink-0",
                         freeformStage === "searching"
-                          ? "animate-pulse text-stone-900"
-                          : "text-stone-400"
+                          ? "animate-pulse text-fg"
+                          : "text-fg-faint"
                       )}
                     />
 
                     {freeformStage === "searching" ? (
-                      <span className="text-[11px] text-stone-500">
+                      <span className="text-[11px] text-fg-subtle">
                         Проверяю, есть ли подходящий шаблон…
                       </span>
                     ) : templateMatch?.found ? (
-                      <span className="text-[11px] text-stone-600">
+                      <span className="text-[11px] text-fg-soft">
                         Шаблон найден:{" "}
-                        <span className="text-stone-900">
+                        <span className="text-fg">
                           {templateMatch.name}
                         </span>{" "}
                         — реквизиты подставлены
                       </span>
                     ) : (
-                      <span className="text-[11px] text-stone-600">
+                      <span className="text-[11px] text-fg-soft">
                         Шаблона нет —{" "}
                         <span className="font-medium text-violet-700">
                           документ составлен с нуля
@@ -230,7 +230,7 @@ export function GenerationSheet({ caseId }: { caseId: string }) {
               </AnimatePresence>
             </div>
 
-            <div className="flex shrink-0 items-center gap-2 border-t border-stone-200 px-5 py-4">
+            <div className="flex shrink-0 items-center gap-2 border-t border-line px-5 py-4">
               <Button className="flex-1 gap-1.5">
                 <Download className="h-4 w-4" />
                 Скачать всё (.zip)

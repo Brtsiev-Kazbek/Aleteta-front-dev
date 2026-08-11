@@ -99,10 +99,10 @@ export function ProfileForm({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
           Электронная почта
         </span>
-        <div className="flex h-10 items-center rounded-md border border-stone-200 bg-stone-50 px-3 text-sm text-stone-500">
+        <div className="flex h-10 items-center rounded-md border border-line bg-stone-50 px-3 text-sm text-fg-subtle">
           {email}
         </div>
       </div>

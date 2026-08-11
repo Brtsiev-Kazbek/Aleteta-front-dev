@@ -115,9 +115,9 @@ export function CaseLawDemo() {
   if (!scenario) return null;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <div className="flex items-center justify-between border-b border-stone-200 px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+    <div className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-surface">
+      <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
           Судебная практика по пункту
         </span>
         <div className="flex items-center gap-1">
@@ -144,10 +144,10 @@ export function CaseLawDemo() {
             transition={{ duration: 0.22 }}
             className="rounded border-l-2 border-violet-500 bg-stone-50 py-2.5 pl-3 pr-3"
           >
-            <span className="font-mono text-[10px] text-stone-400">
+            <span className="font-mono text-[10px] text-fg-faint">
               п. {scenario.clause}
             </span>
-            <p className="mt-1 text-[11px] leading-relaxed text-stone-700">
+            <p className="mt-1 text-[11px] leading-relaxed text-fg-muted">
               {scenario.text}
             </p>
           </motion.div>
@@ -158,13 +158,13 @@ export function CaseLawDemo() {
           {stage === 1 ? (
             <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-violet-600" />
           ) : (
-            <Scale className="h-3.5 w-3.5 shrink-0 text-stone-400" />
+            <Scale className="h-3.5 w-3.5 shrink-0 text-fg-faint" />
           )}
-          <span className="min-w-0 flex-1 truncate text-[11px] text-stone-500">
+          <span className="min-w-0 flex-1 truncate text-[11px] text-fg-subtle">
             {stage === 0 ? "Готов к поиску" : `Ищу: ${scenario.query}`}
           </span>
           {stage >= 2 && (
-            <span className="shrink-0 font-mono text-[10px] text-stone-400">
+            <span className="shrink-0 font-mono text-[10px] text-fg-faint">
               {scenario.precedents.length} акта
             </span>
           )}
@@ -182,17 +182,17 @@ export function CaseLawDemo() {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.28 }}
-                  className="rounded border border-stone-200 p-3"
+                  className="rounded border border-line p-3"
                 >
                   <div className="flex items-start gap-2">
-                    <Gavel className="mt-0.5 h-3.5 w-3.5 shrink-0 text-stone-400" />
+                    <Gavel className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-faint" />
 
                     <div className="flex min-w-0 flex-col gap-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[11px] font-medium text-stone-900">
+                        <span className="text-[11px] font-medium text-fg">
                           {precedent.court}
                         </span>
-                        <span className="font-mono text-[10px] text-stone-400">
+                        <span className="font-mono text-[10px] text-fg-faint">
                           № {precedent.number} · {precedent.year}
                         </span>
                         <span
@@ -209,7 +209,7 @@ export function CaseLawDemo() {
                         </span>
                       </div>
 
-                      <p className="text-[11px] leading-relaxed text-stone-600">
+                      <p className="text-[11px] leading-relaxed text-fg-soft">
                         {precedent.holding}
                       </p>
                     </div>
@@ -226,13 +226,13 @@ export function CaseLawDemo() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="mt-3 border-t border-stone-200 pt-3"
+              className="mt-3 border-t border-line pt-3"
             >
-              <p className="text-[11px] leading-relaxed text-stone-600">
+              <p className="text-[11px] leading-relaxed text-fg-soft">
                 Практика подставлена в замечание к пункту — можно сослаться
                 прямо в протоколе разногласий.
               </p>
-              <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-stone-300">
+              <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-ghost">
                 Демонстрационные данные
               </p>
             </motion.div>

@@ -126,9 +126,9 @@ export function OriginalPane({
     return (
       <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={null} syncScroll={syncScroll} onToggleSync={onToggleSync}>
         <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
-          <FileWarning className="h-5 w-5 text-stone-300" />
-          <p className="text-[13px] text-stone-900">Оригинал не открылся</p>
-          <p className="max-w-xs text-[12.5px] leading-relaxed text-stone-500">
+          <FileWarning className="h-5 w-5 text-fg-ghost" />
+          <p className="text-[13px] text-fg">Оригинал не открылся</p>
+          <p className="max-w-xs text-[12.5px] leading-relaxed text-fg-subtle">
             {error}
           </p>
         </div>
@@ -139,7 +139,7 @@ export function OriginalPane({
   if (!source) {
     return (
       <Frame page={page} pageCount={pageCount} onPageChange={onPageChange} link={null} syncScroll={syncScroll} onToggleSync={onToggleSync}>
-        <div className="flex h-full items-center justify-center gap-2 text-[12.5px] text-stone-500">
+        <div className="flex h-full items-center justify-center gap-2 text-[12.5px] text-fg-subtle">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
           Открываю оригинал
         </div>
@@ -183,9 +183,9 @@ function Frame({
   const last = pageCount ?? page;
 
   return (
-    <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
-      <div className="flex shrink-0 items-center gap-2 border-b border-stone-200 px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
+    <div className="flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-line bg-surface">
+      <div className="flex shrink-0 items-center gap-2 border-b border-line px-4 py-2.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
           Оригинал
         </span>
 
@@ -206,7 +206,7 @@ function Frame({
             "flex items-center gap-1.5 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] transition-colors",
             syncScroll
               ? "border-amber-200 bg-amber-50 text-amber-700"
-              : "border-stone-200 text-stone-400 hover:text-stone-900"
+              : "border-line text-fg-faint hover:text-fg"
           )}
         >
           {syncScroll ? (
@@ -226,7 +226,7 @@ function Frame({
             <ChevronLeft className="h-3.5 w-3.5" />
           </PageStep>
 
-          <span className="min-w-[4.5rem] text-center font-mono text-[10px] uppercase tracking-[0.1em] text-stone-500 tabular-nums">
+          <span className="min-w-[4.5rem] text-center font-mono text-[10px] uppercase tracking-[0.1em] text-fg-subtle tabular-nums">
             {page}
             {pageCount ? ` из ${pageCount}` : ""}
           </span>
@@ -245,7 +245,7 @@ function Frame({
               target="_blank"
               rel="noopener noreferrer"
               title="Открыть в отдельном окне"
-              className="ml-1 rounded p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900"
+              className="ml-1 rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span className="sr-only">Открыть в отдельном окне</span>
@@ -254,7 +254,7 @@ function Frame({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 bg-stone-100">{children}</div>
+      <div className="min-h-0 flex-1 bg-surface-2">{children}</div>
     </div>
   );
 }
@@ -276,7 +276,7 @@ function PageStep({
       title={title}
       onClick={onClick}
       disabled={disabled}
-      className="rounded p-1.5 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900 disabled:pointer-events-none disabled:opacity-30"
+      className="rounded p-1.5 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg disabled:pointer-events-none disabled:opacity-30"
     >
       {children}
       <span className="sr-only">{title}</span>

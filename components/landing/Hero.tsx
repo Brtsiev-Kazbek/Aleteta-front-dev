@@ -81,7 +81,7 @@ export function Hero() {
           className="flex items-center gap-3"
         >
           <span className="h-px w-8 bg-violet-500" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-stone-400">
+          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-faint">
             Для юристов, кадровиков, бухгалтеров и вузов
           </span>
         </motion.div>
@@ -112,7 +112,7 @@ export function Hero() {
           initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.55 }}
-          className="mt-7 max-w-2xl text-lg leading-relaxed text-stone-400"
+          className="mt-7 max-w-2xl text-lg leading-relaxed text-fg-faint"
         >
           Алетейя берёт на себя рутину: анализирует файлы, извлекает реквизиты,
           помнит контекст каждой задачи и собирает сотни документов без ошибок
@@ -127,7 +127,7 @@ export function Hero() {
         >
           <MagneticLink
             href="/auth/register"
-            className="group inline-flex h-11 items-center gap-2 rounded-md bg-white px-6 text-sm font-medium text-stone-950 transition-colors hover:bg-stone-200"
+            className="group inline-flex h-11 items-center gap-2 rounded-md bg-surface px-6 text-sm font-medium text-stone-950 transition-colors hover:bg-surface-3"
           >
             Начать работу
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -135,14 +135,14 @@ export function Hero() {
 
           <Link
             href="#features"
-            className="group inline-flex h-11 items-center px-1 text-sm font-medium text-stone-300 transition-colors hover:text-white"
+            className="group inline-flex h-11 items-center px-1 text-sm font-medium text-fg-ghost transition-colors hover:text-white"
           >
-            <span className="border-b border-stone-700 pb-0.5 transition-colors group-hover:border-stone-300">
+            <span className="border-b border-stone-700 pb-0.5 transition-colors group-hover:border-line-strong">
               Посмотреть, как это работает
             </span>
           </Link>
 
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-600 sm:ml-2">
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-soft sm:ml-2">
             Без карты · Настройка не нужна
           </span>
         </motion.div>
@@ -151,12 +151,12 @@ export function Hero() {
           initial={reduceMotion ? undefined : { opacity: 0 }}
           animate={reduceMotion ? undefined : { opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-stone-800 pt-6"
+          className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-inverse-line pt-6"
         >
           {FACTS.map((fact) => (
             <li
               key={fact}
-              className="group flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-stone-500 transition-colors hover:text-stone-300"
+              className="group flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-fg-subtle transition-colors hover:text-fg-ghost"
             >
               <span
                 aria-hidden

@@ -21,7 +21,7 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         aria-valuemax={100}
         aria-valuenow={clamped}
         className={cn(
-          "relative h-px w-full overflow-hidden bg-stone-200",
+          "relative h-px w-full overflow-hidden bg-surface-3",
           className
         )}
         {...props}

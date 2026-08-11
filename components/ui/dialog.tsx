@@ -38,14 +38,14 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "shadow-panel fixed left-1/2 top-1/2 z-50 flex w-full max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col gap-5 rounded-lg border border-stone-200 bg-white p-6 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        "shadow-panel fixed left-1/2 top-1/2 z-50 flex w-full max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col gap-5 rounded-lg border border-line bg-surface p-6 duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         className
       )}
       {...props}
     >
       {children}
       {!hideClose && (
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-stone-400 opacity-70 transition-opacity hover:bg-stone-100 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
+        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-fg-faint opacity-70 transition-opacity hover:bg-surface-2 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring">
           <X className="h-4 w-4" />
           <span className="sr-only">Закрыть</span>
         </DialogPrimitive.Close>
@@ -84,7 +84,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg font-medium leading-tight tracking-[-0.02em] text-stone-900",
+      "text-lg font-medium leading-tight tracking-[-0.02em] text-fg",
       className
     )}
     {...props}
@@ -98,7 +98,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm leading-relaxed text-stone-500", className)}
+    className={cn("text-sm leading-relaxed text-fg-subtle", className)}
     {...props}
   />
 ));

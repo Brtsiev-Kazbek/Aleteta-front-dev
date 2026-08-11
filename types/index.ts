@@ -26,22 +26,22 @@ export const CASE_STATUS_META: Record<
 > = {
   in_progress: {
     label: "В работе",
-    badgeClassName: "border-stone-200 text-stone-600",
+    badgeClassName: "border-line text-fg-soft",
     dotClassName: "bg-stone-900",
   },
   collecting: {
     label: "Сбор данных",
-    badgeClassName: "border-stone-200 text-stone-600",
+    badgeClassName: "border-line text-fg-soft",
     dotClassName: "bg-amber-500",
   },
   active: {
     label: "Активно",
-    badgeClassName: "border-stone-200 text-stone-600",
+    badgeClassName: "border-line text-fg-soft",
     dotClassName: "bg-emerald-500",
   },
   archived: {
     label: "В архиве",
-    badgeClassName: "border-stone-200 text-stone-400",
+    badgeClassName: "border-line text-fg-faint",
     dotClassName: "bg-stone-300",
   },
 };
@@ -335,11 +335,11 @@ export const DOCUMENT_STATUS_META: Record<
 > = {
   draft: {
     label: "Черновик",
-    className: "border-stone-200 text-stone-400",
+    className: "border-line text-fg-faint",
   },
   ready: {
     label: "Готов",
-    className: "border-stone-200 text-stone-600",
+    className: "border-line text-fg-soft",
   },
   signed: {
     label: "Подписан",
@@ -413,9 +413,9 @@ export const RISK_LEVEL_META: Record<
   },
   info: {
     label: "Замечание",
-    cardClassName: "border-stone-200 bg-stone-50",
-    badgeClassName: "border-stone-200 bg-white text-stone-600",
-    iconClassName: "text-stone-500",
+    cardClassName: "border-line bg-stone-50",
+    badgeClassName: "border-line bg-surface text-fg-soft",
+    iconClassName: "text-fg-subtle",
   },
 };
 

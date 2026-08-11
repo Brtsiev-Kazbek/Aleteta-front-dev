@@ -44,12 +44,12 @@ export function LandingFooter() {
               <span className="flex h-7 w-7 items-center justify-center rounded bg-stone-950 text-[13px] font-medium text-white">
                 А
               </span>
-              <span className="text-sm font-medium tracking-[-0.01em] text-stone-900">
+              <span className="text-sm font-medium tracking-[-0.01em] text-fg">
                 Алетейя
               </span>
             </Link>
 
-            <p className="mt-4 max-w-[15rem] text-xs leading-relaxed text-stone-500">
+            <p className="mt-4 max-w-[15rem] text-xs leading-relaxed text-fg-subtle">
               Рабочее пространство для дел и документов. Проверяет реквизиты
               до генерации, а не после.
             </p>
@@ -57,7 +57,7 @@ export function LandingFooter() {
 
           {COLUMNS.map((column) => (
             <div key={column.title} className="flex flex-col">
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
                 {column.title}
               </span>
 
@@ -66,7 +66,7 @@ export function LandingFooter() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-[13px] text-stone-600 transition-colors hover:text-stone-900"
+                    className="text-[13px] text-fg-soft transition-colors hover:text-fg"
                   >
                     {link.label}
                   </Link>
@@ -76,11 +76,11 @@ export function LandingFooter() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-2 border-t border-stone-200 pt-6 sm:flex-row sm:items-center">
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+        <div className="mt-14 flex flex-col items-start justify-between gap-2 border-t border-line pt-6 sm:flex-row sm:items-center">
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
             © 2026 Алетейя · Владикавказ
           </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
             Ранний доступ
           </span>
         </div>

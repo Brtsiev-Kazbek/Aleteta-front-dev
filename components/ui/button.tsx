@@ -10,17 +10,17 @@ import { cn } from "@/lib/utils";
  * фирменным цветом и мягких теней: на продуктовых экранах они шумят.
  */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {
         default: "bg-stone-950 text-white hover:bg-stone-800",
         destructive: "bg-red-600 text-white hover:bg-red-700",
         outline:
-          "border border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:bg-stone-50 hover:text-stone-900",
-        secondary: "bg-stone-100 text-stone-900 hover:bg-stone-200",
-        ghost: "text-stone-500 hover:bg-stone-100 hover:text-stone-900",
-        link: "text-stone-900 underline-offset-4 hover:underline",
+          "border border-line bg-surface text-fg-muted hover:border-line-strong hover:bg-stone-50 hover:text-fg",
+        secondary: "bg-surface-2 text-fg hover:bg-surface-3",
+        ghost: "text-fg-subtle hover:bg-surface-2 hover:text-fg",
+        link: "text-fg underline-offset-4 hover:underline",
       },
       size: {
         default: "h-9 px-4 py-2",

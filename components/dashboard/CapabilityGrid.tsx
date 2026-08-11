@@ -261,12 +261,12 @@ export function CapabilityGrid() {
             <section key={group.title}>
               <div className="flex items-baseline justify-between gap-3">
                 <MetaLabel>{group.title}</MetaLabel>
-                <span className="font-mono text-[10px] tabular-nums text-stone-300">
+                <span className="font-mono text-[10px] tabular-nums text-fg-ghost">
                   {group.items.length}
                 </span>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-4 grid grid-cols-1 gap-px border border-line bg-surface-3 sm:grid-cols-2 lg:grid-cols-3">
                 {group.items.map((item, index) => (
                   <motion.button
                     key={item.id}
@@ -280,9 +280,9 @@ export function CapabilityGrid() {
                       ease: [0.22, 0.61, 0.36, 1],
                     }}
                     className={cn(
-                      "group relative flex flex-col items-start overflow-hidden bg-white p-5 text-left",
+                      "group relative flex flex-col items-start overflow-hidden bg-surface p-5 text-left",
                       "transition-colors duration-300 hover:bg-stone-50",
-                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-400"
+                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
                     )}
                   >
                     {/* Волосяная линия сверху — появляется при наведении */}
@@ -292,20 +292,20 @@ export function CapabilityGrid() {
                     />
 
                     <div className="flex w-full items-baseline gap-2.5">
-                      <span className="font-mono text-[10px] tabular-nums text-stone-300 transition-colors duration-300 group-hover:text-violet-600">
+                      <span className="font-mono text-[10px] tabular-nums text-fg-ghost transition-colors duration-300 group-hover:text-violet-600">
                         {String(offset + index + 1).padStart(2, "0")}
                       </span>
-                      <span className="text-[15px] font-medium tracking-[-0.015em] text-stone-900">
+                      <span className="text-[15px] font-medium tracking-[-0.015em] text-fg">
                         {item.title}
                       </span>
-                      <ArrowUpRight className="ml-auto h-3.5 w-3.5 shrink-0 text-stone-300 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-stone-900" />
+                      <ArrowUpRight className="ml-auto h-3.5 w-3.5 shrink-0 text-fg-ghost transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg" />
                     </div>
 
-                    <p className="mt-2.5 text-[13px] leading-relaxed text-stone-500">
+                    <p className="mt-2.5 text-[13px] leading-relaxed text-fg-subtle">
                       {item.note}
                     </p>
 
-                    <span className="relative mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400 transition-colors duration-300 group-hover:text-stone-900">
+                    <span className="relative mt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint transition-colors duration-300 group-hover:text-fg">
                       {item.action}
                       <span
                         aria-hidden

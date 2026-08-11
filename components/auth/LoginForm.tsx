@@ -118,7 +118,7 @@ export function LoginForm({
           hint={
             <Link
               href="/auth/forgot-password"
-              className="text-[12px] text-stone-500 transition-colors hover:text-stone-900"
+              className="text-[12px] text-fg-subtle transition-colors hover:text-fg"
             >
               Забыли пароль?
             </Link>
@@ -141,11 +141,11 @@ export function LoginForm({
         Войти
       </Button>
 
-      <p className="mt-6 text-sm text-stone-500">
+      <p className="mt-6 text-sm text-fg-subtle">
         Нет аккаунта?{" "}
         <Link
           href={`/auth/register?next=${encodeURIComponent(nextPath)}`}
-          className="border-b border-stone-300 pb-0.5 text-stone-900 transition-colors hover:border-stone-900"
+          className="border-b border-line-strong pb-0.5 text-fg transition-colors hover:border-stone-900"
         >
           Зарегистрироваться
         </Link>

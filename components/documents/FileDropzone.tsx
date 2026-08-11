@@ -72,24 +72,24 @@ export function FileDropzone({
           handleFiles(event.dataTransfer.files);
         }}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed px-8 py-14 text-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400",
+          "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed px-8 py-14 text-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-focus",
           isDragging
             ? "border-stone-900 bg-stone-50"
-            : "border-stone-300 bg-white hover:border-stone-400 hover:bg-stone-50/60"
+            : "border-line-strong bg-surface hover:border-stone-400 hover:bg-stone-50/60"
         )}
       >
         <Upload
           className={cn(
             "h-5 w-5 transition-colors",
-            isDragging ? "text-stone-900" : "text-stone-300"
+            isDragging ? "text-fg" : "text-fg-ghost"
           )}
         />
 
         <div className="flex flex-col gap-1.5">
-          <p className="text-sm text-stone-900">
+          <p className="text-sm text-fg">
             Перетащите файл или нажмите, чтобы выбрать
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
             {hint}
           </p>
         </div>
@@ -111,7 +111,7 @@ export function FileDropzone({
         <button
           type="button"
           onClick={() => onPick(demoFile)}
-          className="self-center border-b border-stone-200 pb-0.5 text-xs text-stone-500 transition-colors hover:border-stone-400 hover:text-stone-900"
+          className="self-center border-b border-line pb-0.5 text-xs text-fg-subtle transition-colors hover:border-stone-400 hover:text-fg"
         >
           {demoLabel}
         </button>

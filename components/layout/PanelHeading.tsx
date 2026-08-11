@@ -31,17 +31,17 @@ export function PanelHeading({
       <div className="flex min-w-0 flex-col">
         <span className="flex items-center gap-2.5">
           <span aria-hidden className="h-px w-6 bg-violet-500" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-stone-400">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-fg-faint">
             {eyebrow}
           </span>
         </span>
 
-        <h1 className="mt-5 max-w-2xl text-[1.75rem] font-medium leading-[1.12] tracking-[-0.03em] text-stone-900">
+        <h1 className="mt-5 max-w-2xl text-[1.75rem] font-medium leading-[1.12] tracking-[-0.03em] text-fg">
           {title}
         </h1>
 
         {description && (
-          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-stone-500">
+          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-fg-subtle">
             {description}
           </p>
         )}
@@ -63,7 +63,7 @@ export function MetaLabel({
   return (
     <span
       className={cn(
-        "font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400",
+        "font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint",
         className
       )}
     >

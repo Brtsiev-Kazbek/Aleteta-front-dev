@@ -93,10 +93,10 @@ function Badge({
 }) {
   const className = cn(
     "hidden shrink-0 items-center gap-1.5 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.1em] sm:inline-flex",
-    tone === "quiet" && "border-stone-200 text-stone-500",
+    tone === "quiet" && "border-line text-fg-subtle",
     tone === "active" && "border-violet-200 bg-violet-50/60 text-violet-700",
     tone === "alarm" && "border-red-200 text-red-600",
-    onClick && "transition-colors hover:border-stone-400 hover:text-stone-900"
+    onClick && "transition-colors hover:border-stone-400 hover:text-fg"
   );
 
   if (!onClick) return <span className={className}>{children}</span>;

@@ -128,9 +128,9 @@ export function ProductPreview() {
   const isReady = phase === "ready";
 
   return (
-    <div className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_48px_-16px_rgba(0,0,0,0.14)]">
+    <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_48px_-16px_rgba(0,0,0,0.14)]">
       {/* Строка дела */}
-      <div className="flex items-center gap-3 border-b border-stone-200 px-4 py-2.5">
+      <div className="flex items-center gap-3 border-b border-line px-4 py-2.5">
         <AnimatePresence mode="wait">
           <motion.span
             key={data.caseTitle}
@@ -138,7 +138,7 @@ export function ProductPreview() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.25 }}
-            className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400"
+            className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
           >
             {data.caseTitle}
           </motion.span>
@@ -176,7 +176,7 @@ export function ProductPreview() {
                 {data.columns.map((column) => (
                   <th
                     key={column}
-                    className="whitespace-nowrap border-b border-stone-200 px-4 py-2.5 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-stone-400"
+                    className="whitespace-nowrap border-b border-line px-4 py-2.5 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-fg-faint"
                   >
                     {column}
                   </th>
@@ -190,9 +190,9 @@ export function ProductPreview() {
                   <td
                     key={index}
                     className={cn(
-                      "whitespace-nowrap border-b border-stone-100 px-4 py-3 text-sm text-stone-700",
+                      "whitespace-nowrap border-b border-line-soft px-4 py-3 text-sm text-fg-muted",
                       data.monoColumns.includes(index) &&
-                        "font-mono text-[13px] text-stone-600"
+                        "font-mono text-[13px] text-fg-soft"
                     )}
                   >
                     {cell}
@@ -207,9 +207,9 @@ export function ProductPreview() {
                       <td
                         key={index}
                         className={cn(
-                          "whitespace-nowrap px-4 py-3 text-sm text-stone-700",
+                          "whitespace-nowrap px-4 py-3 text-sm text-fg-muted",
                           data.monoColumns.includes(index) &&
-                            "font-mono text-[13px] text-stone-600"
+                            "font-mono text-[13px] text-fg-soft"
                         )}
                       >
                         {cell}
@@ -241,9 +241,9 @@ export function ProductPreview() {
                             data.monoColumns.includes(index) &&
                               "font-mono text-[13px]",
                             isFilled
-                              ? "text-stone-700"
+                              ? "text-fg-muted"
                               : typed
-                                ? "text-stone-900"
+                                ? "text-fg"
                                 : "text-red-700"
                           )}
                         >
@@ -269,9 +269,9 @@ export function ProductPreview() {
       </div>
 
       {/* Нижняя панель */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3">
         <div className="flex items-baseline gap-2.5">
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
             Готово к генерации
           </span>
 
@@ -285,7 +285,7 @@ export function ProductPreview() {
                 transition={{ duration: 0.25 }}
                 className={cn(
                   "absolute font-mono text-sm tabular-nums",
-                  isFilled ? "text-emerald-600" : "text-stone-900"
+                  isFilled ? "text-emerald-600" : "text-fg"
                 )}
               >
                 {isFilled ? "2 / 2" : "1 / 2"}

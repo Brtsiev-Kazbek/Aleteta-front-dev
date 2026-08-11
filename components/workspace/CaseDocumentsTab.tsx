@@ -154,10 +154,10 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
       <div
         className={cn(
           "flex flex-wrap items-center gap-x-5 gap-y-3 border-b pb-3.5 transition-colors",
-          isDragging ? "border-stone-900" : "border-stone-200"
+          isDragging ? "border-stone-900" : "border-line"
         )}
       >
-        <label className="flex cursor-pointer items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400 transition-colors hover:text-stone-900">
+        <label className="flex cursor-pointer items-center gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint transition-colors hover:text-fg">
           <Checkbox
             checked={allSelected}
             onCheckedChange={() =>
@@ -172,7 +172,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
         </label>
 
         {isDragging && (
-          <MetaLabel className="text-stone-900">
+          <MetaLabel className="text-fg">
             Отпустите — файл добавится и уйдёт на распознавание
           </MetaLabel>
         )}
@@ -180,7 +180,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
         <div className="ml-auto flex items-center gap-2">
           {selectedIds.length > 0 ? (
             <>
-              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-900">
+              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg">
                 Выбрано: {selectedIds.length}
               </span>
               <Button
@@ -240,17 +240,17 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
 
       {/* Список документов */}
       {documents.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 border border-dashed border-stone-300 px-6 py-16 text-center">
-          <FileText className="h-5 w-5 text-stone-300" />
-          <p className="mt-1 text-sm text-stone-900">Документов пока нет</p>
-          <p className="max-w-sm text-[13px] leading-relaxed text-stone-500">
+        <div className="flex flex-col items-center gap-2 border border-dashed border-line-strong px-6 py-16 text-center">
+          <FileText className="h-5 w-5 text-fg-ghost" />
+          <p className="mt-1 text-sm text-fg">Документов пока нет</p>
+          <p className="max-w-sm text-[13px] leading-relaxed text-fg-subtle">
             Перетащите файл сюда — он распознается сам. Дальше из него можно
             извлечь реквизиты в карточку объекта: пункт «Извлечь реквизиты» в
             меню файла.
           </p>
         </div>
       ) : (
-        <ul className="flex flex-col divide-y divide-stone-200 border-y border-stone-200">
+        <ul className="flex flex-col divide-y divide-line border-y border-line">
           {documents.map((document, index) => {
             const status = DOCUMENT_STATUS_META[document.status];
             const isSelected = selectedIds.includes(document.id);
@@ -273,18 +273,18 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                   className="shrink-0"
                 />
 
-                <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
+                <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
 
                 {/* Клик по строке открывает разбор — это основное действие */}
                 <button
                   type="button"
                   onClick={() => openDocumentReview(document.id)}
-                  className="flex min-w-0 flex-1 flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+                  className="flex min-w-0 flex-1 flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-focus"
                 >
-                  <span className="truncate text-[13px] text-stone-900 underline-offset-4 group-hover:underline">
+                  <span className="truncate text-[13px] text-fg underline-offset-4 group-hover:underline">
                     {document.title}
                   </span>
-                  <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+                  <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
                     {document.type} · {formatDate(document.createdAt)}
                   </span>
                 </button>
@@ -315,7 +315,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                     <DropdownMenuItem
                       onSelect={() => openDocumentReview(document.id)}
                     >
-                      <ShieldCheck className="h-4 w-4 text-stone-400" />
+                      <ShieldCheck className="h-4 w-4 text-fg-faint" />
                       Разобрать по пунктам
                     </DropdownMenuItem>
                     {/*
@@ -333,7 +333,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                         document.ocrStatus !== "done" || !isExtractionAvailable
                       }
                     >
-                      <ScanLine className="h-4 w-4 text-stone-400" />
+                      <ScanLine className="h-4 w-4 text-fg-faint" />
                       {document.ocrStatus !== "done"
                         ? "Извлечь реквизиты — нужен текст"
                         : isExtractionAvailable
@@ -343,7 +343,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                     <DropdownMenuItem
                       onSelect={() => setTextDocumentId(document.id)}
                     >
-                      <FileSearch className="h-4 w-4 text-stone-400" />
+                      <FileSearch className="h-4 w-4 text-fg-faint" />
                       Распознанный текст
                     </DropdownMenuItem>
                     {/*
@@ -359,7 +359,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                         document.ocrStatus === "running"
                       }
                     >
-                      <ScanText className="h-4 w-4 text-stone-400" />
+                      <ScanText className="h-4 w-4 text-fg-faint" />
                       {document.ocrStatus
                         ? "Распознать заново"
                         : "Распознать текст"}
@@ -367,7 +367,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
                     <DropdownMenuItem
                       onSelect={() => void handleDownload(document.id)}
                     >
-                      <Download className="h-4 w-4 text-stone-400" />
+                      <Download className="h-4 w-4 text-fg-faint" />
                       Скачать
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

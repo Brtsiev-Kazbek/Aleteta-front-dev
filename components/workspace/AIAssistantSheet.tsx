@@ -75,8 +75,8 @@ export function AIAssistantSheet({
           <MetaLabel>Ассистент по делу</MetaLabel>
           <SheetTitle>Алетейя</SheetTitle>
           <SheetDescription asChild>
-            <div className="flex items-center gap-1.5 text-stone-500">
-              <FileText className="h-3 w-3 shrink-0 text-stone-300" />
+            <div className="flex items-center gap-1.5 text-fg-subtle">
+              <FileText className="h-3 w-3 shrink-0 text-fg-ghost" />
               <span className="truncate">Контекст: {contextFile}</span>
             </div>
           </SheetDescription>
@@ -101,7 +101,7 @@ export function AIAssistantSheet({
                     className={cn(
                       "max-w-[88%] rounded-lg px-3.5 py-2.5 text-[13px] leading-relaxed",
                       message.role === "assistant"
-                        ? "border border-stone-200 bg-white text-stone-900"
+                        ? "border border-line bg-surface text-fg"
                         : "bg-stone-950 text-white"
                     )}
                   >
@@ -140,7 +140,7 @@ export function AIAssistantSheet({
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-1 self-start rounded-lg border border-stone-200 bg-white px-4 py-3"
+                className="flex items-center gap-1 self-start rounded-lg border border-line bg-surface px-4 py-3"
               >
                 {[0, 1, 2].map((dot) => (
                   <motion.span
@@ -162,7 +162,7 @@ export function AIAssistantSheet({
         </ScrollArea>
 
         {/* Ввод */}
-        <div className="flex shrink-0 flex-col gap-2.5 border-t border-stone-200 px-5 py-4">
+        <div className="flex shrink-0 flex-col gap-2.5 border-t border-line px-5 py-4">
           <div className="flex flex-wrap gap-1.5">
             {SUGGESTED_PROMPTS.map((prompt) => (
               <button
@@ -170,7 +170,7 @@ export function AIAssistantSheet({
                 type="button"
                 onClick={() => handleSend(prompt)}
                 disabled={isThinking}
-                className="rounded border border-stone-200 px-2.5 py-1.5 text-xs text-stone-600 transition-colors hover:border-stone-900 hover:text-stone-900 disabled:opacity-40"
+                className="rounded border border-line px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-stone-900 hover:text-fg disabled:opacity-40"
               >
                 {prompt}
               </button>
@@ -188,13 +188,13 @@ export function AIAssistantSheet({
                 }
               }}
               placeholder="Спросите Алетейю о деле…"
-              className="h-10 w-full rounded-md border border-stone-200 bg-white pl-3.5 pr-11 text-[13px] text-stone-900 outline-none transition-colors placeholder:text-stone-400 focus:border-stone-900"
+              className="h-10 w-full rounded-md border border-line bg-surface pl-3.5 pr-11 text-[13px] text-fg outline-none transition-colors placeholder:text-fg-faint focus:border-stone-900"
             />
             <button
               type="button"
               onClick={() => handleSend(draft)}
               disabled={!draft.trim() || isThinking}
-              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded bg-stone-950 text-white transition-colors hover:bg-stone-800 disabled:bg-stone-100 disabled:text-stone-400"
+              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded bg-stone-950 text-white transition-colors hover:bg-stone-800 disabled:bg-surface-2 disabled:text-fg-faint"
               aria-label="Отправить сообщение"
             >
               <ArrowUp className="h-3.5 w-3.5" />
@@ -237,15 +237,15 @@ function FindingCard({
             >
               {meta.label}
             </span>
-            <span className="font-mono text-[10px] text-stone-400">
+            <span className="font-mono text-[10px] text-fg-faint">
               {finding.clause}
             </span>
           </div>
 
-          <p className="text-[13px] font-medium text-stone-900">
+          <p className="text-[13px] font-medium text-fg">
             {finding.title}
           </p>
-          <p className="text-[13px] leading-relaxed text-stone-600">
+          <p className="text-[13px] leading-relaxed text-fg-soft">
             {finding.description}
           </p>
         </div>
@@ -270,21 +270,21 @@ function CitationCard({
       initial={{ opacity: 0, x: 8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.26, delay }}
-      className="rounded border border-stone-200 bg-white p-3 transition-colors hover:border-stone-300"
+      className="rounded border border-line bg-surface p-3 transition-colors hover:border-line-strong"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <FileText className="h-3 w-3 shrink-0 text-stone-300" />
+        <FileText className="h-3 w-3 shrink-0 text-fg-ghost" />
         <span className="min-w-0 truncate text-[11px] font-medium text-stone-800">
           {citation.document}
         </span>
-        <span className="ml-auto shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+        <span className="ml-auto shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
           {citation.clause} · стр. {citation.page}
         </span>
       </div>
 
-      <div className="mt-2 flex gap-2 border-l border-stone-200 pl-2.5">
-        <Quote className="mt-0.5 h-2.5 w-2.5 shrink-0 text-stone-300" />
-        <p className="text-[11px] leading-relaxed text-stone-600">
+      <div className="mt-2 flex gap-2 border-l border-line pl-2.5">
+        <Quote className="mt-0.5 h-2.5 w-2.5 shrink-0 text-fg-ghost" />
+        <p className="text-[11px] leading-relaxed text-fg-soft">
           {citation.quote}
         </p>
       </div>

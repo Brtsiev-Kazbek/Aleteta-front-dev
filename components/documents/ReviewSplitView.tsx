@@ -31,7 +31,7 @@ const RISK_ICONS: Record<RiskLevel, LucideIcon> = {
 const HIGHLIGHT: Record<RiskLevel, { background: string; border: string }> = {
   critical: { background: "rgb(254 242 242)", border: "border-red-200" },
   warning: { background: "rgb(255 251 235)", border: "border-amber-200" },
-  info: { background: "rgb(245 245 244)", border: "border-stone-300" },
+  info: { background: "rgb(245 245 244)", border: "border-line-strong" },
 };
 
 interface ReviewSplitViewProps {
@@ -99,12 +99,12 @@ export function ReviewSplitView({
   return (
     <div className="flex h-full min-h-0 flex-col">
       {/* Шапка результата */}
-      <div className="flex shrink-0 flex-wrap items-center gap-4 border-b border-stone-200 px-5 py-3.5">
+      <div className="flex shrink-0 flex-wrap items-center gap-4 border-b border-line px-5 py-3.5">
         <div className="flex min-w-0 flex-col leading-tight">
-          <span className="truncate text-[13px] text-stone-900">
+          <span className="truncate text-[13px] text-fg">
             {file.name}
           </span>
-          <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+          <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
             {formatFileSize(file.sizeBytes)} · разобран по пунктам
           </span>
         </div>
@@ -160,14 +160,14 @@ export function ReviewSplitView({
       {/* Split-View */}
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-2">
         {/* Левая панель — оригинал */}
-        <section className="flex min-h-0 flex-col border-b border-stone-200 lg:border-b-0 lg:border-r">
-          <header className="shrink-0 border-b border-stone-200 px-5 py-2.5">
+        <section className="flex min-h-0 flex-col border-b border-line lg:border-b-0 lg:border-r">
+          <header className="shrink-0 border-b border-line px-5 py-2.5">
             <MetaLabel>Оригинал документа</MetaLabel>
           </header>
 
-          <div className="scrollable-area min-h-0 flex-1 overflow-auto bg-stone-100 px-6 py-6">
-            <div className="mx-auto flex max-w-xl flex-col gap-3 bg-white px-8 py-9 shadow-sm">
-              <h2 className="text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-stone-900">
+          <div className="scrollable-area min-h-0 flex-1 overflow-auto bg-surface-2 px-6 py-6">
+            <div className="mx-auto flex max-w-xl flex-col gap-3 bg-surface px-8 py-9 shadow-sm">
+              <h2 className="text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-fg">
                 Договор купли-продажи земельного участка
               </h2>
 
@@ -215,14 +215,14 @@ export function ReviewSplitView({
                         <span
                           className={cn(
                             "font-mono text-[10px] tabular-nums transition-colors",
-                            isHighlighted ? "text-stone-900" : "text-stone-400"
+                            isHighlighted ? "text-fg" : "text-fg-faint"
                           )}
                         >
                           {paragraph.clause}
                         </span>
                       </span>
 
-                      <p className="text-justify text-[11px] leading-[1.75] text-stone-700">
+                      <p className="text-justify text-[11px] leading-[1.75] text-fg-muted">
                         {paragraph.text}
                       </p>
                     </div>
@@ -235,9 +235,9 @@ export function ReviewSplitView({
 
         {/* Правая панель — разбор */}
         <section className="flex min-h-0 flex-col">
-          <header className="flex shrink-0 items-center gap-3 border-b border-stone-200 px-5 py-2.5">
+          <header className="flex shrink-0 items-center gap-3 border-b border-line px-5 py-2.5">
             <MetaLabel>Разбор Алетейи</MetaLabel>
-            <span className="ml-auto text-[11px] text-stone-400">
+            <span className="ml-auto text-[11px] text-fg-faint">
               Нажмите на замечание — абзац подсветится слева
             </span>
           </header>
@@ -284,15 +284,15 @@ export function ReviewSplitView({
                           >
                             {meta.label}
                           </span>
-                          <span className="font-mono text-[10px] text-stone-400">
+                          <span className="font-mono text-[10px] text-fg-faint">
                             п. {clause}
                           </span>
                         </div>
 
-                        <p className="text-[13px] font-medium text-stone-900">
+                        <p className="text-[13px] font-medium text-fg">
                           {risk.title}
                         </p>
-                        <p className="text-[13px] leading-relaxed text-stone-600">
+                        <p className="text-[13px] leading-relaxed text-fg-soft">
                           {risk.description}
                         </p>
 
@@ -304,9 +304,9 @@ export function ReviewSplitView({
                               exit={{ opacity: 0, height: 0 }}
                               className="mt-1.5 flex flex-col gap-2 overflow-hidden"
                             >
-                              <div className="rounded border border-stone-200 bg-white p-3">
+                              <div className="rounded border border-line bg-surface p-3">
                                 <MetaLabel>Формулировка правки</MetaLabel>
-                                <p className="mt-2 text-[11px] leading-relaxed text-stone-600">
+                                <p className="mt-2 text-[11px] leading-relaxed text-fg-soft">
                                   {risk.recommendation}
                                 </p>
                               </div>
@@ -331,14 +331,14 @@ export function ReviewSplitView({
           </div>
 
           {/* Действие */}
-          <div className="shrink-0 border-t border-stone-200 bg-white px-5 py-3.5">
+          <div className="shrink-0 border-t border-line bg-surface px-5 py-3.5">
             {isFixed ? (
               <div className="flex items-center gap-2.5">
                 <Check
                   className="h-3.5 w-3.5 shrink-0 text-emerald-600"
                   strokeWidth={3}
                 />
-                <span className="text-[13px] text-stone-600">
+                <span className="text-[13px] text-fg-soft">
                   Исправленная редакция готова — учтены все{" "}
                   {REVIEW_RISKS.length}{" "}
                   {plural(
@@ -400,18 +400,18 @@ function CasePractice({
   }, [riskId]);
 
   return (
-    <div className="rounded border border-stone-200 bg-white p-3">
+    <div className="rounded border border-line bg-surface p-3">
       <div className="flex items-center gap-1.5">
         {isSearching ? (
-          <Loader2 className="h-3 w-3 shrink-0 animate-spin text-stone-900" />
+          <Loader2 className="h-3 w-3 shrink-0 animate-spin text-fg" />
         ) : (
-          <Scale className="h-3 w-3 shrink-0 text-stone-400" />
+          <Scale className="h-3 w-3 shrink-0 text-fg-faint" />
         )}
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
           {isSearching ? `Ищу практику по п. ${clause}` : "Судебная практика"}
         </span>
         {!isSearching && (
-          <span className="ml-auto font-mono text-[10px] tabular-nums text-stone-400">
+          <span className="ml-auto font-mono text-[10px] tabular-nums text-fg-faint">
             {practice.length} акта
           </span>
         )}
@@ -428,7 +428,7 @@ function CasePractice({
                 repeat: Infinity,
                 delay: index * 0.15,
               }}
-              className="h-9 rounded border border-stone-200"
+              className="h-9 rounded border border-line"
             />
           ))}
         </div>
@@ -441,14 +441,14 @@ function CasePractice({
                 initial={{ opacity: 0, x: 8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.26, delay: index * 0.08 }}
-                className="border-l border-stone-200 pl-2.5"
+                className="border-l border-line pl-2.5"
               >
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <Gavel className="h-3 w-3 shrink-0 text-stone-300" />
+                  <Gavel className="h-3 w-3 shrink-0 text-fg-ghost" />
                   <span className="text-[11px] font-medium text-stone-800">
                     {item.court}
                   </span>
-                  <span className="font-mono text-[10px] text-stone-400">
+                  <span className="font-mono text-[10px] text-fg-faint">
                     № {item.number} · {item.year}
                   </span>
                   <span
@@ -464,14 +464,14 @@ function CasePractice({
                       : "в вашу пользу"}
                   </span>
                 </div>
-                <p className="mt-1 text-[11px] leading-relaxed text-stone-600">
+                <p className="mt-1 text-[11px] leading-relaxed text-fg-soft">
                   {item.holding}
                 </p>
               </motion.li>
             ))}
           </ul>
 
-          <p className="mt-2.5 font-mono text-[9px] uppercase tracking-[0.1em] text-stone-300">
+          <p className="mt-2.5 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-ghost">
             Демонстрационные данные
           </p>
         </>

@@ -33,7 +33,7 @@ export function AuthShell({
             <span className="flex h-7 w-7 items-center justify-center rounded bg-stone-950 text-[13px] font-medium text-white">
               А
             </span>
-            <span className="text-sm font-medium tracking-[-0.01em] text-stone-900">
+            <span className="text-sm font-medium tracking-[-0.01em] text-fg">
               Алетейя
             </span>
           </Link>
@@ -41,7 +41,7 @@ export function AuthShell({
           {/* Выход на лендинг: с формы входа обратной дороги иначе нет. */}
           <Link
             href="/"
-            className="group inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400 transition-colors hover:text-stone-900"
+            className="group inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint transition-colors hover:text-fg"
           >
             <ArrowLeft className="h-3 w-3 transition-transform duration-300 group-hover:-translate-x-0.5" />
             На главную
@@ -52,7 +52,7 @@ export function AuthShell({
           <div className="w-full max-w-[26rem]">{children}</div>
         </div>
 
-        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
           © 2026 Алетейя
         </p>
       </div>
@@ -80,7 +80,7 @@ export function AuthShell({
         <div className="relative flex w-full flex-col justify-center px-14 xl:px-20">
           <span className="flex items-center gap-2.5">
             <span aria-hidden className="h-px w-6 bg-violet-500" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-stone-500">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-fg-subtle">
               {eyebrow}
             </span>
           </span>
@@ -89,16 +89,16 @@ export function AuthShell({
             {heading}
           </h2>
 
-          <ul className="mt-12 flex max-w-lg flex-col divide-y divide-stone-800/80 border-y border-stone-800/80">
+          <ul className="mt-12 flex max-w-lg flex-col divide-y divide-stone-800/80 border-y border-inverse-line/80">
             {points.map((item, index) => (
               <li
                 key={item}
                 className="group flex items-baseline gap-5 py-4 transition-colors"
               >
-                <span className="shrink-0 font-mono text-[10px] tabular-nums text-stone-600 transition-colors group-hover:text-violet-400">
+                <span className="shrink-0 font-mono text-[10px] tabular-nums text-fg-soft transition-colors group-hover:text-violet-400">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="text-sm leading-relaxed text-stone-400 transition-colors group-hover:text-stone-200">
+                <span className="text-sm leading-relaxed text-fg-faint transition-colors group-hover:text-stone-200">
                   {item}
                 </span>
               </li>
@@ -106,7 +106,7 @@ export function AuthShell({
           </ul>
 
           {footnote && (
-            <p className="mt-8 max-w-md text-[13px] leading-relaxed text-stone-500">
+            <p className="mt-8 max-w-md text-[13px] leading-relaxed text-fg-subtle">
               {footnote}
             </p>
           )}

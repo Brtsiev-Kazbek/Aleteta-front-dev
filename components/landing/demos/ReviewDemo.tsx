@@ -71,12 +71,12 @@ export function ReviewDemo() {
   const highlightedParagraph = RISKS.find((r) => r.id === activeRisk)?.paragraphId;
 
   return (
-    <div className="grid h-full grid-cols-1 overflow-hidden rounded-xl border border-stone-200 bg-white md:grid-cols-2">
+    <div className="grid h-full grid-cols-1 overflow-hidden rounded-xl border border-line bg-surface md:grid-cols-2">
       {/* Левая панель — оригинал */}
-      <div className="flex flex-col border-b border-stone-200 md:border-b-0 md:border-r">
-        <div className="flex items-center gap-2 border-b border-stone-200 bg-stone-50/70 px-3 py-2">
-          <FileText className="h-3.5 w-3.5 text-stone-400" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-500">
+      <div className="flex flex-col border-b border-line md:border-b-0 md:border-r">
+        <div className="flex items-center gap-2 border-b border-line bg-stone-50/70 px-3 py-2">
+          <FileText className="h-3.5 w-3.5 text-fg-faint" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
             Договор оказания услуг
           </span>
         </div>
@@ -110,12 +110,12 @@ export function ReviewDemo() {
                 <div className="flex gap-2">
                   <span
                     className={`shrink-0 text-[10px] font-medium tabular-nums ${
-                      isActive ? "text-stone-900" : "text-stone-400"
+                      isActive ? "text-fg" : "text-fg-faint"
                     }`}
                   >
                     {paragraph.clause}
                   </span>
-                  <p className="text-[11px] leading-relaxed text-stone-600">
+                  <p className="text-[11px] leading-relaxed text-fg-soft">
                     {paragraph.text}
                   </p>
                 </div>
@@ -127,11 +127,11 @@ export function ReviewDemo() {
 
       {/* Правая панель — анализ */}
       <div className="flex flex-col bg-stone-50/40">
-        <div className="flex items-center gap-2 border-b border-stone-200 bg-stone-50/70 px-3 py-2">
-          <span className="text-[10px] font-medium uppercase tracking-wide text-stone-500">
+        <div className="flex items-center gap-2 border-b border-line bg-stone-50/70 px-3 py-2">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-fg-subtle">
             Анализ Алетейи
           </span>
-          <span className="ml-auto text-[10px] text-stone-400">
+          <span className="ml-auto text-[10px] text-fg-faint">
             клик → подсветка абзаца
           </span>
         </div>
@@ -170,12 +170,12 @@ export function ReviewDemo() {
                       >
                         {isCritical ? "Критический" : "Предупреждение"}
                       </span>
-                      <span className="text-[10px] text-stone-500">
+                      <span className="text-[10px] text-fg-subtle">
                         пункт {risk.clause}
                       </span>
                     </div>
 
-                    <p className="text-[11px] font-medium text-stone-900">
+                    <p className="text-[11px] font-medium text-fg">
                       {risk.title}
                     </p>
 
@@ -183,7 +183,7 @@ export function ReviewDemo() {
                       <motion.p
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="text-[10px] leading-relaxed text-stone-600"
+                        className="text-[10px] leading-relaxed text-fg-soft"
                       >
                         {risk.text}
                       </motion.p>

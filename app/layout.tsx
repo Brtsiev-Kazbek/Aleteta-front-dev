@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className="bg-stone-50 text-stone-900 antialiased">
+      <body className="bg-stone-50 text-fg antialiased">
         <TooltipProvider delayDuration={150}>{children}</TooltipProvider>
       </body>
     </html>

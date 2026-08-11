@@ -48,7 +48,7 @@ export default function DocsPage({ params }: { params: { slug?: string[] } }) {
       <article className="max-w-[46rem]">
         <div className="flex items-center gap-2.5">
           <span aria-hidden className="h-px w-6 bg-violet-500" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-stone-400">
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-fg-faint">
             {page.summary}
           </span>
         </div>
@@ -61,18 +61,18 @@ export default function DocsPage({ params }: { params: { slug?: string[] } }) {
         {next && (
           <Link
             href={next.slug ? `/docs/${next.slug}` : "/docs"}
-            className="group mt-16 flex items-center justify-between gap-6 border-t border-stone-200 pt-6"
+            className="group mt-16 flex items-center justify-between gap-6 border-t border-line pt-6"
           >
             <span className="flex min-w-0 flex-col">
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
                 Дальше
               </span>
-              <span className="mt-1 truncate text-[15px] text-stone-900">
+              <span className="mt-1 truncate text-[15px] text-fg">
                 {next.title}
               </span>
             </span>
 
-            <ArrowRight className="h-4 w-4 shrink-0 text-stone-400 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-stone-900" />
+            <ArrowRight className="h-4 w-4 shrink-0 text-fg-faint transition-transform duration-300 group-hover:translate-x-0.5 group-hover:text-fg" />
           </Link>
         )}
       </article>

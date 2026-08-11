@@ -198,10 +198,10 @@ export function FreeformDemo() {
   if (!scenario) return null;
 
   return (
-    <div className="flex h-full min-h-[520px] flex-col overflow-hidden rounded-lg border border-stone-200 bg-white">
+    <div className="flex h-full min-h-[520px] flex-col overflow-hidden rounded-lg border border-line bg-surface">
       {/* Запрос */}
-      <div className="border-b border-stone-200 p-4">
-        <div className="flex min-h-[42px] items-start gap-2 rounded border border-stone-300 px-3 py-2.5">
+      <div className="border-b border-line p-4">
+        <div className="flex min-h-[42px] items-start gap-2 rounded border border-line-strong px-3 py-2.5">
           <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-600" />
           <span className="text-xs leading-relaxed text-stone-800">
             {typed}
@@ -226,21 +226,21 @@ export function FreeformDemo() {
               <Search
                 className={cn(
                   "h-3.5 w-3.5 shrink-0",
-                  searching ? "animate-pulse text-stone-900" : "text-stone-400"
+                  searching ? "animate-pulse text-fg" : "text-fg-faint"
                 )}
               />
               {searching ? (
-                <span className="text-[11px] text-stone-500">
+                <span className="text-[11px] text-fg-subtle">
                   Проверяю, есть ли подходящий шаблон…
                 </span>
               ) : scenario.hasTemplate ? (
-                <span className="text-[11px] text-stone-600">
+                <span className="text-[11px] text-fg-soft">
                   Шаблон найден:{" "}
-                  <span className="text-stone-900">{scenario.templateName}</span>{" "}
+                  <span className="text-fg">{scenario.templateName}</span>{" "}
                   — реквизиты подставлены
                 </span>
               ) : (
-                <span className="text-[11px] text-stone-600">
+                <span className="text-[11px] text-fg-soft">
                   Шаблона нет —{" "}
                   <span className="font-medium text-violet-700">
                     составляю документ с нуля
@@ -255,9 +255,9 @@ export function FreeformDemo() {
       {/* Лист документа */}
       <div
         ref={sheetRef}
-        className="scrollable-area min-h-0 flex-1 overflow-y-auto bg-stone-100 p-5"
+        className="scrollable-area min-h-0 flex-1 overflow-y-auto bg-surface-2 p-5"
       >
-        <div className="mx-auto max-w-[30rem] bg-white px-8 py-9 shadow-sm">
+        <div className="mx-auto max-w-[30rem] bg-surface px-8 py-9 shadow-sm">
           {scenario.blocks.slice(0, visibleBlocks).map((block, i) => (
             <motion.div
               key={`${scenario.fileName}-${i}`}
@@ -266,33 +266,33 @@ export function FreeformDemo() {
               transition={{ duration: 0.28 }}
             >
               {block.kind === "title" && (
-                <h4 className="whitespace-pre-line text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-stone-900">
+                <h4 className="whitespace-pre-line text-center text-[11px] font-bold uppercase leading-relaxed tracking-wide text-fg">
                   {block.text}
                 </h4>
               )}
 
               {block.kind === "meta" && (
-                <div className="mt-5 flex items-baseline justify-between text-[10px] text-stone-600">
+                <div className="mt-5 flex items-baseline justify-between text-[10px] text-fg-soft">
                   <span>{block.left}</span>
                   <span>{block.right}</span>
                 </div>
               )}
 
               {block.kind === "para" && (
-                <p className="mt-4 text-justify text-[10px] leading-[1.7] text-stone-700">
+                <p className="mt-4 text-justify text-[10px] leading-[1.7] text-fg-muted">
                   {block.text}
                 </p>
               )}
 
               {block.kind === "heading" && (
-                <h5 className="mt-5 text-[10px] font-bold text-stone-900">
+                <h5 className="mt-5 text-[10px] font-bold text-fg">
                   {block.text}
                 </h5>
               )}
 
               {block.kind === "clause" && (
-                <p className="mt-2.5 text-justify text-[10px] leading-[1.7] text-stone-700">
-                  <span className="font-medium text-stone-900">
+                <p className="mt-2.5 text-justify text-[10px] leading-[1.7] text-fg-muted">
+                  <span className="font-medium text-fg">
                     {block.number}
                   </span>{" "}
                   {block.text}
@@ -300,11 +300,11 @@ export function FreeformDemo() {
               )}
 
               {block.kind === "signatures" && (
-                <div className="mt-8 grid grid-cols-2 gap-6 border-t border-stone-200 pt-5">
-                  <span className="whitespace-pre-line text-[9px] leading-[1.8] text-stone-700">
+                <div className="mt-8 grid grid-cols-2 gap-6 border-t border-line pt-5">
+                  <span className="whitespace-pre-line text-[9px] leading-[1.8] text-fg-muted">
                     {block.left}
                   </span>
-                  <span className="whitespace-pre-line text-[9px] leading-[1.8] text-stone-700">
+                  <span className="whitespace-pre-line text-[9px] leading-[1.8] text-fg-muted">
                     {block.right}
                   </span>
                 </div>
@@ -320,7 +320,7 @@ export function FreeformDemo() {
                   key={row}
                   animate={{ opacity: [0.3, 0.6, 0.3] }}
                   transition={{ duration: 1.3, repeat: Infinity, delay: row * 0.15 }}
-                  className="h-2 rounded bg-stone-200"
+                  className="h-2 rounded bg-surface-3"
                   style={{ width: `${94 - row * 12}%` }}
                 />
               ))}
@@ -336,13 +336,13 @@ export function FreeformDemo() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex items-center gap-2.5 border-t border-stone-200 px-4 py-3"
+            className="flex items-center gap-2.5 border-t border-line px-4 py-3"
           >
             <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" strokeWidth={3} />
-            <span className="min-w-0 flex-1 truncate text-[11px] text-stone-700">
+            <span className="min-w-0 flex-1 truncate text-[11px] text-fg-muted">
               {scenario.fileName}
             </span>
-            <span className="inline-flex shrink-0 items-center gap-1.5 rounded border border-stone-200 px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-stone-500">
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded border border-line px-2 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-subtle">
               <Download className="h-3 w-3" />
               Скачать
             </span>

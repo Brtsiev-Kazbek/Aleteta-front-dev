@@ -55,7 +55,7 @@ function RoleSelect({
         onChange={(event) => onChange(event.target.value as WorkspaceRole)}
         aria-label={label}
         className={cn(
-          "w-full appearance-none rounded-md border border-stone-200 bg-white pl-2.5 pr-7 text-[13px] text-stone-700 transition-colors hover:border-stone-300 focus-visible:border-stone-900 focus-visible:outline-none disabled:opacity-50",
+          "w-full appearance-none rounded-md border border-line bg-surface pl-2.5 pr-7 text-[13px] text-fg-muted transition-colors hover:border-line-strong focus-visible:border-stone-900 focus-visible:outline-none disabled:opacity-50",
           className
         )}
       >
@@ -68,7 +68,7 @@ function RoleSelect({
 
       <ChevronDown
         aria-hidden
-        className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-stone-400"
+        className="pointer-events-none absolute right-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-fg-faint"
       />
     </div>
   );
@@ -156,26 +156,26 @@ export function MembersPanel({
   return (
     <div className="flex flex-col gap-6">
       {/* Состав */}
-      <ul className="flex flex-col divide-y divide-stone-200 border-y border-stone-200">
+      <ul className="flex flex-col divide-y divide-line border-y border-line">
         {members.map((member) => (
           <li key={member.userId} className="flex items-center gap-3.5 py-3.5">
             <span
               aria-hidden
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-stone-200 bg-white font-mono text-[11px] uppercase text-stone-500"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-line bg-surface font-mono text-[11px] uppercase text-fg-subtle"
             >
               {initials(member.fullName)}
             </span>
 
             <div className="flex min-w-0 flex-1 flex-col">
-              <span className="truncate text-sm text-stone-900">
+              <span className="truncate text-sm text-fg">
                 {member.fullName}
                 {member.isSelf && (
-                  <span className="ml-2 font-mono text-[9px] uppercase tracking-[0.12em] text-stone-400">
+                  <span className="ml-2 font-mono text-[9px] uppercase tracking-[0.12em] text-fg-faint">
                     это вы
                   </span>
                 )}
               </span>
-              <span className="mt-0.5 truncate text-[12px] text-stone-500">
+              <span className="mt-0.5 truncate text-[12px] text-fg-subtle">
                 {member.email}
                 {member.jobTitle ? ` · ${member.jobTitle}` : ""}
               </span>
@@ -196,8 +196,8 @@ export function MembersPanel({
                 className={cn(
                   "shrink-0 rounded border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em]",
                   member.role === "owner"
-                    ? "border-stone-300 text-stone-700"
-                    : "border-stone-200 text-stone-400"
+                    ? "border-line-strong text-fg-muted"
+                    : "border-line text-fg-faint"
                 )}
               >
                 {ROLE_LABELS[member.role]}
@@ -225,18 +225,18 @@ export function MembersPanel({
       {/* Незакрытые приглашения */}
       {invites.length > 0 && (
         <div className="flex flex-col gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400">
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint">
             Приглашения ждут ответа
           </span>
 
-          <ul className="flex flex-col divide-y divide-stone-100">
+          <ul className="flex flex-col divide-y divide-line-soft">
             {invites.map((invite) => (
               <li key={invite.id} className="flex items-center gap-3 py-2.5">
                 <div className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate text-[13px] text-stone-700">
+                  <span className="truncate text-[13px] text-fg-muted">
                     {invite.email}
                   </span>
-                  <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+                  <span className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
                     {ROLE_LABELS[invite.role]} · действует до{" "}
                     {formatDate(invite.expiresAt)}
                   </span>
@@ -266,7 +266,7 @@ export function MembersPanel({
       {canManage && (
         <form
           onSubmit={handleInvite}
-          className="flex flex-col gap-3 border-t border-stone-200 pt-5"
+          className="flex flex-col gap-3 border-t border-line pt-5"
           noValidate
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">

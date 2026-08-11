@@ -158,7 +158,7 @@ export function SecurityPanel({ email }: { email: string }) {
 
       <form
         onSubmit={handleEmail}
-        className="flex flex-col gap-4 border-t border-stone-200 pt-6"
+        className="flex flex-col gap-4 border-t border-line pt-6"
         noValidate
       >
         <TextField
@@ -175,7 +175,7 @@ export function SecurityPanel({ email }: { email: string }) {
           placeholder={email}
           autoComplete="email"
           hint={
-            <span className="text-[12px] text-stone-400">
+            <span className="text-[12px] text-fg-faint">
               сейчас: {email}
             </span>
           }

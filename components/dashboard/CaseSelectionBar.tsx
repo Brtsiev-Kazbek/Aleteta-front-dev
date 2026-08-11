@@ -68,15 +68,15 @@ export function CaseSelectionBar() {
             transition={{ duration: 0.22, ease: "easeOut" }}
             className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2"
           >
-            <div className="shadow-panel flex items-center gap-3 rounded-lg border border-stone-200 bg-white/95 px-4 py-3 backdrop-blur">
-              <FolderKanban className="h-3.5 w-3.5 shrink-0 text-stone-400" />
+            <div className="shadow-panel flex items-center gap-3 rounded-lg border border-line bg-surface/95 px-4 py-3 backdrop-blur">
+              <FolderKanban className="h-3.5 w-3.5 shrink-0 text-fg-faint" />
 
-              <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
-                <span className="tabular-nums text-stone-900">{count}</span>{" "}
+              <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
+                <span className="tabular-nums text-fg">{count}</span>{" "}
                 {plural(count, "дело", "дела", "дел")} выбрано
               </span>
 
-              <span className="h-5 w-px bg-stone-200" />
+              <span className="h-5 w-px bg-surface-3" />
 
               <Button size="sm" onClick={() => setSheetOpen(true)}>
                 Создать документ
@@ -106,7 +106,7 @@ export function CaseSelectionBar() {
             <div className="flex items-center gap-2">
               <MetaLabel>Работа по нескольким делам</MetaLabel>
               {status === "running" && (
-                <Loader2 className="h-3 w-3 animate-spin text-stone-400" />
+                <Loader2 className="h-3 w-3 animate-spin text-fg-faint" />
               )}
             </div>
 
@@ -136,7 +136,7 @@ export function CaseSelectionBar() {
           {status === "running" && (
             <div className="px-5 py-6">
               <Progress value={progress} />
-              <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+              <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
                 Подставляем реквизиты · {Math.round(progress)}%
               </p>
             </div>
@@ -153,15 +153,15 @@ export function CaseSelectionBar() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.24, delay: index * 0.06 }}
-                        className="flex items-center gap-3 rounded border border-stone-200 px-3 py-2.5"
+                        className="flex items-center gap-3 rounded border border-line px-3 py-2.5"
                       >
-                        <FileText className="h-3.5 w-3.5 shrink-0 text-stone-300" />
+                        <FileText className="h-3.5 w-3.5 shrink-0 text-fg-ghost" />
 
                         <div className="flex min-w-0 flex-1 flex-col leading-tight">
-                          <span className="truncate text-[13px] text-stone-900">
+                          <span className="truncate text-[13px] text-fg">
                             {result.name}
                           </span>
-                          <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-stone-400">
+                          <span className="mt-0.5 truncate font-mono text-[10px] uppercase tracking-[0.1em] text-fg-faint">
                             {result.caseTitle}
                           </span>
                         </div>
@@ -176,7 +176,7 @@ export function CaseSelectionBar() {
                 </div>
               </ScrollArea>
 
-              <div className="flex items-center gap-2 border-t border-stone-200 px-5 py-4">
+              <div className="flex items-center gap-2 border-t border-line px-5 py-4">
                 <Button
                   className="flex-1"
                   onClick={() => {
@@ -197,7 +197,7 @@ export function CaseSelectionBar() {
                     <div className="flex flex-col gap-2">
                       <div className="flex items-baseline justify-between gap-3">
                         <MetaLabel>Дела для этого документа</MetaLabel>
-                        <span className="font-mono text-[10px] tabular-nums text-stone-400">
+                        <span className="font-mono text-[10px] tabular-nums text-fg-faint">
                           {count} из {cases.length}
                         </span>
                       </div>
@@ -213,7 +213,7 @@ export function CaseSelectionBar() {
                                 "flex cursor-pointer items-center gap-2.5 rounded border px-3 py-2 transition-colors",
                                 isPicked
                                   ? "border-stone-900 bg-stone-50"
-                                  : "border-stone-200 hover:border-stone-300"
+                                  : "border-line hover:border-line-strong"
                               )}
                             >
                               <Checkbox
@@ -226,7 +226,7 @@ export function CaseSelectionBar() {
                               <span
                                 className={cn(
                                   "truncate text-[13px] transition-colors",
-                                  isPicked ? "text-stone-900" : "text-stone-500"
+                                  isPicked ? "text-fg" : "text-fg-subtle"
                                 )}
                               >
                                 {item.title}
@@ -243,8 +243,8 @@ export function CaseSelectionBar() {
 
                       <div
                         className={cn(
-                          "rounded-md border bg-white p-3 transition-colors",
-                          prompt.trim() ? "border-stone-900" : "border-stone-200"
+                          "rounded-md border bg-surface p-3 transition-colors",
+                          prompt.trim() ? "border-stone-900" : "border-line"
                         )}
                       >
                         <AutoGrowTextarea
@@ -267,7 +267,7 @@ export function CaseSelectionBar() {
                             key={item}
                             type="button"
                             onClick={() => setPrompt(item)}
-                            className="rounded border border-stone-200 px-2.5 py-1.5 text-xs text-stone-600 transition-colors hover:border-stone-900 hover:text-stone-900"
+                            className="rounded border border-line px-2.5 py-1.5 text-xs text-fg-soft transition-colors hover:border-stone-900 hover:text-fg"
                           >
                             {item}
                           </button>
@@ -277,7 +277,7 @@ export function CaseSelectionBar() {
                   </div>
                 </ScrollArea>
 
-                <div className="flex items-center gap-2 border-t border-stone-200 px-5 py-4">
+                <div className="flex items-center gap-2 border-t border-line px-5 py-4">
                   <Button
                     className="flex-1 gap-1.5"
                     onClick={handleGenerate}

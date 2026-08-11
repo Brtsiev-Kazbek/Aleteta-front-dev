@@ -67,7 +67,7 @@ export function DashboardHero() {
           className="flex items-center gap-3"
         >
           <span aria-hidden className="h-px w-8 bg-violet-500" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-stone-400">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-fg-faint">
             Демонстрационный режим
           </span>
         </motion.div>
@@ -94,7 +94,7 @@ export function DashboardHero() {
           initial={reduceMotion ? undefined : { opacity: 0, y: 12 }}
           animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.35 }}
-          className="mt-5 max-w-xl text-[15px] leading-relaxed text-stone-400"
+          className="mt-5 max-w-xl text-[15px] leading-relaxed text-fg-faint"
         >
           Ровно то, что показано на главной странице. Всё ниже запускается на
           демонстрационных данных — ничего не отправляется наружу.
@@ -114,13 +114,13 @@ export function DashboardHero() {
         >
           <Link
             href="/dashboard/recognize"
-            className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 text-[13px] font-medium text-stone-900 transition-colors hover:bg-stone-200"
+            className="inline-flex items-center gap-2 rounded-md bg-surface px-4 py-2.5 text-[13px] font-medium text-fg transition-colors hover:bg-surface-3"
           >
             <ScanText className="h-4 w-4" />
             Распознать документ
           </Link>
 
-          <span className="text-[12.5px] text-stone-500">
+          <span className="text-[12.5px] text-fg-subtle">
             Скан или PDF — текст появится на странице и останется в поиске
           </span>
         </motion.div>
@@ -130,14 +130,14 @@ export function DashboardHero() {
           initial={reduceMotion ? undefined : { opacity: 0 }}
           animate={reduceMotion ? undefined : { opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-10 flex flex-wrap items-baseline gap-x-10 gap-y-3 border-t border-stone-800 pt-6"
+          className="mt-10 flex flex-wrap items-baseline gap-x-10 gap-y-3 border-t border-inverse-line pt-6"
         >
           {stats.map((stat) => (
             <li key={stat.label} className="flex items-baseline gap-2">
               <span className="font-mono text-lg tabular-nums text-white">
                 <AnimatedNumber value={stat.value} />
               </span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-500">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-subtle">
                 {stat.label}
               </span>
             </li>

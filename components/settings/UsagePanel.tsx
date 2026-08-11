@@ -62,8 +62,8 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
               className={cn(
                 "rounded border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-colors",
                 report.days === period.days
-                  ? "border-stone-900 text-stone-900"
-                  : "border-stone-200 text-stone-500 hover:border-stone-400 hover:text-stone-900",
+                  ? "border-stone-900 text-fg"
+                  : "border-line text-fg-subtle hover:border-stone-400 hover:text-fg",
                 isPending && "opacity-60"
               )}
             >
@@ -72,7 +72,7 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
           ))}
         </div>
 
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
           Валюта маршрутизатора
         </span>
       </div>
@@ -84,13 +84,13 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
       )}
 
       {isEmpty ? (
-        <p className="rounded-lg border border-dashed border-stone-300 px-5 py-8 text-center text-[13px] text-stone-500">
+        <p className="rounded-lg border border-dashed border-line-strong px-5 py-8 text-center text-[13px] text-fg-subtle">
           За этот период обращений к модели не было.
         </p>
       ) : (
         <>
           {/* Итог */}
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-stone-200 bg-stone-200 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-surface-3 sm:grid-cols-4">
             <Total label="Расход" value={formatMoney(report.totals.cost)} />
             <Total label="Запросов" value={String(report.totals.requests)} />
             <Total
@@ -111,9 +111,9 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
               key: member.memberId ?? "worker",
               cells: [
                 <span key="name" className="flex min-w-0 flex-col">
-                  <span className="truncate text-stone-900">{member.fullName}</span>
+                  <span className="truncate text-fg">{member.fullName}</span>
                   {member.email && (
-                    <span className="truncate text-[11px] text-stone-400">
+                    <span className="truncate text-[11px] text-fg-faint">
                       {member.email}
                     </span>
                   )}
@@ -132,8 +132,8 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
               key: item.caseId,
               cells: [
                 <span key="title" className="flex min-w-0 flex-col">
-                  <span className="truncate text-stone-900">{item.title}</span>
-                  <span className="truncate text-[11px] text-stone-400">
+                  <span className="truncate text-fg">{item.title}</span>
+                  <span className="truncate text-[11px] text-fg-faint">
                     {item.documents} {plural(item.documents)}
                   </span>
                 </span>,
@@ -161,12 +161,12 @@ function Total({
   alarm?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-1.5 bg-white px-4 py-4">
+    <div className="flex flex-col gap-1.5 bg-surface px-4 py-4">
       <MetaLabel>{label}</MetaLabel>
       <span
         className={cn(
           "text-[19px] font-medium tabular-nums tracking-[-0.02em]",
-          alarm ? "text-red-600" : "text-stone-900"
+          alarm ? "text-red-600" : "text-fg"
         )}
       >
         {value}
@@ -206,12 +206,12 @@ function Table({
       <div className="scrollable-area overflow-x-auto">
         <table className="w-full border-collapse text-left text-[13px]">
           <thead>
-            <tr className="border-b border-stone-200">
+            <tr className="border-b border-line">
               {head.map((title, index) => (
                 <th
                   key={title}
                   className={cn(
-                    "py-2 pr-6 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-stone-400",
+                    "py-2 pr-6 font-mono text-[10px] font-normal uppercase tracking-[0.12em] text-fg-faint",
                     index > 0 && "text-right"
                   )}
                 >
@@ -223,12 +223,12 @@ function Table({
 
           <tbody>
             {rows.map((row) => (
-              <tr key={row.key} className="border-b border-stone-100">
+              <tr key={row.key} className="border-b border-line-soft">
                 {row.cells.map((cell, index) => (
                   <td
                     key={index}
                     className={cn(
-                      "max-w-[16rem] py-3 pr-6 align-top text-stone-600",
+                      "max-w-[16rem] py-3 pr-6 align-top text-fg-soft",
                       index > 0 && "text-right tabular-nums"
                     )}
                   >

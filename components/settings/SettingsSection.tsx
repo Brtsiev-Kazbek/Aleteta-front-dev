@@ -30,14 +30,14 @@ export function SettingsSection({
      * краю прокручиваемой области, и раздел выглядит обрезанным.
      */
     <section id={id} className="scroll-mt-8">
-      <div className="flex items-start justify-between gap-4 border-b border-stone-200 pb-3">
+      <div className="flex items-start justify-between gap-4 border-b border-line pb-3">
         <div className="flex items-start gap-2.5">
-          <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-stone-400" />
+          <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-faint" />
           <div className="flex min-w-0 flex-col">
-            <h2 className="text-[15px] font-medium tracking-[-0.01em] text-stone-900">
+            <h2 className="text-[15px] font-medium tracking-[-0.01em] text-fg">
               {title}
             </h2>
-            <span className="mt-1 text-[13px] text-stone-500">
+            <span className="mt-1 text-[13px] text-fg-subtle">
               {description}
             </span>
           </div>

@@ -49,7 +49,7 @@ export function Field({
       <div className="flex items-baseline justify-between gap-3">
         <label
           htmlFor={htmlFor}
-          className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-400"
+          className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-faint"
         >
           {label}
         </label>
@@ -136,7 +136,7 @@ export function PasswordField({
         <button
           type="button"
           onClick={() => setVisible((current) => !current)}
-          className="absolute inset-y-1 right-1 flex w-9 items-center justify-center rounded text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900"
+          className="absolute inset-y-1 right-1 flex w-9 items-center justify-center rounded text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
           aria-label={isVisible ? "Скрыть пароль" : "Показать пароль"}
         >
           {isVisible ? (
@@ -161,12 +161,12 @@ export function PasswordField({
                       : measured.score === 2
                         ? "bg-amber-400"
                         : "bg-emerald-500"
-                    : "bg-stone-200"
+                    : "bg-surface-3"
                 )}
               />
             ))}
           </div>
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-stone-400">
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-fg-faint">
             {measured.label}
           </span>
         </div>
@@ -218,17 +218,17 @@ export function FormHeading({
     <div className="flex flex-col">
       <span className="flex items-center gap-2.5">
         <span aria-hidden className="h-px w-6 bg-violet-500" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-stone-400">
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-fg-faint">
           {eyebrow}
         </span>
       </span>
 
-      <h1 className="mt-5 text-[1.75rem] font-medium leading-[1.12] tracking-[-0.03em] text-stone-900">
+      <h1 className="mt-5 text-[1.75rem] font-medium leading-[1.12] tracking-[-0.03em] text-fg">
         {title}
       </h1>
 
       {description && (
-        <p className="mt-3 text-sm leading-relaxed text-stone-500">
+        <p className="mt-3 text-sm leading-relaxed text-fg-subtle">
           {description}
         </p>
       )}

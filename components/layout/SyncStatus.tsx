@@ -30,10 +30,10 @@ export function SyncStatus() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.18 }}
-            className="flex items-center gap-2 rounded-md border border-stone-200 bg-white px-3 py-1.5 shadow-sm"
+            className="flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-1.5 shadow-sm"
           >
-            <Loader2 className="h-3 w-3 animate-spin text-stone-400" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-500">
+            <Loader2 className="h-3 w-3 animate-spin text-fg-faint" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-subtle">
               Сохраняется
             </span>
           </motion.div>
@@ -47,16 +47,16 @@ export function SyncStatus() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.18 }}
-            className="pointer-events-auto flex max-w-lg items-start gap-2.5 rounded-md border border-red-200 bg-white py-2.5 pl-3 pr-2 shadow-sm"
+            className="pointer-events-auto flex max-w-lg items-start gap-2.5 rounded-md border border-red-200 bg-surface py-2.5 pl-3 pr-2 shadow-sm"
           >
             <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-500" />
-            <span className="text-[13px] leading-relaxed text-stone-700">
+            <span className="text-[13px] leading-relaxed text-fg-muted">
               {error}
             </span>
             <button
               type="button"
               onClick={dismiss}
-              className="ml-1 shrink-0 rounded p-1 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-900"
+              className="ml-1 shrink-0 rounded p-1 text-fg-faint transition-colors hover:bg-surface-2 hover:text-fg"
               aria-label="Скрыть сообщение"
             >
               <X className="h-3.5 w-3.5" />

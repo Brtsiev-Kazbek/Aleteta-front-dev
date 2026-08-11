@@ -48,7 +48,7 @@ export function SectionHeading({
           <span
             className={cn(
               "font-mono text-[11px] tabular-nums",
-              isDark ? "text-stone-600" : "text-stone-300"
+              isDark ? "text-fg-soft" : "text-fg-ghost"
             )}
           >
             {index}
@@ -59,7 +59,7 @@ export function SectionHeading({
           className={cn(
             "inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium tracking-wide",
             isDark
-              ? "border-white/10 bg-white/5 text-violet-300"
+              ? "border-white/10 bg-surface/5 text-violet-300"
               : "border-violet-200/70 bg-violet-50 text-violet-700"
           )}
         >
@@ -88,7 +88,7 @@ export function SectionHeading({
       <h2
         className={cn(
           "mt-6 max-w-3xl text-[2rem] font-medium leading-[1.12] tracking-[-0.025em] sm:text-[2.75rem]",
-          isDark ? "text-white" : "text-stone-900",
+          isDark ? "text-white" : "text-fg",
           align === "center" && "mx-auto"
         )}
       >
@@ -99,7 +99,7 @@ export function SectionHeading({
         <p
           className={cn(
             "mt-5 max-w-xl text-base leading-relaxed sm:text-[17px]",
-            isDark ? "text-stone-400" : "text-stone-600",
+            isDark ? "text-fg-faint" : "text-fg-soft",
             align === "center" && "mx-auto"
           )}
         >

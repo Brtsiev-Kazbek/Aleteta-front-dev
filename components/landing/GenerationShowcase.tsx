@@ -70,7 +70,7 @@ export function GenerationShowcase() {
   const progress = (ready / OUTPUT.length) * 100;
 
   return (
-    <section className="grain relative overflow-hidden border-b border-stone-800 bg-stone-950">
+    <section className="grain relative overflow-hidden border-b border-inverse-line bg-stone-950">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-grid-dark opacity-60"
@@ -83,7 +83,7 @@ export function GenerationShowcase() {
               05
             </span>
             <span className="h-px w-8 bg-stone-700" />
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-stone-500">
+            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-fg-subtle">
               Генерация пакета
             </span>
           </div>
@@ -96,7 +96,7 @@ export function GenerationShowcase() {
         <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
           {/* Источник */}
           <Reveal className="lg:col-span-4">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-600">
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-soft">
               Объекты дела
             </span>
 
@@ -113,11 +113,11 @@ export function GenerationShowcase() {
                   transition={{ duration: 0.4, delay: index * 0.08 }}
                   className="flex items-center gap-2.5 rounded border bg-stone-900/60 px-3 py-2.5"
                 >
-                  <FileText className="h-3.5 w-3.5 shrink-0 text-stone-600" />
-                  <span className="min-w-0 flex-1 truncate text-xs text-stone-300">
+                  <FileText className="h-3.5 w-3.5 shrink-0 text-fg-soft" />
+                  <span className="min-w-0 flex-1 truncate text-xs text-fg-ghost">
                     {source.name}
                   </span>
-                  <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.1em] text-stone-600">
+                  <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.1em] text-fg-soft">
                     {source.type}
                   </span>
                 </motion.div>
@@ -155,7 +155,7 @@ export function GenerationShowcase() {
                   initial={{ opacity: 0.6, scale: 1 }}
                   animate={{ opacity: 0, scale: 1.15 }}
                   transition={{ duration: 1.4, repeat: Infinity }}
-                  className="absolute inset-0 rounded-md bg-white"
+                  className="absolute inset-0 rounded-md bg-surface"
                 />
               )}
             </div>
@@ -171,7 +171,7 @@ export function GenerationShowcase() {
               </div>
 
               <div className="mt-2.5 flex items-baseline justify-between">
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-stone-600">
+                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-soft">
                   Готово
                 </span>
                 <span className="font-mono text-sm tabular-nums text-white">
@@ -189,14 +189,14 @@ export function GenerationShowcase() {
               }
               transition={{ duration: 1.2, repeat: Infinity }}
             >
-              <ArrowRight className="h-5 w-5 text-stone-700" />
+              <ArrowRight className="h-5 w-5 text-fg-muted" />
             </motion.div>
           </div>
 
           {/* Результат */}
           <Reveal delay={0.1} className="lg:col-span-7">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-stone-600">
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-fg-soft">
                 Готовые документы
               </span>
 
@@ -206,7 +206,7 @@ export function GenerationShowcase() {
                     initial={{ opacity: 0, x: 8 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0 }}
-                    className="inline-flex items-center gap-1.5 rounded border border-stone-700 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-stone-300"
+                    className="inline-flex items-center gap-1.5 rounded border border-stone-700 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-fg-ghost"
                   >
                     <Download className="h-3 w-3" />
                     Скачать .zip
@@ -245,14 +245,14 @@ export function GenerationShowcase() {
                           />
                         </motion.span>
                       ) : (
-                        <FileText className="h-3 w-3 text-stone-700" />
+                        <FileText className="h-3 w-3 text-fg-muted" />
                       )}
                     </span>
 
                     <span
                       className={cn(
                         "min-w-0 flex-1 truncate text-[11px] transition-colors",
-                        isReady ? "text-stone-300" : "text-stone-600"
+                        isReady ? "text-fg-ghost" : "text-fg-soft"
                       )}
                     >
                       {document}
@@ -268,7 +268,7 @@ export function GenerationShowcase() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="mt-4 text-[12px] leading-relaxed text-stone-500"
+                  className="mt-4 text-[12px] leading-relaxed text-fg-subtle"
                 >
                   Реквизиты подставлены из карточек объектов. Значения не
                   сочиняются заново — поэтому расхождений между документами

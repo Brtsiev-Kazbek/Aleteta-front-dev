@@ -51,10 +51,10 @@ export function BulkDemo() {
   const selectedCount = Math.min(stage, 3);
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white">
-      <div className="border-b border-stone-200 px-4 py-3">
-        <span className="text-sm font-semibold text-stone-900">Все дела</span>
-        <span className="ml-2 text-xs text-stone-400">
+    <div className="relative flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface">
+      <div className="border-b border-line px-4 py-3">
+        <span className="text-sm font-semibold text-fg">Все дела</span>
+        <span className="ml-2 text-xs text-fg-faint">
           выделите галочками нужные
         </span>
       </div>
@@ -97,13 +97,13 @@ export function BulkDemo() {
                 )}
               </motion.span>
 
-              <FolderKanban className="h-3.5 w-3.5 shrink-0 text-stone-400" />
+              <FolderKanban className="h-3.5 w-3.5 shrink-0 text-fg-faint" />
 
-              <span className="min-w-0 flex-1 truncate text-xs text-stone-900">
+              <span className="min-w-0 flex-1 truncate text-xs text-fg">
                 {item.title}
               </span>
 
-              <span className="shrink-0 rounded border border-stone-200 bg-white px-1.5 py-0.5 text-[9px] text-stone-500">
+              <span className="shrink-0 rounded border border-line bg-surface px-1.5 py-0.5 text-[9px] text-fg-subtle">
                 {item.status}
               </span>
 
@@ -136,15 +136,15 @@ export function BulkDemo() {
             exit={{ opacity: 0, y: 16 }}
             className="absolute bottom-3 left-1/2 -translate-x-1/2"
           >
-            <div className="flex items-center gap-2.5 rounded-xl border border-stone-200 bg-white px-3 py-2 shadow-xl">
+            <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3 py-2 shadow-xl">
               <span className="whitespace-nowrap text-xs">
-                <span className="font-semibold text-stone-900">
+                <span className="font-semibold text-fg">
                   {selectedCount}
                 </span>
-                <span className="text-stone-500"> дела выбрано</span>
+                <span className="text-fg-subtle"> дела выбрано</span>
               </span>
 
-              <span className="h-4 w-px bg-stone-200" />
+              <span className="h-4 w-px bg-surface-3" />
 
               <span
                 className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium text-white transition-colors ${

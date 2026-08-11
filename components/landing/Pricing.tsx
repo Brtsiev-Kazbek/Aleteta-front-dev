@@ -86,7 +86,7 @@ export function Pricing() {
           description="Без привязки карты на старте. Отказаться можно в любой момент."
         />
 
-        <div className="mt-12 grid grid-cols-1 gap-px border border-stone-200 bg-stone-200 lg:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 gap-px border border-line bg-surface-3 lg:grid-cols-3">
           {PLANS.map((plan, index) => (
             <Reveal key={plan.id} delay={index * 0.08}>
               <div
@@ -99,7 +99,7 @@ export function Pricing() {
                   "group relative flex h-full flex-col p-7 transition-colors lg:p-8",
                   plan.highlighted
                     ? "bg-stone-950"
-                    : "bg-white hover:bg-stone-50/80"
+                    : "bg-surface hover:bg-stone-50/80"
                 )}
               >
                 {plan.highlighted && (
@@ -112,7 +112,7 @@ export function Pricing() {
                   <h3
                     className={cn(
                       "text-sm font-medium",
-                      plan.highlighted ? "text-white" : "text-stone-900"
+                      plan.highlighted ? "text-white" : "text-fg"
                     )}
                   >
                     {plan.name}
@@ -128,7 +128,7 @@ export function Pricing() {
                 <p
                   className={cn(
                     "mt-1.5 text-xs",
-                    plan.highlighted ? "text-stone-400" : "text-stone-500"
+                    plan.highlighted ? "text-fg-faint" : "text-fg-subtle"
                   )}
                 >
                   {plan.description}
@@ -138,7 +138,7 @@ export function Pricing() {
                   <span
                     className={cn(
                       "font-mono text-3xl tracking-tight",
-                      plan.highlighted ? "text-white" : "text-stone-900"
+                      plan.highlighted ? "text-white" : "text-fg"
                     )}
                   >
                     {plan.price}
@@ -147,7 +147,7 @@ export function Pricing() {
                     <span
                       className={cn(
                         "text-xs",
-                        plan.highlighted ? "text-stone-500" : "text-stone-400"
+                        plan.highlighted ? "text-fg-subtle" : "text-fg-faint"
                       )}
                     >
                       {plan.period}
@@ -159,8 +159,8 @@ export function Pricing() {
                   className={cn(
                     "mt-7 flex flex-1 flex-col divide-y border-y",
                     plan.highlighted
-                      ? "divide-stone-800 border-stone-800"
-                      : "divide-stone-100 border-stone-100"
+                      ? "divide-stone-800 border-inverse-line"
+                      : "divide-line-soft border-line-soft"
                   )}
                 >
                   {plan.features.map((feature) => (
@@ -168,7 +168,7 @@ export function Pricing() {
                       key={feature}
                       className={cn(
                         "py-2.5 text-sm",
-                        plan.highlighted ? "text-stone-300" : "text-stone-700"
+                        plan.highlighted ? "text-fg-ghost" : "text-fg-muted"
                       )}
                     >
                       {feature}
@@ -181,8 +181,8 @@ export function Pricing() {
                   className={cn(
                     "mt-7 inline-flex h-11 items-center justify-center rounded-md text-sm font-medium transition-colors",
                     plan.highlighted
-                      ? "bg-white text-stone-950 hover:bg-stone-100"
-                      : "border border-stone-200 text-stone-900 hover:bg-stone-50"
+                      ? "bg-surface text-stone-950 hover:bg-surface-2"
+                      : "border border-line text-fg hover:bg-stone-50"
                   )}
                 >
                   {plan.cta}
@@ -193,7 +193,7 @@ export function Pricing() {
         </div>
 
         <Reveal delay={0.25}>
-          <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.12em] text-stone-400">
+          <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-faint">
             Данные дела можно выгрузить и удалить в любой момент
           </p>
         </Reveal>

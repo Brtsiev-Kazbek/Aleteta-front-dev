@@ -63,7 +63,7 @@ export function FeatureShowcase({
   if (!active) return null;
 
   return (
-    <section id={id} className={cn("border-b border-stone-200", className)}>
+    <section id={id} className={cn("border-b border-line", className)}>
       <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           index={index}
@@ -78,7 +78,7 @@ export function FeatureShowcase({
         >
           {/* Навигация */}
           <div className="lg:col-span-4">
-            <div className="flex flex-col border-l border-stone-200">
+            <div className="flex flex-col border-l border-line">
               {features.map((feature, i) => {
                 const isActive = i === activeIndex;
 
@@ -118,7 +118,7 @@ export function FeatureShowcase({
                       <span
                         className={cn(
                           "font-mono text-[10px] tabular-nums transition-colors",
-                          isActive ? "text-violet-600" : "text-stone-300"
+                          isActive ? "text-violet-600" : "text-fg-ghost"
                         )}
                       >
                         {String(i + 1).padStart(2, "0")}
@@ -128,8 +128,8 @@ export function FeatureShowcase({
                         className={cn(
                           "text-sm transition-colors",
                           isActive
-                            ? "font-medium text-stone-900"
-                            : "text-stone-500 hover:text-stone-700"
+                            ? "font-medium text-fg"
+                            : "text-fg-subtle hover:text-fg-muted"
                         )}
                       >
                         {feature.tab}
@@ -149,16 +149,16 @@ export function FeatureShowcase({
                 transition={{ duration: 0.25 }}
                 className="mt-8"
               >
-                <h3 className="text-lg font-medium leading-snug tracking-[-0.01em] text-stone-900">
+                <h3 className="text-lg font-medium leading-snug tracking-[-0.01em] text-fg">
                   {active.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-stone-600">
+                <p className="mt-3 text-sm leading-relaxed text-fg-soft">
                   {active.description}
                 </p>
 
-                <ul className="mt-5 flex flex-col divide-y divide-stone-100 border-y border-stone-100">
+                <ul className="mt-5 flex flex-col divide-y divide-line-soft border-y border-line-soft">
                   {active.bullets.map((bullet) => (
-                    <li key={bullet} className="py-2.5 text-sm text-stone-700">
+                    <li key={bullet} className="py-2.5 text-sm text-fg-muted">
                       {bullet}
                     </li>
                   ))}
