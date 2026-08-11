@@ -249,7 +249,7 @@ export function ExtractDemo() {
             >
               <Check className="h-3.5 w-3.5 shrink-0 text-ok-fg" />
               <span className="text-label text-fg-soft">
-                Реквизиты подставлены, форматы проверены
+                Реквизиты извлечены, форматы проверены
               </span>
             </motion.div>
           )}

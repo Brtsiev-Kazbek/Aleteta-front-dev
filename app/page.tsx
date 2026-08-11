@@ -1,6 +1,5 @@
 import { Audience } from "@/components/landing/Audience";
-import { CapabilityIndex } from "@/components/landing/CapabilityIndex";
-import { ComparisonSlider } from "@/components/landing/ComparisonSlider";
+import { Bento } from "@/components/landing/Bento";
 import { DocumentMarquee } from "@/components/landing/DocumentMarquee";
 import { FAQ } from "@/components/landing/FAQ";
 import { FeatureShowcase } from "@/components/landing/FeatureShowcase";
@@ -14,13 +13,37 @@ import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { LandingHeader } from "@/components/landing/LandingHeader";
-import { PackageBuilder } from "@/components/landing/PackageBuilder";
 import { Pricing } from "@/components/landing/Pricing";
-import { ProblemSection } from "@/components/landing/ProblemSection";
 import { ScrollProgress } from "@/components/landing/ScrollProgress";
-import { SocialProof } from "@/components/landing/SocialProof";
-import { SolutionIntro } from "@/components/landing/SolutionIntro";
 
+/**
+ * Лендинг.
+ *
+ * Разделов стало вдвое меньше — было тринадцать. Тринадцать разделов не читает
+ * никто: человек долистывает до середины, теряет нить и уходит, так и не
+ * добравшись до тарифов. Убраны те, что пересказывали друг друга: перечень
+ * возможностей повторял показ возможностей, «до и после» повторял раздел про
+ * потерянное время, а блок с отзывами стоял с заготовками вместо цитат —
+ * выдуманные отзывы публиковать нельзя, а настоящих пока нет.
+ *
+ * Порядок держится на одном вопросе за раз:
+ *
+ *   что это           → первый экран
+ *   что оно делает    → бенто-сетка
+ *   покажи            → показ возможностей, генерация пакета
+ *   как начать        → три шага
+ *   это про меня?     → кому подходит
+ *   сколько           → тарифы
+ *   а если…           → вопросы
+ *   ну хорошо         → последний экран
+ *
+ * ТОН РАЗДЕЛОВ ЧЕРЕДУЕТСЯ, и это единственная роскошь, которую страница себе
+ * позволяет. Тёмных полей три: входное (первый экран вместе с бегущей строкой
+ * читается как одно), генерация пакета и последнее. Первое и последнее работают
+ * скобками вокруг светлой середины, где объясняют; среднее — единственная
+ * остановка внутри неё, и стоит оно там, где показывают главное действие
+ * продукта. Четвёртое сломало бы приём: страница стала бы полосатой.
+ */
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-bg">
@@ -28,62 +51,45 @@ export default function LandingPage() {
       <LandingHeader />
 
       <main>
+        {/* Что это */}
         <Hero />
         <DocumentMarquee />
 
-        {/* 01 — где уходит время */}
-        <ProblemSection />
+        {/* Что оно делает */}
+        <Bento />
 
-        {/* 02 — до и после, перетаскиванием */}
-        <ComparisonSlider />
-
-        {/* 03 — что такое Алетейя */}
-        <SolutionIntro />
-
-        {/* 04 — подготовка и выпуск документов */}
+        {/* Покажи */}
         <FeatureShowcase
-          id="features"
-          index="04"
+          id="production"
           eyebrow="Подготовка документов"
           title="Пять инструментов для выпуска документов"
-          description="Демонстрации ниже показывают реальные экраны продукта."
+          description="Ниже — настоящие экраны продукта, а не рисунки к ним."
           features={PRODUCTION_FEATURES}
         />
 
-        {/* 05 — кинематографичная генерация пакета */}
         <GenerationShowcase />
 
-        {/* 06 — анализ, проверка и правовая позиция */}
         <FeatureShowcase
           id="analysis"
-          index="06"
           eyebrow="Анализ и проверка"
           title="Четыре инструмента для работы с чужими документами"
           description="Разбор по пунктам, судебная практика и проверка сразу нескольких договоров."
           features={ANALYSIS_FEATURES}
         />
 
-        {/* 07 — полный перечень возможностей */}
-        <CapabilityIndex />
-
-        {/* 08 — расчёт на своём объёме */}
-        <PackageBuilder />
-
-        {/* 09 — кому подходит */}
-        <Audience />
-
-        {/* 10 — как это работает */}
+        {/* Как начать */}
         <HowItWorks />
 
-        {/* 11 — показатели и отзывы */}
-        <SocialProof />
+        {/* Это про меня? */}
+        <Audience />
 
-        {/* 12 — тарифы */}
+        {/* Сколько */}
         <Pricing />
 
-        {/* 13 — вопросы */}
+        {/* А если… */}
         <FAQ />
 
+        {/* Ну хорошо */}
         <FinalCTA />
       </main>
 

@@ -36,22 +36,22 @@ const COLUMNS = [
 
 export function LandingFooter() {
   return (
-    <footer className="bg-bg">
-      <div className="mx-auto max-w-6xl px-6 py-14">
+    <footer className="border-t border-line bg-surface">
+      <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-5">
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 items-center justify-center rounded bg-inverse text-body font-medium text-inverse-fg">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-inverse text-body font-medium text-inverse-fg">
                 А
               </span>
-              <span className="text-body font-medium text-fg">
+              <span className="text-body-lg font-medium tracking-tight text-fg">
                 Алетейя
               </span>
             </Link>
 
             <p className="mt-4 max-w-[15rem] text-caption leading-relaxed text-fg-subtle">
-              Рабочее пространство для дел и документов. Проверяет реквизиты
-              до генерации, а не после.
+              Рабочее пространство для дел и документов. Показывает ошибку в
+              реквизитах до генерации, а не после.
             </p>
           </div>
 

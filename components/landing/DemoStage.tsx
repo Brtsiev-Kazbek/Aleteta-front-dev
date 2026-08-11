@@ -24,14 +24,14 @@ export function DemoStage({
   return (
     <div
       className={cn(
-        "relative rounded-2xl border border-line/80 bg-gradient-to-b from-surface to-bg/60 p-2.5 sm:p-3.5",
+        "relative rounded-3xl border border-line/80 bg-gradient-to-b from-surface to-bg/60 p-2.5 sm:p-3.5",
         className
       )}
     >
       {/* Сетка под демонстрацией: гаснет к краям, чтобы не спорить с контентом. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl"
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl"
       >
         <div className="absolute inset-0 bg-grid opacity-[0.35] mask-fade-b" />
       </div>

@@ -1,104 +1,198 @@
 "use client";
 
-import { useRef, type MouseEvent } from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { FileUp, ScanText, Sparkles } from "lucide-react";
 
-import { Reveal } from "@/components/landing/Reveal";
+import { SectionShell } from "@/components/landing/SectionShell";
+
+/**
+ * Три шага — весь продукт.
+ *
+ * Сложные продукты продаются простым объяснением: человек должен за десять
+ * секунд понять, что от него потребуется. Три шага — предел, который читают до
+ * конца; на пятом бросают.
+ *
+ * Внутри каждого шага стоит не иконка ради иконки, а маленькая сцена из
+ * настоящего интерфейса: строка файла с состоянием распознавания, карточка
+ * реквизитов, список готовых документов. Иллюстрация, повторяющая то, что
+ * человек увидит после входа, работает как обещание, которое можно проверить.
+ */
 
 const STEPS = [
   {
-    number: "01",
-    title: "Загрузите документы",
-    text: "Уставы, паспорта, выписки, счета. Система распознаёт текст и вытаскивает реквизиты в структурированный вид.",
+    icon: FileUp,
+    title: "Загрузите файл",
+    text: "Скан, фотография, PDF. Хоть на сто девятнадцать страниц — читается волнами, ничего не теряется.",
+    scene: <UploadScene />,
   },
   {
-    number: "02",
-    title: "Проверьте матрицу",
-    text: "Объекты сведены в таблицу. Незаполненные и некорректные реквизиты отмечены — их видно до генерации.",
+    icon: ScanText,
+    title: "Реквизиты вынимаются сами",
+    text: "Кадастровый номер, ИНН, адрес, даты. То, в чём модель не уверена, помечается — проверить нужно три поля, а не сорок.",
+    scene: <ExtractScene />,
   },
   {
-    number: "03",
-    title: "Соберите пакет",
-    text: "По каждому объекту формируется комплект документов из ваших шаблонов с подставленными значениями.",
+    icon: Sparkles,
+    title: "Пакет готовится по вашим шаблонам",
+    text: "Договор, акт и заявление — на основе карточки объекта. Что попадёт в документ, видно до выпуска, а не после.",
+    scene: <PackageScene />,
   },
 ];
 
 export function HowItWorks() {
   const reduceMotion = useReducedMotion();
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Мягкий световой круг, следующий за курсором.
-  const x = useMotionValue(-400);
-  const y = useMotionValue(-400);
-  const springX = useSpring(x, { stiffness: 120, damping: 24 });
-  const springY = useSpring(y, { stiffness: 120, damping: 24 });
-
-  function handleMove(event: MouseEvent<HTMLElement>) {
-    if (reduceMotion) return;
-    const rect = sectionRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    x.set(event.clientX - rect.left);
-    y.set(event.clientY - rect.top);
-  }
 
   return (
-    <section
+    <SectionShell
       id="how"
-      ref={sectionRef}
-      onMouseMove={handleMove}
-      className="grain relative overflow-hidden border-b border-inverse-line bg-inverse"
+      eyebrow="Как это работает"
+      title="Три шага от скана до пакета документов"
+      lead="Никаких настроек, интеграций и обучения. Всё, что нужно, — файл."
     >
-      {/* Свет за курсором */}
-      {!reduceMotion && (
-        <motion.div
-          aria-hidden
-          style={{ left: springX, top: springY }}
-          className="pointer-events-none absolute z-0 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-70"
-        >
-          <div className="h-full w-full rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.16),transparent_65%)]" />
-        </motion.div>
-      )}
-
-      <div className="relative z-10 mx-auto max-w-6xl px-6 py-20">
-        <Reveal>
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-label tabular-nums text-brand">
-              10
+      <div className="grid gap-5 lg:grid-cols-3">
+        {STEPS.map((step, index) => (
+          <motion.article
+            key={step.title}
+            initial={reduceMotion ? undefined : { opacity: 0, y: 24 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{
+              duration: 0.55,
+              delay: index * 0.08,
+              ease: [0.22, 0.61, 0.36, 1],
+            }}
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-bg p-7 transition-colors duration-300 hover:border-line-strong"
+          >
+            <span className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-fg text-inverse-fg">
+                <step.icon className="h-4 w-4" />
+              </span>
+              <span className="font-mono text-label uppercase text-fg-faint">
+                Шаг {index + 1}
+              </span>
             </span>
-            <span className="h-px w-8 bg-inverse-3" />
-            <span className="font-mono text-label uppercase text-fg-subtle">
-              Как это работает
-            </span>
-          </div>
 
-          <h2 className="mt-5 max-w-2xl text-display font-medium leading-[1.15] text-inverse-fg sm:text-display-lg">
-            От папки со сканами до готового пакета — три шага
-          </h2>
-        </Reveal>
+            <h3 className="mt-6 text-title font-medium text-fg">{step.title}</h3>
+            <p className="mt-3 text-body leading-relaxed text-fg-subtle">
+              {step.text}
+            </p>
 
-        <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden rounded-lg bg-inverse-3 md:grid-cols-3">
-          {STEPS.map((step, index) => (
-            <Reveal key={step.number} delay={index * 0.12}>
-              <motion.div
-                whileHover={{ backgroundColor: "rgb(24 24 27)" }}
-                transition={{ duration: 0.25 }}
-                className="flex h-full flex-col bg-inverse p-7 lg:p-8"
-              >
-                <span className="font-mono text-label tabular-nums text-brand">
-                  {step.number}
-                </span>
+            <div className="mt-8 flex-1">{step.scene}</div>
+          </motion.article>
+        ))}
+      </div>
+    </SectionShell>
+  );
+}
 
-                <h3 className="mt-5 text-title-sm font-medium text-inverse-fg">
-                  {step.title}
-                </h3>
-                <p className="mt-3 text-body leading-relaxed text-fg-faint">
-                  {step.text}
-                </p>
-              </motion.div>
-            </Reveal>
-          ))}
+/* ------------------------------------------------------------------ */
+/*  СЦЕНЫ                                                              */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Сцены нарочно статичны и минимальны. Их работа — узнаваемость: человек,
+ * дошедший до продукта, должен увидеть ровно то, что ему обещали. Анимация
+ * здесь только отвлекала бы от заголовка, ради которого блок и существует.
+ */
+
+function Frame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-line bg-surface">
+      {children}
+    </div>
+  );
+}
+
+function UploadScene() {
+  return (
+    <Frame>
+      <div className="flex items-center gap-2.5 border-b border-line px-3.5 py-3">
+        <span className="h-6 w-5 shrink-0 rounded-sm bg-surface-3" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-body-sm text-fg">
+            Выписка_ЕГРН.pdf
+          </span>
+          <span className="mt-0.5 block font-mono text-label uppercase text-fg-faint">
+            6,4 МБ · 10 страниц
+          </span>
+        </span>
+      </div>
+
+      <div className="px-3.5 py-3">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-label uppercase text-fg-faint">
+            Распознаётся
+          </span>
+          <span className="font-mono text-label tabular-nums text-fg-subtle">
+            7 / 10
+          </span>
+        </div>
+        <div className="mt-2 h-1 overflow-hidden rounded-full bg-surface-3">
+          <div className="h-full w-[70%] rounded-full bg-fg" />
         </div>
       </div>
-    </section>
+    </Frame>
+  );
+}
+
+function ExtractScene() {
+  const fields = [
+    { label: "Кадастровый номер", value: "15:09:0000000:0000", sure: true },
+    { label: "Площадь", value: "440 кв.м.", sure: true },
+    { label: "Правообладатель", value: "Брциев К. Р.", sure: false },
+  ];
+
+  return (
+    <Frame>
+      <div className="divide-y divide-line">
+        {fields.map((field) => (
+          <div
+            key={field.label}
+            className="flex items-center justify-between gap-3 px-3.5 py-2.5"
+          >
+            <span className="shrink-0 text-label text-fg-faint">
+              {field.label}
+            </span>
+            <span
+              className={
+                field.sure
+                  ? "truncate text-body-sm text-fg"
+                  : "truncate rounded bg-warn-bg px-1.5 py-0.5 text-body-sm text-warn-fg"
+              }
+            >
+              {field.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
+function PackageScene() {
+  const documents = [
+    "Договор купли-продажи",
+    "Акт приёма-передачи",
+    "Заявление в Росреестр",
+  ];
+
+  return (
+    <Frame>
+      <div className="divide-y divide-line">
+        {documents.map((name) => (
+          <div key={name} className="flex items-center gap-2.5 px-3.5 py-2.5">
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-ok-bg">
+              <span className="h-1.5 w-1.5 rounded-full bg-ok" />
+            </span>
+            <span className="min-w-0 flex-1 truncate text-body-sm text-fg">
+              {name}
+            </span>
+            <span className="shrink-0 font-mono text-label uppercase text-fg-faint">
+              DOCX
+            </span>
+          </div>
+        ))}
+      </div>
+    </Frame>
   );
 }

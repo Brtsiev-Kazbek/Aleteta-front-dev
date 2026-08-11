@@ -237,7 +237,7 @@ export function FreeformDemo() {
                 <span className="text-label text-fg-soft">
                   Шаблон найден:{" "}
                   <span className="text-fg">{scenario.templateName}</span>{" "}
-                  — реквизиты подставлены
+                  — по данным дела
                 </span>
               ) : (
                 <span className="text-label text-fg-soft">

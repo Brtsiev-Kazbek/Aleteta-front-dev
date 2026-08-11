@@ -70,27 +70,23 @@ export function GenerationShowcase() {
   const progress = (ready / OUTPUT.length) * 100;
 
   return (
-    <section className="grain relative overflow-hidden border-b border-inverse-line bg-inverse">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-grid-dark opacity-60"
-      />
+    <section className="grain relative overflow-hidden bg-inverse">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="mesh-dark absolute inset-0 opacity-60" />
+        <div className="bg-grid-dark absolute inset-0 opacity-50" />
+      </div>
 
-      <div className="relative mx-auto max-w-6xl px-6 py-20">
+      <div className="relative mx-auto max-w-6xl px-6 py-24 sm:py-32">
         <Reveal>
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-label tabular-nums text-brand">
-              05
-            </span>
-            <span className="h-px w-8 bg-inverse-3" />
-            <span className="font-mono text-label uppercase text-fg-subtle">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="font-mono text-label uppercase text-brand-line/70">
               Генерация пакета
             </span>
-          </div>
 
-          <h2 className="mt-5 max-w-2xl text-display font-medium leading-[1.15] text-inverse-fg sm:text-display-lg">
-            Четыре объекта — десять документов. Одно нажатие.
-          </h2>
+            <h2 className="mt-4 text-section font-medium text-inverse-fg">
+              Четыре объекта — десять документов. Одно нажатие.
+            </h2>
+          </div>
         </Reveal>
 
         <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -270,9 +266,9 @@ export function GenerationShowcase() {
                   exit={{ opacity: 0 }}
                   className="mt-4 text-caption leading-relaxed text-fg-subtle"
                 >
-                  Реквизиты подставлены из карточек объектов. Значения не
-                  сочиняются заново — поэтому расхождений между документами
-                  пакета не возникает.
+                  Значения взяты из проверенных карточек объектов и не сочиняются
+                  заново — поэтому расхождений между документами пакета не
+                  возникает.
                 </motion.p>
               )}
             </AnimatePresence>

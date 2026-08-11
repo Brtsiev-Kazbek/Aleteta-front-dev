@@ -2,189 +2,169 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, Check } from "lucide-react";
 
-import { cn } from "@/lib/utils";
-import { MagneticLink } from "@/components/landing/MagneticLink";
 import { ProductPreview } from "@/components/landing/ProductPreview";
 
-/** Последние два куска идут акцентом: в них и заключено обещание продукта. */
+/**
+ * Первый экран.
+ *
+ * Здесь решается всё: у страницы примерно пять секунд, чтобы объяснить, что это
+ * и зачем. Отсюда устройство кадра — оно намеренно повторяет приём, которым
+ * пользуются те, у кого это получается лучше всех.
+ *
+ * ОДНО ОБЕЩАНИЕ, НАБРАННОЕ КРУПНО. Заголовок занимает половину экрана и говорит
+ * одну вещь. Не три преимущества через запятую, не список возможностей — одно
+ * предложение, которое человек дочитает до конца. Всё остальное ниже.
+ *
+ * ПРОДУКТ В КАДРЕ, А НЕ ИЛЛЮСТРАЦИЯ. Под заголовком стоит настоящий интерфейс,
+ * крупно и с тенью, как предмет, положенный на страницу. Абстрактные картинки
+ * из фотостока в деловом продукте работают против него: они говорят «нам нечего
+ * показать».
+ *
+ * ТЁМНЫЙ ФОН СО СВЕЧЕНИЕМ. Тёмное поле даёт светлому снимку интерфейса выступить
+ * вперёд — тот же приём, что у витрины с подсветкой. Свечение собрано из трёх
+ * пятен разного радиуса: одно читалось бы как виньетка и удешевляло кадр.
+ */
+
+/** Заголовок по строкам: последняя идёт градиентом — в ней и есть обещание. */
 const HEADLINE = [
-  { text: "Интеллектуальная", accent: false },
-  { text: "операционная", accent: false },
-  { text: "система", accent: false },
-  { text: "для ваших дел", accent: true },
-  { text: "и документов", accent: true },
+  { text: "Документы по делу —", accent: false },
+  { text: "без перепечатывания", accent: true },
 ];
 
-/** Только проверяемые утверждения о продукте. */
+/** Только проверяемое. Обещания, которых продукт не выполняет, тут дороже всего. */
 const FACTS = [
-  "Проверка реквизитов до генерации",
+  "Распознаёт сканы и PDF",
+  "Проверяет реквизиты до генерации",
   "Экспорт в DOCX",
-  "Работает в браузере",
 ];
 
 export function Hero() {
   const reduceMotion = useReducedMotion();
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Продукт «выпрямляется» по мере попадания в кадр.
+  /*
+   * Снимок продукта «встаёт» по мере подхода к нему. Приём старый и работает
+   * ровно потому, что почти незаметен: глаз ловит, что предмет объёмный, но
+   * движения не замечает.
+   */
   const { scrollYProgress } = useScroll({
     target: previewRef,
-    offset: ["start 0.9", "start 0.3"],
+    offset: ["start 0.95", "start 0.35"],
   });
-  const rotateX = useTransform(scrollYProgress, [0, 1], [12, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.92, 1]);
+  const rotateX = useTransform(scrollYProgress, [0, 1], [14, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
+  const lift = useTransform(scrollYProgress, [0, 1], [40, 0]);
+
+  const appear = (delay: number) =>
+    reduceMotion
+      ? {}
+      : {
+          initial: { opacity: 0, y: 22 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.7, delay, ease: [0.22, 0.61, 0.36, 1] },
+        };
 
   return (
-    <section className="grain relative overflow-hidden bg-inverse">
-      {/* Сетка и мягкое свечение */}
+    <section className="relative overflow-hidden bg-inverse">
+      {/* Свечение и зерно */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="animate-grid-pan absolute inset-0 bg-grid-dark" />
-
-        {/* Луч по сетке: движение ловится боковым зрением, читать не мешает. */}
-        <div className="absolute inset-y-0 left-0 w-[45%] overflow-hidden">
-          <div className="animate-sweep h-full w-1/3 bg-gradient-to-r from-transparent via-brand/[0.07] to-transparent blur-2xl" />
-        </div>
-
-        {/* Встречный слой свечения — пятно перестаёт ходить по одной дуге. */}
-        <div
-          className="aurora-drift-slow absolute inset-x-0 top-0 h-[40rem]"
-          style={{
-            backgroundImage:
-              "radial-gradient(32rem 20rem at 68% 4%, rgba(99,102,241,0.14), transparent 64%)",
-          }}
-        />
-        <div
-          className="aurora-drift absolute inset-x-0 top-0 h-[46rem]"
-          style={{
-            backgroundImage:
-              "radial-gradient(48rem 26rem at 22% 6%, rgba(139,92,246,0.20), transparent 62%), radial-gradient(40rem 24rem at 82% 18%, rgba(217,119,6,0.10), transparent 62%)",
-          }}
-        />
-        {/* Переход к светлой части страницы */}
-        <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent to-inverse" />
+        <div className="mesh-dark absolute inset-0" />
+        <div className="bg-grid-dark absolute inset-0 opacity-[0.55]" />
+        {/* Растворение к низу: секция должна перетекать в следующую, а не обрываться. */}
+        <div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-b from-transparent to-inverse" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-6 pb-28 pt-32 sm:pt-40">
-        {/* Рубрика */}
-        <motion.div
-          initial={reduceMotion ? undefined : { opacity: 0 }}
-          animate={reduceMotion ? undefined : { opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center gap-3"
-        >
-          <span className="h-px w-8 bg-brand" />
-          <span className="font-mono text-label uppercase text-fg-faint">
-            Для юристов, кадровиков, бухгалтеров и вузов
+      <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-32 sm:pt-40 lg:pb-32">
+        {/* Пометка над заголовком */}
+        <motion.div {...appear(0)} className="flex justify-center">
+          <span className="glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-brand opacity-60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand" />
+            </span>
+            <span className="text-caption text-inverse-fg/70">
+              Распознавание уже работает — попробуйте на своём файле
+            </span>
           </span>
         </motion.div>
 
-        {/* Заголовок: слова проявляются по очереди */}
-        <h1 className="mt-7 max-w-4xl text-display-lg font-medium leading-[1.06] text-inverse-fg sm:text-display-lg">
-          {HEADLINE.map((chunk, index) => (
+        {/* Обещание */}
+        <h1 className="mx-auto mt-8 max-w-4xl text-center text-hero font-medium text-inverse-fg">
+          {HEADLINE.map((line, index) => (
             <motion.span
-              key={chunk.text}
-              initial={reduceMotion ? undefined : { opacity: 0, y: 26 }}
-              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.65,
-                delay: 0.12 + index * 0.07,
-                ease: [0.22, 0.61, 0.36, 1],
-              }}
-              className={cn(
-                "mr-[0.28em] inline-block",
-                chunk.accent && "text-gradient"
-              )}
+              key={line.text}
+              {...appear(0.08 + index * 0.09)}
+              className="block"
             >
-              {chunk.text}
+              {line.accent ? (
+                <span className="text-brand-gradient">{line.text}</span>
+              ) : (
+                line.text
+              )}
             </motion.span>
           ))}
         </h1>
 
         <motion.p
-          initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55 }}
-          className="mt-7 max-w-2xl text-title-sm leading-relaxed text-fg-faint"
+          {...appear(0.28)}
+          className="mx-auto mt-7 max-w-2xl text-center text-lead text-inverse-fg/55"
         >
-          Алетейя берёт на себя рутину: анализирует файлы, извлекает реквизиты,
-          помнит контекст каждой задачи и собирает сотни документов без ошибок
-          в данных.
+          Загрузите скан — Алетейя прочитает его и вынет реквизиты в карточку
+          объекта: кадастровый номер, ИНН, адрес, даты. Дальше вы работаете с
+          проверенными значениями, а не переносите их из PDF в шаблон руками.
         </motion.p>
 
+        {/* Действия */}
         <motion.div
-          initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.65 }}
-          className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center"
+          {...appear(0.36)}
+          className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
-          <MagneticLink
-            href="/auth/register"
-            className="group inline-flex h-11 items-center gap-2 rounded-md bg-surface px-6 text-body font-medium text-fg transition-colors hover:bg-surface-3"
-          >
-            Начать работу
-            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-          </MagneticLink>
-
           <Link
-            href="#features"
-            className="group inline-flex h-11 items-center px-1 text-body font-medium text-fg-ghost transition-colors hover:text-inverse-fg"
+            href="/auth/register"
+            className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-inverse-fg px-7 text-body font-medium text-inverse transition-transform duration-200 hover:scale-[1.02] sm:w-auto"
           >
-            <span className="border-b border-inverse-line pb-0.5 transition-colors group-hover:border-line-strong">
-              Посмотреть, как это работает
-            </span>
+            Начать бесплатно
+            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
           </Link>
 
-          <span className="font-mono text-label uppercase text-fg-soft sm:ml-2">
-            Без карты · Настройка не нужна
-          </span>
+          <Link
+            href="#product"
+            className="glass inline-flex h-12 w-full items-center justify-center rounded-full px-7 text-body font-medium text-inverse-fg transition-colors duration-200 hover:bg-inverse-fg/10 sm:w-auto"
+          >
+            Посмотреть, как работает
+          </Link>
         </motion.div>
 
+        {/* Проверяемые утверждения */}
         <motion.ul
-          initial={reduceMotion ? undefined : { opacity: 0 }}
-          animate={reduceMotion ? undefined : { opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-inverse-line pt-6"
+          {...appear(0.44)}
+          className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5"
         >
           {FACTS.map((fact) => (
             <li
               key={fact}
-              className="group flex items-center gap-2 font-mono text-label uppercase text-fg-subtle transition-colors hover:text-fg-ghost"
+              className="flex items-center gap-1.5 text-caption text-inverse-fg/45"
             >
-              <span
-                aria-hidden
-                className="h-1 w-1 rounded-full bg-brand/70 transition-colors group-hover:bg-brand"
-              />
+              <Check className="h-3.5 w-3.5 shrink-0 text-brand" strokeWidth={2.5} />
               {fact}
             </li>
           ))}
         </motion.ul>
 
-        {/* Продукт: светлая карточка на тёмном, наклон выпрямляется при скролле */}
-        <div ref={previewRef} className="mt-16" style={{ perspective: 1600 }}>
+        {/* Продукт */}
+        <div
+          id="product"
+          ref={previewRef}
+          className="mt-20 scroll-mt-24 [perspective:1800px] sm:mt-24"
+        >
           <motion.div
-            style={
-              reduceMotion
-                ? undefined
-                : { rotateX, scale, transformOrigin: "center top" }
-            }
-            className="relative"
+            style={reduceMotion ? undefined : { rotateX, scale, y: lift }}
+            className="product-shadow overflow-hidden rounded-2xl [transform-style:preserve-3d]"
           >
-            {/* Свечение под продуктом */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-x-10 -bottom-8 top-10 rounded-[2rem] bg-brand/20 blur-3xl"
-            />
-            <div className="relative">
-              <ProductPreview />
-            </div>
+            <ProductPreview />
           </motion.div>
         </div>
       </div>

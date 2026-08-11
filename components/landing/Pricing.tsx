@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
+import { Check } from "lucide-react";
 
-import { Reveal } from "@/components/landing/Reveal";
-import { SectionHeading } from "@/components/landing/SectionHeading";
+import { SectionShell } from "@/components/landing/SectionShell";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -75,129 +76,140 @@ const PLANS: Plan[] = [
   },
 ];
 
+/**
+ * Тарифы.
+ *
+ * Средний тариф тёмный и приподнят над соседями — приём столь же старый, сколь
+ * и надёжный: глазу нужно указать, что выбрать, иначе выбор из трёх равных
+ * откладывается навсегда.
+ *
+ * Карточки разнесены промежутком, а не сложены в бесшовное полотно: полотно
+ * читается как таблица, где тарифы сравнивают построчно, а сравнивать тут
+ * нечего — наборы возможностей разной длины.
+ */
 export function Pricing() {
-  return (
-    <section id="pricing" className="bg-bg">
-      <div className="mx-auto max-w-6xl px-6 py-20">
-        <SectionHeading
-          index="12"
-          eyebrow="Тарифы"
-          title="Начните бесплатно, платите когда увидите пользу"
-          description="Без привязки карты на старте. Отказаться можно в любой момент."
-        />
+  const reduceMotion = useReducedMotion();
 
-        <div className="mt-12 grid grid-cols-1 gap-px border border-line bg-surface-3 lg:grid-cols-3">
-          {PLANS.map((plan, index) => (
-            <Reveal key={plan.id} delay={index * 0.08}>
+  return (
+    <SectionShell
+      id="pricing"
+      eyebrow="Тарифы"
+      title="Начните бесплатно, платите когда увидите пользу"
+      lead="Без привязки карты на старте. Отказаться можно в любой момент."
+    >
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-center">
+        {PLANS.map((plan, index) => (
+          <motion.div
+            key={plan.id}
+            initial={reduceMotion ? undefined : { opacity: 0, y: 24 }}
+            whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{
+              duration: 0.55,
+              delay: index * 0.08,
+              ease: [0.22, 0.61, 0.36, 1],
+            }}
+            className={cn(
+              "relative flex h-full flex-col overflow-hidden rounded-3xl p-8",
+              plan.highlighted
+                ? "border border-inverse-line bg-inverse lg:py-11 lg:shadow-[0_40px_80px_-50px_rgb(var(--fg)/0.6)]"
+                : "border border-line bg-surface"
+            )}
+          >
+            {plan.highlighted && (
               <div
+                aria-hidden
+                className="mesh-dark pointer-events-none absolute inset-0 opacity-70"
+              />
+            )}
+
+            <div className="relative flex items-baseline justify-between gap-3">
+              <h3
                 className={cn(
-                  /*
-                    Тарифы сложены в сетку без промежутков, поэтому подъём
-                    карточки здесь неуместен — он разорвал бы полотно. Отклик
-                    даём заливкой: колонка под курсором чуть светлеет.
-                  */
-                  "group relative flex h-full flex-col p-7 transition-colors lg:p-8",
-                  plan.highlighted
-                    ? "bg-inverse"
-                    : "bg-surface hover:bg-bg/80"
+                  "text-title-sm font-medium",
+                  plan.highlighted ? "text-inverse-fg" : "text-fg"
                 )}
               >
-                {plan.highlighted && (
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent"
-                  />
+                {plan.name}
+              </h3>
+
+              {plan.highlighted && (
+                <span className="rounded-full bg-brand px-2.5 py-1 font-mono text-label uppercase text-brand-fg">
+                  Рекомендуем
+                </span>
+              )}
+            </div>
+
+            <p
+              className={cn(
+                "relative mt-2 text-body",
+                plan.highlighted ? "text-inverse-fg/55" : "text-fg-subtle"
+              )}
+            >
+              {plan.description}
+            </p>
+
+            <div className="relative mt-8 flex items-baseline gap-2">
+              <span
+                className={cn(
+                  "text-display font-medium tabular-nums",
+                  plan.highlighted ? "text-inverse-fg" : "text-fg"
                 )}
-                <div className="flex items-baseline justify-between gap-3">
-                  <h3
-                    className={cn(
-                      "text-body font-medium",
-                      plan.highlighted ? "text-inverse-fg" : "text-fg"
-                    )}
-                  >
-                    {plan.name}
-                  </h3>
-
-                  {plan.highlighted && (
-                    <span className="font-mono text-label uppercase text-brand">
-                      Рекомендуем
-                    </span>
-                  )}
-                </div>
-
-                <p
+              >
+                {plan.price}
+              </span>
+              {plan.period && (
+                <span
                   className={cn(
-                    "mt-1.5 text-caption",
-                    plan.highlighted ? "text-fg-faint" : "text-fg-subtle"
+                    "text-body",
+                    plan.highlighted ? "text-inverse-fg/45" : "text-fg-faint"
                   )}
                 >
-                  {plan.description}
-                </p>
+                  {plan.period}
+                </span>
+              )}
+            </div>
 
-                <div className="mt-7 flex items-baseline gap-2">
+            <Link
+              href="/auth/register"
+              className={cn(
+                "relative mt-7 inline-flex h-11 items-center justify-center rounded-full text-body font-medium transition-colors",
+                plan.highlighted
+                  ? "bg-inverse-fg text-inverse hover:bg-inverse-fg/90"
+                  : "border border-line bg-bg text-fg hover:bg-surface-2"
+              )}
+            >
+              {plan.cta}
+            </Link>
+
+            <ul className="relative mt-8 flex flex-1 flex-col gap-3">
+              {plan.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-2.5">
+                  <Check
+                    className={cn(
+                      "mt-0.5 h-3.5 w-3.5 shrink-0",
+                      plan.highlighted ? "text-brand-line" : "text-brand"
+                    )}
+                    strokeWidth={2.5}
+                  />
                   <span
                     className={cn(
-                      "font-mono text-display ",
-                      plan.highlighted ? "text-inverse-fg" : "text-fg"
+                      "text-body leading-snug",
+                      plan.highlighted ? "text-inverse-fg/70" : "text-fg-muted"
                     )}
                   >
-                    {plan.price}
+                    {feature}
                   </span>
-                  {plan.period && (
-                    <span
-                      className={cn(
-                        "text-caption",
-                        plan.highlighted ? "text-fg-subtle" : "text-fg-faint"
-                      )}
-                    >
-                      {plan.period}
-                    </span>
-                  )}
-                </div>
-
-                <ul
-                  className={cn(
-                    "mt-7 flex flex-1 flex-col divide-y border-y",
-                    plan.highlighted
-                      ? "divide-inverse-line border-inverse-line"
-                      : "divide-line-soft border-line-soft"
-                  )}
-                >
-                  {plan.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className={cn(
-                        "py-2.5 text-body",
-                        plan.highlighted ? "text-fg-ghost" : "text-fg-muted"
-                      )}
-                    >
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/auth/register"
-                  className={cn(
-                    "mt-7 inline-flex h-11 items-center justify-center rounded-md text-body font-medium transition-colors",
-                    plan.highlighted
-                      ? "bg-surface text-fg hover:bg-surface-2"
-                      : "border border-line text-fg hover:bg-bg"
-                  )}
-                >
-                  {plan.cta}
-                </Link>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal delay={0.25}>
-          <p className="mt-6 font-mono text-label uppercase text-fg-faint">
-            Данные дела можно выгрузить и удалить в любой момент
-          </p>
-        </Reveal>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        ))}
       </div>
-    </section>
+
+      <p className="mt-8 text-center text-caption text-fg-faint">
+        Данные дела можно выгрузить и удалить в любой момент
+      </p>
+    </SectionShell>
   );
 }

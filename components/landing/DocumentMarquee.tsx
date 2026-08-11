@@ -56,13 +56,12 @@ export function DocumentMarquee() {
   return (
     <section
       aria-label="Типы документов, которые формирует система"
-      className="border-b border-line bg-inverse pb-14 pt-2"
+      className="bg-inverse pb-16 pt-4"
     >
       <div className="mx-auto max-w-6xl px-6">
-        <div className="flex items-center gap-3">
-          <span className="h-px w-8 bg-inverse-3" />
-          <span className="font-mono text-label uppercase text-fg-subtle">
-            Что собирается автоматически
+        <div className="flex items-center justify-center gap-3">
+          <span className="font-mono text-label uppercase text-inverse-fg/35">
+            Документы, которые готовит Алетейя
           </span>
         </div>
       </div>
@@ -74,7 +73,7 @@ export function DocumentMarquee() {
       </div>
 
       <div className="mx-auto mt-7 max-w-6xl px-6">
-        <p className="max-w-xl text-body leading-relaxed text-fg-subtle">
+        <p className="mx-auto max-w-xl text-center text-body leading-relaxed text-inverse-fg/40">
           Список не закрытый: свои шаблоны и свои типы объектов добавляются без
           участия разработчиков.
         </p>

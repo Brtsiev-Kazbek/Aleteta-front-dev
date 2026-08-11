@@ -132,7 +132,7 @@ export default async function SettingsPage() {
                 id="organization"
                 icon={Building2}
                 title="Организация"
-                description="Реквизиты, которые подставляются в шаблоны документов."
+                description="Реквизиты, которые проверяются перед генерацией документов."
                 aside={
                   <span className="shrink-0 font-mono text-label uppercase text-fg-faint">
                     тариф: {settings.workspace.plan}

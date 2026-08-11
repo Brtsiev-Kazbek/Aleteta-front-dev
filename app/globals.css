@@ -348,6 +348,99 @@
     background-size: 56px 56px;
   }
 
+  /* ------------------------------------------------------------------ */
+  /*  ЛЕНДИНГ                                                            */
+  /* ------------------------------------------------------------------ */
+
+  /*
+   * Приёмы ниже живут только на маркетинговой странице. У неё другая работа:
+   * пять секунд, чтобы объяснить, что это и зачем. Интерфейс приложения к ним
+   * не притрагивается — там человек проводит рабочий день, и «эффектно» ему
+   * мешает.
+   */
+
+  /*
+   * Цветное свечение за тёмным героем.
+   *
+   * Три мягких пятна вместо одного: одно читается как виньетка и удешевляет
+   * кадр, три дают ощущение объёма. Радиусы намеренно разные — совпадающие
+   * складываются в правильную фигуру, и она сразу видна.
+   */
+  .mesh-dark {
+    background-image:
+      radial-gradient(48rem 30rem at 12% -8%, rgb(var(--brand) / 0.28), transparent 58%),
+      radial-gradient(36rem 26rem at 88% 4%, rgb(99 102 241 / 0.2), transparent 60%),
+      radial-gradient(40rem 24rem at 58% 40%, rgb(var(--brand) / 0.1), transparent 62%);
+  }
+
+  /* То же для светлых секций — вчетверо тише. */
+  .mesh-light {
+    background-image:
+      radial-gradient(42rem 26rem at 8% 0%, rgb(var(--brand) / 0.07), transparent 60%),
+      radial-gradient(34rem 22rem at 92% 12%, rgb(99 102 241 / 0.05), transparent 62%);
+  }
+
+  /*
+   * Стеклянная карточка. Держится на трёх вещах разом: полупрозрачная заливка,
+   * размытие подложки и светлая линия по верхней кромке — она и создаёт
+   * ощущение стекла, а не просто мутного прямоугольника.
+   */
+  .glass {
+    background-color: rgb(255 255 255 / 0.055);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgb(255 255 255 / 0.09);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.11),
+      0 24px 60px -30px rgb(0 0 0 / 0.7);
+  }
+
+  /* Стекло на светлом фоне. */
+  .glass-light {
+    background-color: rgb(255 255 255 / 0.72);
+    backdrop-filter: blur(16px) saturate(130%);
+    -webkit-backdrop-filter: blur(16px) saturate(130%);
+    border: 1px solid rgb(var(--fg) / 0.07);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.7),
+      0 20px 50px -28px rgb(var(--fg) / 0.28);
+  }
+
+  /*
+   * Обрамление продукта: широкая мягкая тень, из-за которой снимок интерфейса
+   * читается как предмет, лежащий на странице, а не как картинка в тексте.
+   */
+  .product-shadow {
+    box-shadow:
+      0 2px 6px -2px rgb(0 0 0 / 0.3),
+      0 30px 70px -24px rgb(0 0 0 / 0.55),
+      0 0 0 1px rgb(255 255 255 / 0.07);
+  }
+
+  /* Акцентный текст градиентом — ровно на одну фразу в заголовке. */
+  .text-brand-gradient {
+    background-image: linear-gradient(
+      104deg,
+      rgb(var(--brand-line)),
+      rgb(var(--brand)) 42%,
+      rgb(129 140 248)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Верхняя кромка секции — волосяная линия, растворяющаяся к краям. */
+  .edge-top {
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      rgb(var(--fg) / 0.1) 22%,
+      rgb(var(--fg) / 0.1) 78%,
+      transparent
+    );
+  }
+
   /*
    * Тень продуктовой панели — ровно та же, что под превью на лендинге.
    * Используется на всплывающих панелях приложения, чтобы они читались

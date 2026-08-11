@@ -156,7 +156,7 @@ export function BatchGenerationGrid({ caseId }: { caseId: string }) {
             Объекты дела
           </span>
           <span className="mt-1 text-body-sm text-fg-subtle">
-            Реквизиты подставляются в шаблоны при генерации пакета
+            Обязательные реквизиты проверяются до генерации пакета
           </span>
         </div>
 

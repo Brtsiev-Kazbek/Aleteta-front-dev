@@ -137,7 +137,8 @@ report(
  * ветка появилась позже остальных, и её высоту забыли бы не задать.
  */
 const ROW_BRANCHES = 7;
-const rowHeight = count(grid, "h-11") + count(grid, "h-[var(--row-h)]");
+const rowHeight =
+  count(grid, "h-row") + count(grid, "h-11") + count(grid, "h-[var(--row-h)]");
 report(
   rowHeight === ROW_BRANCHES,
   `высота строки задана во всех ${ROW_BRANCHES} ветках одинаково`,
@@ -206,6 +207,39 @@ report(
   textarea.includes("style.height"),
   "автовысота поля ввода на месте",
   "правка style.height — единственное, что растит его под текст"
+);
+
+/*
+ * Шкала кеглей известна `tailwind-merge`.
+ *
+ * Из-за чего страж. `cn("text-section", "text-fg")` без настройки возвращает
+ * один `text-fg`: библиотека не знает имени `section`, относит его к цвету
+ * текста и выбрасывает как конфликт. Заголовок молча теряет кегль — ни сборка,
+ * ни линтер об этом не скажут. Так съехали все заголовки, собранные через `cn`,
+ * и нашлось это на снимке, а не в коде.
+ *
+ * Страж сверяет два списка: ступени в конфиге Tailwind и ступени, перечисленные
+ * в `lib/utils.ts`. Новая ступень, забытая во втором списке, — та же ошибка
+ * заново.
+ */
+const tailwindConfig = await source("tailwind.config.ts");
+const utils = await source("lib/utils.ts");
+
+const fontSizeBlock = tailwindConfig.slice(
+  tailwindConfig.indexOf("fontSize: {"),
+  tailwindConfig.indexOf("fontFamily: {")
+);
+const steps = [...fontSizeBlock.matchAll(/^\s{8}"?([a-z-]+)"?:\s*\[/gm)].map(
+  (match) => match[1]
+);
+const missing = steps.filter((step) => !utils.includes(`"${step}"`));
+
+report(
+  steps.length >= 10 && missing.length === 0,
+  "шкала кеглей известна tailwind-merge",
+  missing.length
+    ? `нет в lib/utils.ts: ${missing.join(", ")} — эти классы будут молча съедены рядом с цветом`
+    : "не нашлись ступени в tailwind.config.ts — проверьте разбор"
 );
 
 /* ------------------------------------------------------------------ */
