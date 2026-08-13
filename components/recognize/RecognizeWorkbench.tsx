@@ -9,6 +9,7 @@ import {
   ChevronUp,
   Copy,
   Download,
+  FileDown,
   FileText,
   Loader2,
   PanelRightClose,
@@ -1234,6 +1235,20 @@ function TextPane({
             </IconButton>
             <IconButton title="Скачать текстом" onClick={handleDownload}>
               <Download className="h-3.5 w-3.5" />
+            </IconButton>
+            <IconButton
+              title="Скачать в Word"
+              onClick={() => {
+                /*
+                 * Обычная навигация, а не fetch с blob: файл собирается на
+                 * сервере и приходит с заголовком «сохранить как». Браузер сам
+                 * положит его в загрузки, а вкладке не надо держать в памяти
+                 * мегабайты.
+                 */
+                window.location.href = `/api/documents/${document.id}/docx`;
+              }}
+            >
+              <FileDown className="h-3.5 w-3.5" />
             </IconButton>
           </>
         )}

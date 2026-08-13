@@ -8,6 +8,7 @@ import {
   Check,
   Copy,
   Download,
+  FileDown,
   FileSearch,
   Loader2,
   ScanText,
@@ -179,6 +180,20 @@ export function RecognizedTextSheet({
                   </IconButton>
                   <IconButton title="Скачать текстом" onClick={handleDownload}>
                     <Download className="h-3.5 w-3.5" />
+                  </IconButton>
+                  <IconButton
+                    title="Скачать в Word"
+                    onClick={() => {
+                      /*
+                       * Обычная навигация, а не fetch с blob: файл собирается
+                       * на сервере и приходит с заголовком «сохранить как».
+                       * Браузер сам покажет его в загрузках, и вкладке не надо
+                       * держать в памяти мегабайты.
+                       */
+                      window.location.href = `/api/documents/${documentId}/docx`;
+                    }}
+                  >
+                    <FileDown className="h-3.5 w-3.5" />
                   </IconButton>
                 </>
               )}
