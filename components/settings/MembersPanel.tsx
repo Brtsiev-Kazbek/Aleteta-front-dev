@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Loader2, MailPlus, UserMinus, X } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import {
   cancelInviteAction,
   inviteMemberAction,
@@ -122,7 +123,7 @@ export function MembersPanel({
     setNotice(null);
 
     startTransition(async () => {
-      const result = await inviteMemberAction(email, role);
+      const result = await callAction(inviteMemberAction(email, role));
 
       if (!result.ok) {
         setError(result.error ?? "Не удалось отправить приглашение.");

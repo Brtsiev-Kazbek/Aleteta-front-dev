@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { signUpAction } from "@/app/actions/auth";
 import {
   FormError,
@@ -83,14 +84,14 @@ export function RegisterForm({
     setError(null);
 
     startTransition(async () => {
-      const result = await signUpAction({
+      const result = await callAction(signUpAction({
         fullName,
         email,
         password,
         jobTitle,
         workspaceName,
         next: nextPath,
-      });
+      }));
 
       if (!result.ok) {
         setError(result.error ?? "Не удалось зарегистрироваться.");

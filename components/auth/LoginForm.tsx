@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { signInAction } from "@/app/actions/auth";
 import {
   FormError,
@@ -60,7 +61,7 @@ export function LoginForm({
     setError(null);
 
     startTransition(async () => {
-      const result = await signInAction(email, password);
+      const result = await callAction(signInAction(email, password));
 
       if (!result.ok) {
         setError(result.error ?? "Не удалось войти.");

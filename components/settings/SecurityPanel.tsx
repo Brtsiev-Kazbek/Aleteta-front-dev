@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { changeEmailAction, changePasswordAction } from "@/app/actions/auth";
 import {
   FormError,
@@ -58,7 +59,7 @@ export function SecurityPanel({ email }: { email: string }) {
     setNotice(null);
 
     startTransition(async () => {
-      const result = await changePasswordAction(current, next);
+      const result = await callAction(changePasswordAction(current, next));
 
       if (!result.ok) {
         setError(result.error ?? "Не удалось сменить пароль.");
@@ -85,7 +86,7 @@ export function SecurityPanel({ email }: { email: string }) {
     setEmailNotice(null);
 
     startTransition(async () => {
-      const result = await changeEmailAction(newEmail);
+      const result = await callAction(changeEmailAction(newEmail));
 
       if (!result.ok) {
         setEmailFormError(result.error ?? "Не удалось сменить почту.");

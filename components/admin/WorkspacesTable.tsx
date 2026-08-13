@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Archive, ArchiveRestore, Loader2 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import {
   setWorkspaceArchivedAction,
   setWorkspacePlanAction,
@@ -198,7 +199,7 @@ function PlanSelect({
             const next = event.target.value;
             setError(null);
             startTransition(async () => {
-              const result = await setWorkspacePlanAction(workspaceId, next);
+              const result = await callAction(setWorkspacePlanAction(workspaceId, next));
               if (!result.ok) setError(result.error ?? "Не получилось.");
             });
           }}

@@ -46,8 +46,18 @@ export function ActionButton({
 
     setError(null);
     startTransition(async () => {
-      const result = await action();
-      if (!result.ok) setError(result.error ?? "Не получилось.");
+      /*
+       * Обрыв на пути к действию — обычное дело: сервер разработки
+       * перезапускается, вкладка спала, сеть моргнула. Без перехвата Next
+       * показывает «Unhandled Runtime Error: Failed to fetch» поверх всей
+       * страницы, хотя сказать нужно одно: не дошло, повторите.
+       */
+      try {
+        const result = await action();
+        if (!result.ok) setError(result.error ?? "Не получилось.");
+      } catch {
+        setError("Сервер не ответил. Повторите.");
+      }
     });
   }
 

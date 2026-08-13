@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 
+import { callAction } from "@/lib/actions/client";
 import { getUsageAction } from "@/app/actions/usage";
 import { MetaLabel } from "@/components/layout/PanelHeading";
 import { cn } from "@/lib/utils";
@@ -34,7 +35,7 @@ export function UsagePanel({ initial }: { initial: UsageReport }) {
 
   const choosePeriod = (days: number) => {
     startTransition(async () => {
-      const result = await getUsageAction(days);
+      const result = await callAction(getUsageAction(days));
 
       if (result.ok && result.data) {
         setReport(result.data);

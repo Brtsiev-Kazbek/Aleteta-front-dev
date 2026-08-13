@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -118,7 +119,7 @@ export function CaseDocumentsTab({ caseId }: { caseId: string }) {
   async function handleDownload(documentId: string) {
     if (!isBackedByDatabase) return;
 
-    const result = await createDocumentUrlAction(documentId);
+    const result = await callAction(createDocumentUrlAction(documentId));
     if (!result.ok || !result.data) {
       setSyncError(result.error ?? "Не удалось получить ссылку на файл.");
       return;

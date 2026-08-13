@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { updatePasswordAction } from "@/app/actions/auth";
 import {
   FormError,
@@ -63,7 +64,7 @@ export function ResetPasswordForm({ hasSession }: { hasSession: boolean }) {
     setError(null);
 
     startTransition(async () => {
-      const result = await updatePasswordAction(password);
+      const result = await callAction(updatePasswordAction(password));
 
       if (!result.ok) {
         setError(result.error ?? "Не удалось сменить пароль.");

@@ -9,6 +9,8 @@ import {
 } from "@/app/actions/ai";
 import { createLogger, shortId } from "@/lib/logger";
 
+import { isPersistedId } from "@/lib/ids";
+
 import { createSync, isRemote } from "../sync";
 import type { RecognitionSlice, SliceCreator } from "../types";
 
@@ -75,12 +77,7 @@ const MAX_FAILURES = 3;
  * сервер про такой — гарантированная ошибка разбора uuid, причём повторяемая
  * бесконечно: состояние не меняется, а значит, наблюдатель не остановится.
  */
-const UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function isPersisted(id: string): boolean {
-  return UUID.test(id);
-}
+const isPersisted = isPersistedId;
 
 /** Наблюдатели по документам. Вне состояния: их надо гасить, а не рисовать. */
 interface Watcher {

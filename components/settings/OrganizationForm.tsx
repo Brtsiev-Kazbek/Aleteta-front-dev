@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { updateWorkspaceAction } from "@/app/actions/workspace";
 import { FormError, FormSuccess, TextField } from "@/components/auth/fields";
 import { Button } from "@/components/ui/button";
@@ -67,12 +68,12 @@ export function OrganizationForm({
     setSaved(false);
 
     startTransition(async () => {
-      const result = await updateWorkspaceAction({
+      const result = await callAction(updateWorkspaceAction({
         name,
         legalName,
         inn,
         address,
-      });
+      }));
 
       if (!result.ok) {
         setError(result.error ?? "Не удалось сохранить реквизиты.");

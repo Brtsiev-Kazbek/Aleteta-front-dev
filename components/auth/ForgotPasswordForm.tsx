@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { ArrowRight, Loader2, MailCheck } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { requestPasswordResetAction } from "@/app/actions/auth";
 import {
   FormError,
@@ -37,7 +38,7 @@ export function ForgotPasswordForm() {
     setError(null);
 
     startTransition(async () => {
-      const result = await requestPasswordResetAction(email);
+      const result = await callAction(requestPasswordResetAction(email));
       if (result.ok) setSent(true);
       else setError(result.error ?? "Не удалось отправить письмо.");
     });

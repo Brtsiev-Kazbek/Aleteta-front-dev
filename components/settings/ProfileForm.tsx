@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { updateProfileAction } from "@/app/actions/workspace";
 import { FormError, FormSuccess, TextField } from "@/components/auth/fields";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,7 @@ export function ProfileForm({
     setSaved(false);
 
     startTransition(async () => {
-      const result = await updateProfileAction({ fullName, jobTitle });
+      const result = await callAction(updateProfileAction({ fullName, jobTitle }));
 
       if (!result.ok) {
         setError(result.error ?? "Не удалось сохранить профиль.");

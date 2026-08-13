@@ -10,6 +10,7 @@ import {
   type ActionResult,
 } from "@/lib/actions/result";
 import { requireSession } from "@/lib/data/session";
+import { isPersistedId } from "@/lib/ids";
 import { createClient } from "@/lib/supabase/server";
 import { toDocument } from "@/lib/data/mappers";
 import { createLogger, shortId } from "@/lib/logger";
@@ -288,6 +289,15 @@ export async function createDocumentUrlAction(
   documentId: string
 ): Promise<ActionResult<string>> {
   try {
+    /*
+     * Отсекаем временный номер до похода в базу. Иначе Postgres отвечает
+     * «invalid input syntax for type uuid», и это доезжает до человека как
+     * непонятная внутренняя жалоба вместо объяснения.
+     */
+    if (!isPersistedId(documentId)) {
+      return actionFail("Файл ещё не сохранён — ссылки на него нет.");
+    }
+
     await requireSession();
     const supabase = createClient();
 

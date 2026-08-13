@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 
 import { createDocumentUrlAction } from "@/app/actions/documents";
+import { callAction } from "@/lib/actions/client";
+import { isPersistedId } from "@/lib/ids";
 import { cn } from "@/lib/utils";
 import { createLogger, shortId } from "@/lib/logger";
 
@@ -70,8 +72,27 @@ export function OriginalPane({
     setLocal(null);
     setError(null);
 
+    /*
+     * Встроенный набор живёт только во вкладке: его файлов в хранилище нет, а
+     * номера у них временные. Спрашивать по такому ссылку — гарантированный
+     * отказ разбора uuid, и он повторялся на каждый показанный документ.
+     */
+    if (!isPersistedId(documentId)) {
+      setError("Файл из встроенного набора — оригинала в хранилище нет.");
+      return;
+    }
+
     void (async () => {
-      const result = await createDocumentUrlAction(documentId);
+      /*
+       * Обрыв на пути к серверному действию — не исключительный случай:
+       * сервер разработки перезапускается, вкладка засыпает, сеть моргает.
+       * Без перехвата это всплывает как «Unhandled Runtime Error: Failed to
+       * fetch» поверх всей страницы, хотя починить нужно одну панель.
+       */
+      const result = await callAction(
+        createDocumentUrlAction(documentId),
+        "Сервер не ответил. Обновите страницу."
+      );
 
       if (cancelled) return;
 

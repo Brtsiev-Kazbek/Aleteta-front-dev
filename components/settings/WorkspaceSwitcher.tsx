@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Loader2 } from "lucide-react";
 
+import { callAction } from "@/lib/actions/client";
 import { switchWorkspaceAction } from "@/app/actions/workspace";
 import { cn } from "@/lib/utils";
 import type { WorkspaceRole } from "@/types/rows";
@@ -52,7 +53,7 @@ export function WorkspaceSwitcher({
               disabled={isCurrent || isPending}
               onClick={() =>
                 startTransition(async () => {
-                  const result = await switchWorkspaceAction(workspace.id);
+                  const result = await callAction(switchWorkspaceAction(workspace.id));
                   if (result.ok) {
                     // Дела и объекты читаются заново под новым пространством.
                     router.refresh();

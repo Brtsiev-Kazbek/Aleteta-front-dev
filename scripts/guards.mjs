@@ -211,6 +211,37 @@ report(
 );
 
 /*
+ * Вызов серверного действия обёрнут и переживает обрыв связи.
+ *
+ * Из-за чего страж. Серверное действие — запрос по сети. Он может не дойти:
+ * сервер разработки перезапустился, вкладка провисела ночь, сеть моргнула.
+ * Промис отклоняется с `TypeError: Failed to fetch`, и если его никто не ловит,
+ * Next закрывает всю страницу красным полотном с трассировкой по своим
+ * внутренностям. Экран при этом цел, повтор сработал бы — но человек видит
+ * «сломалось всё».
+ *
+ * Так и случилось: четырнадцать мест вызова, ни одного `catch`.
+ */
+const CALLERS = [
+  "components/auth/LoginForm.tsx",
+  "components/settings/MembersPanel.tsx",
+  "components/workspace/CaseDocumentsTab.tsx",
+  "components/recognize/OriginalPane.tsx",
+];
+const bare = [];
+for (const file of CALLERS) {
+  const text = await source(file);
+  /* `callAction` сама и есть обёртка — её вызов не в счёт. */
+  const naked = text.match(/await\s+([a-zA-Z][a-zA-Z0-9_]*Action)\(/g) ?? [];
+  if (naked.some((hit) => !hit.includes("callAction"))) bare.push(file);
+}
+report(
+  bare.length === 0,
+  "вызовы серверных действий обёрнуты в callAction",
+  `голый await доедет до человека красным полотном Next: ${bare.join(", ")}`
+);
+
+/*
  * Замыкание не уезжает из серверного компонента в клиентский.
  *
  * Из-за чего страж. `<ActionButton action={() => someAction()} />` выглядит
