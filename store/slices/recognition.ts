@@ -108,11 +108,48 @@ function stopWatching(documentId: string, reason: string): void {
 
 /** Дочитан ли документ: дальше следить не за чем. */
 function isSettled(state: RecognitionState): boolean {
-  return (
+  if (
     state.ocrStatus === "done" ||
     state.ocrStatus === "failed" ||
     state.ocrStatus === "skipped"
-  );
+  ) {
+    return true;
+  }
+
+  /*
+   * Задание кончилось, а документ остался в работе.
+   *
+   * Так бывает всегда, когда исполнителя убили на полпути: состояние документа
+   * пишет он сам, и, если его сняли по пределу ресурсов или отменили из
+   * админки, писать оказывается некому. Раньше наблюдатель смотрел только на
+   * документ, видел вечное `running` и спрашивал сервер раз в секунду до конца
+   * времён — восемь открытых файлов давали восемь запросов в секунду и ни одной
+   * подсказки человеку.
+   *
+   * Смерть задания — такой же конец работы, как и успех. Не назвать его концом
+   * значит обещать движение, которого не будет.
+   */
+  return state.job?.status === "failed" || state.job?.status === "cancelled";
+}
+
+/** Почему всё кончилось — фразой, которую можно показать человеку. */
+function settledReason(state: RecognitionState): string | null {
+  if (state.ocrStatus !== "running" && state.ocrStatus !== "pending") {
+    return null;
+  }
+
+  if (state.job?.status === "cancelled") {
+    return "Распознавание отменено.";
+  }
+
+  if (state.job?.status === "failed") {
+    return (
+      state.job.error?.trim() ||
+      "Исполнитель не справился с файлом. Попробуйте запустить распознавание заново."
+    );
+  }
+
+  return null;
 }
 
 /** Отпечаток состояния: изменился — значит, работа сдвинулась. */
@@ -211,9 +248,21 @@ export const createRecognitionSlice: SliceCreator<RecognitionSlice> = (
       log.info("watch.settled", {
         документ: shortId(documentId),
         состояние: result.data.ocrStatus,
+        задание: result.data.job?.status ?? "нет",
         страниц: result.data.pagesDone,
         источник: result.data.textSource,
       });
+
+      /*
+       * Если работа кончилась смертью задания, документ об этом ещё не знает.
+       * Говорим человеку сами: молчаливая остановка неотличима от зависания, а
+       * зависание он будет ждать.
+       */
+      const reason = settledReason(result.data);
+      if (reason) {
+        set({ syncError: `«${title(documentId)}»: ${reason}` });
+      }
+
       return;
     }
 
